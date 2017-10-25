@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.hydroh.yamibo.R;
 import com.hydroh.yamibo.model.Section;
 import com.hydroh.yamibo.ui.HomeActivity;
+import com.hydroh.yamibo.ui.ThreadActivity;
 
 import java.util.List;
 
@@ -88,9 +89,9 @@ public class SectionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     public void onClick(View v) {
                         int position = holder.getAdapterPosition();
                         Section section = mSectionList.get(position);
-                        Intent intent = new Intent(parent.getContext(), HomeActivity.class);
+                        Intent intent = new Intent(parent.getContext(), ThreadActivity.class);
                         intent.putExtra("url", section.getUrl());
-                        intent.putExtra("title", "贴子详情");
+                        intent.putExtra("title", section.getTitle());
                         parent.getContext().startActivity(intent);
                     }
                 });

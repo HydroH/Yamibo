@@ -4,7 +4,9 @@ import android.util.Log;
 
 import com.hydroh.yamibo.model.Section;
 
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.parser.Parser;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -23,8 +25,9 @@ public class HttpUtil {
             @Override
             public void run() {
                 try {
-                    org.jsoup.Connection conn = Jsoup.connect(url);
-                    conn.header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:32.0) Gecko/    20100101 Firefox/32.0");
+                    Connection conn = Jsoup.connect(url);
+                    conn.header("User-Agent",
+                            "Mozilla/5.0 (X11; Linux x86_64; rv:32.0) Gecko/    20100101 Firefox/32.0");
                     if (listener != null) {
                         listener.onFinish(conn.get());
                     }
