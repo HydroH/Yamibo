@@ -65,6 +65,7 @@ public class ObjectUtil {
                 image.attr("src", image.attr("abs:src"));
                 image.removeAttr("onmouseover");
                 image.removeAttr("initialized");
+                image.removeAttr("lazyloaded");
             }
             for (Element image : content.select("img.zoom")) {
                 String imgUrl = (image.attr("file").startsWith("http") ? "" : BASE_URL)
