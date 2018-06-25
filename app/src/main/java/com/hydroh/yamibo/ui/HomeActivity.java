@@ -3,33 +3,32 @@ package com.hydroh.yamibo.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.hydroh.yamibo.R;
-import com.hydroh.yamibo.model.Section;
-import com.hydroh.yamibo.ui.adaptor.SectionAdapter;
+import com.hydroh.yamibo.util.DocumentParser;
+import com.hydroh.yamibo.model.SectorGroup;
+import com.hydroh.yamibo.ui.adaptor.HomeAdapter;
+import com.hydroh.yamibo.util.CookieUtil;
 import com.hydroh.yamibo.util.HttpCallbackListener;
 import com.hydroh.yamibo.util.HttpUtil;
-import com.hydroh.yamibo.util.ObjectUtil;
 
-import org.jsoup.nodes.Document;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,16 +37,24 @@ import static android.content.ContentValues.TAG;
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    List<Section> sectionList;
-    String url;
     public static final String DEFAULT_URL = "http://bbs.yamibo.com/forum.php";
+    private List<SectorGroup> groupList;
+    private String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final SwipeRefreshLayout sectionRefresh = (SwipeRefreshLayout) findViewById(R.id.refresh_section);
+        sectionRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadHome(findViewById(R.id.refresh_section));
+            }
+        });
         setSupportActionBar(toolbar);
+        CookieUtil.getInstance().getCookiePreference(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -81,44 +88,51 @@ public class HomeActivity extends AppCompatActivity
 
         Log.d(TAG, "onCreate: URL: " + url);
 
-        loadSectionList(findViewById(R.id.hint_text));
-
+        loadHome(findViewById(R.id.hint_text));
     }
 
-    public void loadSectionList(View view) {
+    public void loadHome(View view) {
         Log.d(TAG, "refreshNetwork: URL: " + url);
 
-        TextView hintText = findViewById(R.id.hint_text);
-        hintText.setVisibility(View.INVISIBLE);
-        ProgressBar hintProgressBar = findViewById(R.id.hint_progressbar);
-        hintProgressBar.setVisibility(View.VISIBLE);
+        if (view.getId() == R.id.hint_text) {
+            TextView hintText = findViewById(R.id.hint_text);
+            hintText.setVisibility(View.GONE);
+            ProgressBar hintProgressBar = findViewById(R.id.hint_progressbar);
+            hintProgressBar.setVisibility(View.VISIBLE);
+        }
 
-        HttpUtil.getHtmlDocument(url, new HttpCallbackListener() {
+        HttpUtil.getHtmlDocument(url, true, new HttpCallbackListener() {
             @Override
-            public void onFinish(Document doc) {
-                sectionList = ObjectUtil.documentToSections(doc);
+            public void onFinish(DocumentParser docParser) {
+                groupList = docParser.toGroupList();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         ProgressBar hintProgressBar = findViewById(R.id.hint_progressbar);
-                        hintProgressBar.setVisibility(View.INVISIBLE);
+                        hintProgressBar.setVisibility(View.GONE);
                         RecyclerView recyclerView = findViewById(R.id.section_list);
+                        SwipeRefreshLayout sectionRefresh = findViewById(R.id.refresh_section);
+                        sectionRefresh.setRefreshing(false);
                         LinearLayoutManager layoutManager = new LinearLayoutManager(recyclerView.getContext());
                         recyclerView.setLayoutManager(layoutManager);
-                        SectionAdapter adapter = new SectionAdapter(sectionList);
+
+                        HomeAdapter adapter = new HomeAdapter(groupList);
                         recyclerView.setAdapter(adapter);
+                        adapter.expandAll();
+
                         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
                                 recyclerView.getContext(),
                                 layoutManager.getOrientation()
                         );
-                        recyclerView.addItemDecoration(dividerItemDecoration);
+                        if (recyclerView.getItemDecorationAt(0) == null) {
+                            recyclerView.addItemDecoration(dividerItemDecoration);
+                        }
                     }
                 });
             }
 
             @Override
             public void onError(Exception e) {
-                sectionList = new ArrayList<Section>();
                 e.printStackTrace();
                 runOnUiThread(new Runnable() {
                     @Override
@@ -126,11 +140,18 @@ public class HomeActivity extends AppCompatActivity
                         TextView hintText = findViewById(R.id.hint_text);
                         hintText.setVisibility(View.VISIBLE);
                         ProgressBar hintProgressBar = findViewById(R.id.hint_progressbar);
-                        hintProgressBar.setVisibility(View.INVISIBLE);
+                        hintProgressBar.setVisibility(View.GONE);
+                        SwipeRefreshLayout sectionRefresh = findViewById(R.id.refresh_section);
+                        sectionRefresh.setRefreshing(false);
                     }
                 });
             }
         });
+    }
+
+    public void startLoginActivity(View view) {
+        Intent intent = new Intent(view.getContext(), LoginActivity.class);
+        view.getContext().startActivity(intent);
     }
 
     @Override

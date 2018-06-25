@@ -21,6 +21,7 @@ public class ObjectUtil {
     public static List<String> imgUrlList;
 
     public static List<Section> documentToSections(Document doc) {
+        Log.d(TAG, "documentToPosts: HTML: " + doc.outerHtml());
         List<Section> sectionList = new ArrayList<Section>();
 
         Elements elements = doc.select("tbody tr td h2 a");
