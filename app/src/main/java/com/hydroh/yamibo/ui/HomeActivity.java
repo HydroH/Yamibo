@@ -2,9 +2,8 @@ package com.hydroh.yamibo.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -15,21 +14,19 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.chad.library.adapter.base.entity.MultiItemEntity;
 import com.hydroh.yamibo.R;
 import com.hydroh.yamibo.util.DocumentParser;
-import com.hydroh.yamibo.model.SectorGroup;
-import com.hydroh.yamibo.ui.adaptor.HomeAdapter;
+import com.hydroh.yamibo.ui.adapter.HomeAdapter;
 import com.hydroh.yamibo.util.CookieUtil;
 import com.hydroh.yamibo.util.HttpCallbackListener;
 import com.hydroh.yamibo.util.HttpUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
@@ -37,41 +34,32 @@ import static android.content.ContentValues.TAG;
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static final String DEFAULT_URL = "http://bbs.yamibo.com/forum.php";
-    private List<SectorGroup> groupList;
+    public static final String DEFAULT_URL = "forum.php";
+    private List<MultiItemEntity> homeItemList;
     private String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        final SwipeRefreshLayout sectionRefresh = (SwipeRefreshLayout) findViewById(R.id.refresh_section);
+        final SwipeRefreshLayout sectionRefresh = findViewById(R.id.refresh_common);
         sectionRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loadHome(findViewById(R.id.refresh_section));
+                loadHome(findViewById(R.id.refresh_common));
             }
         });
+        Toolbar toolbar = findViewById(R.id.nav_toolbar);
         setSupportActionBar(toolbar);
         CookieUtil.getInstance().getCookiePreference(this);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         Intent intent = getIntent();
@@ -101,22 +89,22 @@ public class HomeActivity extends AppCompatActivity
             hintProgressBar.setVisibility(View.VISIBLE);
         }
 
-        HttpUtil.getHtmlDocument(url, true, new HttpCallbackListener() {
+        HttpUtil.getHtmlDocument(url, false, new HttpCallbackListener() {
             @Override
             public void onFinish(DocumentParser docParser) {
-                groupList = docParser.toGroupList();
+                homeItemList = docParser.toHomeList();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         ProgressBar hintProgressBar = findViewById(R.id.hint_progressbar);
                         hintProgressBar.setVisibility(View.GONE);
-                        RecyclerView recyclerView = findViewById(R.id.section_list);
-                        SwipeRefreshLayout sectionRefresh = findViewById(R.id.refresh_section);
+                        RecyclerView recyclerView = findViewById(R.id.list_common);
+                        SwipeRefreshLayout sectionRefresh = findViewById(R.id.refresh_common);
                         sectionRefresh.setRefreshing(false);
                         LinearLayoutManager layoutManager = new LinearLayoutManager(recyclerView.getContext());
                         recyclerView.setLayoutManager(layoutManager);
 
-                        HomeAdapter adapter = new HomeAdapter(groupList);
+                        HomeAdapter adapter = new HomeAdapter(homeItemList);
                         recyclerView.setAdapter(adapter);
                         adapter.expandAll();
 
@@ -124,9 +112,11 @@ public class HomeActivity extends AppCompatActivity
                                 recyclerView.getContext(),
                                 layoutManager.getOrientation()
                         );
+                        dividerItemDecoration.setDrawable(ContextCompat.getDrawable(recyclerView.getContext(), R.drawable.divider_horizontal_thin));
                         if (recyclerView.getItemDecorationAt(0) == null) {
                             recyclerView.addItemDecoration(dividerItemDecoration);
                         }
+
                     }
                 });
             }
@@ -141,7 +131,7 @@ public class HomeActivity extends AppCompatActivity
                         hintText.setVisibility(View.VISIBLE);
                         ProgressBar hintProgressBar = findViewById(R.id.hint_progressbar);
                         hintProgressBar.setVisibility(View.GONE);
-                        SwipeRefreshLayout sectionRefresh = findViewById(R.id.refresh_section);
+                        SwipeRefreshLayout sectionRefresh = findViewById(R.id.refresh_common);
                         sectionRefresh.setRefreshing(false);
                     }
                 });
@@ -156,34 +146,12 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.home, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -206,7 +174,7 @@ public class HomeActivity extends AppCompatActivity
 
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

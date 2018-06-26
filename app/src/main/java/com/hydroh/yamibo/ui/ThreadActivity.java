@@ -23,7 +23,7 @@ import android.widget.TextView;
 import com.hydroh.yamibo.R;
 import com.hydroh.yamibo.util.DocumentParser;
 import com.hydroh.yamibo.model.Post;
-import com.hydroh.yamibo.ui.adaptor.PostAdapter;
+import com.hydroh.yamibo.ui.adapter.PostAdapter;
 import com.hydroh.yamibo.util.HttpCallbackListener;
 import com.hydroh.yamibo.util.HttpUtil;
 import com.hydroh.yamibo.util.ObjectUtil;
@@ -44,17 +44,8 @@ public class ThreadActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_thread);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.nav_toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -86,9 +77,9 @@ public class ThreadActivity extends AppCompatActivity
     public void loadPostList(View view) {
         Log.d(TAG, "refreshNetwork: URL: " + url);
 
-        TextView hintText = findViewById(R.id.hint_text_thread);
+        TextView hintText = findViewById(R.id.hint_text);
         hintText.setVisibility(View.GONE);
-        ProgressBar hintProgressBar = findViewById(R.id.hint_progressbar_thread);
+        ProgressBar hintProgressBar = findViewById(R.id.hint_progressbar);
         hintProgressBar.setVisibility(View.VISIBLE);
 
         HttpUtil.getHtmlDocument(url, false, new HttpCallbackListener() {
@@ -99,9 +90,9 @@ public class ThreadActivity extends AppCompatActivity
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        ProgressBar hintProgressBar = findViewById(R.id.hint_progressbar_thread);
+                        ProgressBar hintProgressBar = findViewById(R.id.hint_progressbar);
                         hintProgressBar.setVisibility(View.GONE);
-                        RecyclerView recyclerView = findViewById(R.id.post_list);
+                        RecyclerView recyclerView = findViewById(R.id.list_common);
                         LinearLayoutManager layoutManager = new LinearLayoutManager(recyclerView.getContext());
                         recyclerView.setLayoutManager(layoutManager);
                         PostAdapter adapter = new PostAdapter(postList, imgUrlList);
@@ -122,9 +113,9 @@ public class ThreadActivity extends AppCompatActivity
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        TextView hintText = findViewById(R.id.hint_text_thread);
+                        TextView hintText = findViewById(R.id.hint_text);
                         hintText.setVisibility(View.VISIBLE);
-                        ProgressBar hintProgressBar = findViewById(R.id.hint_progressbar_thread);
+                        ProgressBar hintProgressBar = findViewById(R.id.hint_progressbar);
                         hintProgressBar.setVisibility(View.GONE);
                     }
                 });
@@ -140,28 +131,6 @@ public class ThreadActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.thread, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

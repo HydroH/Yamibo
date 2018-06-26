@@ -2,8 +2,10 @@ package com.hydroh.yamibo.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -12,11 +14,16 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.hydroh.yamibo.R;
 import com.hydroh.yamibo.model.Thread;
+import com.hydroh.yamibo.ui.adapter.HomeAdapter;
+import com.hydroh.yamibo.util.DocumentParser;
+import com.hydroh.yamibo.util.HttpCallbackListener;
+import com.hydroh.yamibo.util.HttpUtil;
 
 import java.util.List;
 
@@ -32,17 +39,8 @@ public class SectorActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sector);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.nav_toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -63,7 +61,65 @@ public class SectorActivity extends AppCompatActivity
 
         Log.d(TAG, "onCreate: URL: " + url);
 
-        loadThreadList(findViewById(R.id.hint_text));
+        loadSector(findViewById(R.id.hint_text));
+    }
+
+    public void loadSector(View view) {
+        Log.d(TAG, "refreshNetwork: URL: " + url);
+
+        if (view.getId() == R.id.hint_text) {
+            TextView hintText = findViewById(R.id.hint_text);
+            hintText.setVisibility(View.GONE);
+            ProgressBar hintProgressBar = findViewById(R.id.hint_progressbar);
+            hintProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        HttpUtil.getHtmlDocument(url, false, new HttpCallbackListener() {
+            @Override
+            public void onFinish(DocumentParser docParser) {
+                threadList = docParser.toThreadList();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ProgressBar hintProgressBar = findViewById(R.id.hint_progressbar);
+                        hintProgressBar.setVisibility(View.GONE);
+                        RecyclerView recyclerView = findViewById(R.id.list_common);
+                        SwipeRefreshLayout sectionRefresh = findViewById(R.id.refresh_common);
+                        sectionRefresh.setRefreshing(false);
+                        LinearLayoutManager layoutManager = new LinearLayoutManager(recyclerView.getContext());
+                        recyclerView.setLayoutManager(layoutManager);
+
+                        HomeAdapter adapter = new HomeAdapter(threadList);
+                        recyclerView.setAdapter(adapter);
+                        adapter.expandAll();
+
+                        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+                                recyclerView.getContext(),
+                                layoutManager.getOrientation()
+                        );
+                        if (recyclerView.getItemDecorationAt(0) == null) {
+                            recyclerView.addItemDecoration(dividerItemDecoration);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        TextView hintText = findViewById(R.id.hint_text);
+                        hintText.setVisibility(View.VISIBLE);
+                        ProgressBar hintProgressBar = findViewById(R.id.hint_progressbar);
+                        hintProgressBar.setVisibility(View.GONE);
+                        SwipeRefreshLayout sectionRefresh = findViewById(R.id.refresh_common);
+                        sectionRefresh.setRefreshing(false);
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -74,28 +130,6 @@ public class SectorActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.sector, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

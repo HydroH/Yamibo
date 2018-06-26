@@ -15,6 +15,8 @@ import static android.content.ContentValues.TAG;
 
 
 public class HttpUtil {
+    public static final String BASE_URL = "http://bbs.yamibo.com/";
+
     private static final String UA_DESKTOP = "Mozilla/5.0 (X11; Linux x86_64; rv:32.0) Gecko/    20100101 Firefox/32.0";
     private static final String UA_MOBILE = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Mobile Safari/537.36";
 
@@ -23,17 +25,21 @@ public class HttpUtil {
             @Override
             public void run() {
                 try {
+                    String full_url = url;
+                    if (!url.startsWith("http")) {
+                        full_url = BASE_URL + url;
+                    }
                     Connection conn;
                     String ua = isMobile ? UA_MOBILE : UA_DESKTOP;
                     if (CookieUtil.getInstance().isCookieSet()){
                         Log.d(TAG, "run: Cookies loaded: " + CookieUtil.getInstance().getCookie());
-                        conn = Jsoup.connect(url).header("User-Agent", ua)
+                        conn = Jsoup.connect(full_url).header("User-Agent", ua)
                                 .cookies(CookieUtil.getInstance().getCookie());
                     } else {
-                        conn = Jsoup.connect(url).header("User-Agent", ua);
+                        conn = Jsoup.connect(full_url).header("User-Agent", ua);
                     }
                     if (listener != null) {
-                        listener.onFinish(new DocumentParser(conn.get()));
+                        listener.onFinish(new DocumentParser(conn.get(), isMobile));
                     }
                 } catch (Exception e) {
                     if (listener != null) {

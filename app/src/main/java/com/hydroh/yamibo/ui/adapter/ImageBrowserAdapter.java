@@ -1,4 +1,4 @@
-package com.hydroh.yamibo.ui.adaptor;
+package com.hydroh.yamibo.ui.adapter;
 
 
 import android.app.Activity;

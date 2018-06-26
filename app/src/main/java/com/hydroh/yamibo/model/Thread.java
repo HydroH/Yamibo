@@ -1,20 +1,31 @@
 package com.hydroh.yamibo.model;
 
-public class Thread {
+import com.chad.library.adapter.base.entity.MultiItemEntity;
+import com.hydroh.yamibo.ui.adapter.HomeAdapter;
+
+public class Thread implements MultiItemEntity {
     private String title;
+    private String tag;
     private String author;
     private int replyNum;
-    private boolean containsImage;
+    private String url;
 
-    public Thread(String title, String author, int replyNum, boolean containsImage) {
+    public Thread(String title, String tag, String author, int replyNum, String url) {
         this.title = title;
+        this.tag = tag;
         this.author = author;
         this.replyNum = replyNum;
-        this.containsImage = containsImage;
+        this.url = url;
     }
 
     public String getTitle() { return title; }
+    public String getTag() { return tag; }
     public String getAuthor() { return author; }
     public int getReplyNum() { return replyNum; }
-    public boolean isContainsImage() { return containsImage; }
+    public String getUrl() { return url; }
+
+    @Override
+    public int getItemType() {
+        return HomeAdapter.TYPE_THREAD;
+    }
 }

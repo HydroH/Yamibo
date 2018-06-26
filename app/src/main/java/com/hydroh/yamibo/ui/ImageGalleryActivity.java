@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.hydroh.yamibo.R;
-import com.hydroh.yamibo.ui.adaptor.ImageBrowserAdapter;
+import com.hydroh.yamibo.ui.adapter.ImageBrowserAdapter;
 
 import java.util.List;
 

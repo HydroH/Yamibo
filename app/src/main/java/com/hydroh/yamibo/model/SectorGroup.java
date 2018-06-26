@@ -2,9 +2,9 @@ package com.hydroh.yamibo.model;
 
 import com.chad.library.adapter.base.entity.AbstractExpandableItem;
 import com.chad.library.adapter.base.entity.MultiItemEntity;
-import com.hydroh.yamibo.ui.adaptor.HomeAdapter;
+import com.hydroh.yamibo.ui.adapter.HomeAdapter;
 
-public class SectorGroup extends AbstractExpandableItem<Sector> implements MultiItemEntity {
+public class SectorGroup extends AbstractExpandableItem<MultiItemEntity> implements MultiItemEntity {
     private String title;
 
     public SectorGroup(String title) {
