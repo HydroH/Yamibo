@@ -1,5 +1,6 @@
 package com.hydroh.yamibo.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +16,7 @@ import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
-public class ImageGalleryActivity extends AppCompatActivity {
+public class ImageGalleryActivity extends Activity {
 
     ViewPager imageBrowserPager;
 
@@ -35,7 +36,7 @@ public class ImageGalleryActivity extends AppCompatActivity {
 
         int position = urlList.indexOf(url);
         adapter = new ImageBrowserAdapter(this, urlList);
-        imageBrowserPager = (ViewPager) findViewById(R.id.image_viewpager);
+        imageBrowserPager = findViewById(R.id.image_viewpager);
         imageBrowserPager.setAdapter(adapter);
         final int size = urlList.size();
         final Context context = this;

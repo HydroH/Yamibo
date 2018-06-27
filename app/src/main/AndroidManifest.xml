@@ -27,22 +27,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.ThreadActivity"
+            android:name=".ui.PostActivity"
             android:label="@string/title_activity_thread"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".ui.ImageGalleryActivity" />
         <activity
             android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login" />
-        <activity
-            android:name=".ui.SectorActivity"
-            android:label="@string/title_activity_sector"
-            android:parentActivityName=".ui.HomeActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.hydroh.yamibo.ui.HomeActivity" />
-        </activity>
     </application>
 
 </manifest>

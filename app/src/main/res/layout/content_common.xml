@@ -10,7 +10,6 @@
         android:id="@+id/hint_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="loadHome"
         android:paddingBottom="6dp"
         android:paddingTop="6dp"
         android:text="@string/network_error_hint"

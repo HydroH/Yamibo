@@ -42,6 +42,7 @@ public class HomeActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
         final SwipeRefreshLayout sectionRefresh = findViewById(R.id.refresh_common);
         sectionRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -49,6 +50,7 @@ public class HomeActivity extends AppCompatActivity
                 loadHome(findViewById(R.id.refresh_common));
             }
         });
+
         Toolbar toolbar = findViewById(R.id.nav_toolbar);
         setSupportActionBar(toolbar);
         CookieUtil.getInstance().getCookiePreference(this);
@@ -92,7 +94,7 @@ public class HomeActivity extends AppCompatActivity
         HttpUtil.getHtmlDocument(url, false, new HttpCallbackListener() {
             @Override
             public void onFinish(DocumentParser docParser) {
-                homeItemList = docParser.toHomeList();
+                homeItemList = docParser.parseHome();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -107,6 +109,7 @@ public class HomeActivity extends AppCompatActivity
                         HomeAdapter adapter = new HomeAdapter(homeItemList);
                         recyclerView.setAdapter(adapter);
                         adapter.expandAll();
+                        adapter.collapseSticky();
 
                         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
                                 recyclerView.getContext(),
@@ -127,6 +130,11 @@ public class HomeActivity extends AppCompatActivity
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        RecyclerView recyclerView = findViewById(R.id.list_common);
+                        HomeAdapter adapter = (HomeAdapter) recyclerView.getAdapter();
+                        if (adapter != null) {
+                            adapter.clear();
+                        }
                         TextView hintText = findViewById(R.id.hint_text);
                         hintText.setVisibility(View.VISIBLE);
                         ProgressBar hintProgressBar = findViewById(R.id.hint_progressbar);

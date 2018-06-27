@@ -10,7 +10,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="?android:attr/selectableItemBackground">
 
         <TextView
             android:id="@+id/sector_title"
@@ -33,10 +34,12 @@
             android:background="@drawable/notification_round_rect"
             android:gravity="center"
             android:minWidth="22dp"
-            android:paddingLeft="2dp"
-            android:paddingRight="2dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:paddingStart="3dp"
+            android:paddingEnd="3dp"
             android:textColor="@android:color/white"
-            android:textSize="14sp"
+            android:textSize="12sp"
             tools:text="100"/>
 
         <TextView

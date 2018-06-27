@@ -1,10 +1,12 @@
 package com.hydroh.yamibo.util;
 
+import android.util.Log;
+
 import com.chad.library.adapter.base.entity.MultiItemEntity;
 import com.hydroh.yamibo.model.Post;
+import com.hydroh.yamibo.model.Reply;
 import com.hydroh.yamibo.model.Sector;
 import com.hydroh.yamibo.model.SectorGroup;
-import com.hydroh.yamibo.model.Thread;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -13,16 +15,22 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.ContentValues.TAG;
+
 public class DocumentParser {
     private Document doc;
     private boolean isMobile;
+    private List<String> imgUrlList;
 
     public DocumentParser(Document doc, boolean isMobile) {
         this.doc = doc;
         this.isMobile = isMobile;
     }
 
-    public List<MultiItemEntity> toHomeList() {
+    public List<MultiItemEntity> parseHome() {
+        if (isMobile) {
+            throw new RuntimeException("Incompatible viewport!");
+        }
         List<MultiItemEntity> groupList = new ArrayList<>();
         Elements elemGroupHeads = doc.select("div.bm.bmw div.bm_h.cl");
         for (Element elemGroupHead : elemGroupHeads) {
@@ -50,57 +58,94 @@ public class DocumentParser {
             groupList.add(group);
         }
 
-        Elements elemThreads = doc.select("table#threadlisttableid tbody");
-        if (elemThreads.first() == null) {
+        Elements elemPosts = doc.select("table#threadlisttableid tbody");
+        if (elemPosts.first() == null) {
             return groupList;
         }
         SectorGroup groupStick = new SectorGroup("置顶主题");
-        SectorGroup groupThread = new SectorGroup("版块主题");
+        SectorGroup groupNormal = new SectorGroup("版块主题");
 
-        for (Element elemThread : elemThreads) {
-            String elemID = elemThread.id();
+        for (Element elemPost : elemPosts) {
+            String elemID = elemPost.id();
             if (!elemID.contains("thread")) {
                 continue;
             }
-            Element elemTitle = elemThread.child(0).child(1).select("a.s.xst").first();
+            Element elemTitle = elemPost.child(0).child(1).select("a.s.xst").first();
             String title = elemTitle.ownText();
             String url = elemTitle.attr("href");
-            Element elemTag = elemThread.child(0).child(1).select("em a").first();
+            Element elemTag = elemPost.child(0).child(1).select("em a").first();
             String tag = "";
             if (elemTag != null) {
                 tag = "[" + elemTag.ownText() + "]";
             }
 
-            String author = elemThread.select("td.by cite a").first().ownText();
-            String replyStr = elemThread.select("td.num a").first().ownText();
+            String author = elemPost.select("td.by cite a").first().ownText();
+            String replyStr = elemPost.select("td.num a").first().ownText();
             int replyNum;
             try {
                 replyNum = Integer.parseInt(replyStr);
             } catch (NumberFormatException e) {
                 replyNum = 0;
             }
-            Thread thread = new Thread(title, tag, author, replyNum, url);
+            Post post = new Post(title, tag, author, replyNum, url);
 
             if (elemID.startsWith("stickthread")) {
-                groupStick.addSubItem(thread);
+                groupStick.addSubItem(post);
             } else if (elemID.startsWith("normalthread")) {
-                groupThread.addSubItem(thread);
+                groupNormal.addSubItem(post);
             }
         }
         if (groupStick.hasSubItem()) {
             groupList.add(groupStick);
         }
-        if (groupThread.hasSubItem()) {
-            groupList.add(groupThread);
+        if (groupNormal.hasSubItem()) {
+            groupList.add(groupNormal);
         }
         return groupList;
     }
 
-    public List<Thread> toThreadList() {
-        return new ArrayList<>();
+    public List<MultiItemEntity> parsePost() {
+        if (isMobile) {
+            throw new RuntimeException("Incompatible viewport!");
+        }
+        List<MultiItemEntity> replyList = new ArrayList<>();
+        imgUrlList = new ArrayList<>();
+
+        Elements elements = doc.select("div#postlist > div[id^='post_']");
+        for (Element element : elements) {
+            String author = element.select("div.pls.favatar div.authi a.xw1").text();
+            String avatarUrl = element.select("div.avatar a.avtm img").attr("abs:src");
+            int floorNum;
+            try {
+                floorNum = Integer.parseInt(element.select("div.pi strong a em").first().ownText());
+            } catch (NumberFormatException e) {
+                floorNum = 0;
+            }
+            Element content = element.select("td[id^='postmessage']").first();
+            for (Element image : content.select("img")) {
+                image.attr("src", image.attr("abs:src"));
+                image.removeAttr("onmouseover");
+                image.removeAttr("initialized");
+                image.removeAttr("lazyloaded");
+            }
+            for (Element image : content.select("img[file]")) {
+                String imgUrl = (image.attr("file").startsWith("http") ? "" : HttpUtil.BASE_URL)
+                        + image.attr("file");
+                image.attr("src", imgUrl);
+                image.attr("style", "max-width: 100% !important; height:auto;");
+
+                image.attr("onclick", "window.imageListener.openImage(this.src);");
+                imgUrlList.add(imgUrl);
+            }
+            String contentHTML = "<p style=\"word-break:break-all;\">" + content.html() + "</p>";
+            String postDate = element.select("em[id^='authorposton']").text();
+            replyList.add(new Reply(author, avatarUrl, contentHTML, postDate, floorNum));
+            Log.d(TAG, "parsePost: " + author + avatarUrl + postDate);
+            for (String item : imgUrlList) Log.d(TAG, "parsePost: " + item);
+        }
+
+        return replyList;
     }
 
-    public List<Post> toPostList() {
-        return new ArrayList<>();
-    }
+    public List<String> getImgUrlList() { return imgUrlList; }
 }

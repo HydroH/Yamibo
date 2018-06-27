@@ -1,43 +1,31 @@
 package com.hydroh.yamibo.model;
 
+import com.chad.library.adapter.base.entity.MultiItemEntity;
+import com.hydroh.yamibo.ui.adapter.HomeAdapter;
 
-public class Post {
-    private String author, avatar, contentHTML;
-    private String postDate, editDate;
+public class Post implements MultiItemEntity {
+    private String title;
+    private String tag;
+    private String author;
+    private int replyNum;
+    private String url;
 
-    public Post(String author, String avatar, String contentHTML, String postDate) {
+    public Post(String title, String tag, String author, int replyNum, String url) {
+        this.title = title;
+        this.tag = tag;
         this.author = author;
-        this.avatar = avatar;
-        this.contentHTML = contentHTML;
-        this.postDate = postDate;
-        this.editDate = postDate;
+        this.replyNum = replyNum;
+        this.url = url;
     }
 
-    public Post(String author, String avatar, String contentHTML, String postDate, String editDate) {
-        this.author = author;
-        this.avatar = avatar;
-        this.contentHTML = contentHTML;
-        this.postDate = postDate;
-        this.editDate = editDate;
-    }
+    public String getTitle() { return title; }
+    public String getTag() { return tag; }
+    public String getAuthor() { return author; }
+    public int getReplyNum() { return replyNum; }
+    public String getUrl() { return url; }
 
-    public String getAuthor() {
-        return author;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public String getContentHTML() {
-        return contentHTML;
-    }
-
-    public String getPostDate() {
-        return postDate;
-    }
-
-    public String getEditDate() {
-        return editDate;
+    @Override
+    public int getItemType() {
+        return HomeAdapter.TYPE_THREAD;
     }
 }

@@ -1,7 +1,9 @@
 package com.hydroh.yamibo.ui;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,10 +20,11 @@ import android.view.MenuItem;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.entity.MultiItemEntity;
 import com.hydroh.yamibo.R;
-import com.hydroh.yamibo.model.Thread;
-import com.hydroh.yamibo.ui.adapter.HomeAdapter;
 import com.hydroh.yamibo.util.DocumentParser;
+import com.hydroh.yamibo.ui.adapter.PostAdapter;
 import com.hydroh.yamibo.util.HttpCallbackListener;
 import com.hydroh.yamibo.util.HttpUtil;
 
@@ -29,27 +32,16 @@ import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
-public class SectorActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class PostActivity extends AppCompatActivity {
 
-    private List<Thread> threadList;
-    private String url;
+    List<MultiItemEntity> replyList;
+    List<String> imgUrlList;
+    String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sector);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.nav_toolbar);
-        setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        setContentView(R.layout.activity_post);
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
@@ -57,14 +49,19 @@ public class SectorActivity extends AppCompatActivity
             if (extras.containsKey("url")) {
                 url = extras.getString("url");
             }
+            if (extras.containsKey("title")) {
+                setTitle(extras.getString("title"));
+            } else {
+                setTitle("贴子详情");
+            }
         }
 
         Log.d(TAG, "onCreate: URL: " + url);
 
-        loadSector(findViewById(R.id.hint_text));
+        loadPosts(findViewById(R.id.hint_text));
     }
 
-    public void loadSector(View view) {
+    public void loadPosts(View view) {
         Log.d(TAG, "refreshNetwork: URL: " + url);
 
         if (view.getId() == R.id.hint_text) {
@@ -76,8 +73,9 @@ public class SectorActivity extends AppCompatActivity
 
         HttpUtil.getHtmlDocument(url, false, new HttpCallbackListener() {
             @Override
-            public void onFinish(DocumentParser docParser) {
-                threadList = docParser.toThreadList();
+            public void onFinish(DocumentParser doc) {
+                replyList = doc.parsePost();
+                imgUrlList = doc.getImgUrlList();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -89,17 +87,8 @@ public class SectorActivity extends AppCompatActivity
                         LinearLayoutManager layoutManager = new LinearLayoutManager(recyclerView.getContext());
                         recyclerView.setLayoutManager(layoutManager);
 
-                        HomeAdapter adapter = new HomeAdapter(threadList);
+                        PostAdapter adapter = new PostAdapter(replyList, imgUrlList);
                         recyclerView.setAdapter(adapter);
-                        adapter.expandAll();
-
-                        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
-                                recyclerView.getContext(),
-                                layoutManager.getOrientation()
-                        );
-                        if (recyclerView.getItemDecorationAt(0) == null) {
-                            recyclerView.addItemDecoration(dividerItemDecoration);
-                        }
                     }
                 });
             }
@@ -110,6 +99,11 @@ public class SectorActivity extends AppCompatActivity
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        RecyclerView recyclerView = findViewById(R.id.list_common);
+                        PostAdapter adapter = (PostAdapter) recyclerView.getAdapter();
+                        if (adapter != null) {
+                            adapter.clear();
+                        }
                         TextView hintText = findViewById(R.id.hint_text);
                         hintText.setVisibility(View.VISIBLE);
                         ProgressBar hintProgressBar = findViewById(R.id.hint_progressbar);
@@ -122,38 +116,4 @@ public class SectorActivity extends AppCompatActivity
         });
     }
 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
 }

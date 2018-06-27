@@ -1,25 +1,54 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    app:cardCornerRadius="0dp"
+    app:cardElevation="2dp">
 
-
-    <TextView
-        android:id="@+id/post_author"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="8dp"
-        android:textSize="12sp" />
+        android:orientation="vertical"
+        android:background="?android:attr/selectableItemBackground">
 
-    <WebView
-        android:id="@+id/post_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginTop="8dp"
-        android:textSize="16sp" />
+        <TextView
+            android:id="@+id/post_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="12dp"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            tools:text="[测试文字]你好世界你好世界你好世界你好世界你好世界你好世界" />
 
+        <TextView
+            android:id="@+id/post_author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/post_title"
+            android:gravity="center_vertical"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginStart="20dp"
+            android:textSize="14sp"
+            tools:text="氢氧化氢"/>
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/post_replyNum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/post_title"
+            android:layout_alignParentEnd="true"
+            android:gravity="end"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginEnd="20dp"
+            android:textSize="14sp"
+            tools:text="123"/>
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

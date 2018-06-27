@@ -38,7 +38,7 @@ public class ImageBrowserAdapter extends PagerAdapter {
     @Override
     public View instantiateItem(ViewGroup container, int position) {
         View view = View.inflate(context, R.layout.item_img_browser, null);
-        ImageView imageBrowserView = (ImageView) view.findViewById(R.id.image_browser_view);
+        ImageView imageBrowserView = view.findViewById(R.id.image_browser_view);
         String imgUrl = imgUrlList.get(position);
         final PhotoViewAttacher photoViewAttacher = new PhotoViewAttacher(imageBrowserView);
         Glide.with(context)
