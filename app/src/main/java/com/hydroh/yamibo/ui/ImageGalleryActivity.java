@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.hydroh.yamibo.R;
 import com.hydroh.yamibo.ui.adapter.ImageBrowserAdapter;
 
+import java.util.HashMap;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
@@ -23,9 +24,11 @@ public class ImageGalleryActivity extends Activity {
     ImageBrowserAdapter adapter;
     String url;
     List<String> urlList;
+    HashMap<String, String> urlKeyMap;
 
     Toast toast;
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,13 +36,13 @@ public class ImageGalleryActivity extends Activity {
 
         url = getIntent().getStringExtra("imgUrl");
         urlList = getIntent().getStringArrayListExtra("imgUrlList");
+        urlKeyMap = (HashMap<String, String>) getIntent().getSerializableExtra("urlKeyMap");
 
         int position = urlList.indexOf(url);
-        adapter = new ImageBrowserAdapter(this, urlList);
+        adapter = new ImageBrowserAdapter(this, urlList, urlKeyMap);
         imageBrowserPager = findViewById(R.id.image_viewpager);
         imageBrowserPager.setAdapter(adapter);
         final int size = urlList.size();
-        final Context context = this;
 
         int index = position % size + 1;
         ShowToast(index + " / " + size);

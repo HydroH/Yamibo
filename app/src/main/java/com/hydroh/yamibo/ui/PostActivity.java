@@ -27,6 +27,7 @@ import com.hydroh.yamibo.util.DocumentParser;
 import com.hydroh.yamibo.ui.adapter.PostAdapter;
 import com.hydroh.yamibo.util.HttpCallbackListener;
 import com.hydroh.yamibo.util.HttpUtil;
+import com.zzhoujay.richtext.RichText;
 
 import java.util.List;
 
@@ -43,6 +44,14 @@ public class PostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
 
+        final SwipeRefreshLayout sectionRefresh = findViewById(R.id.refresh_common);
+        sectionRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadPosts(findViewById(R.id.refresh_common));
+            }
+        });
+
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         if (extras != null) {
@@ -58,6 +67,7 @@ public class PostActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: URL: " + url);
 
+        RichText.initCacheDir(this);
         loadPosts(findViewById(R.id.hint_text));
     }
 

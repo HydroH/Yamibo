@@ -110,6 +110,8 @@ public class DocumentParser {
         }
         List<MultiItemEntity> replyList = new ArrayList<>();
         imgUrlList = new ArrayList<>();
+        doc.select("div[style*=\"display: none\"]").remove();
+        doc.select("dl.tattl.attm dd p.mbn").remove();
 
         Elements elements = doc.select("div#postlist > div[id^='post_']");
         for (Element element : elements) {
@@ -122,22 +124,22 @@ public class DocumentParser {
                 floorNum = 0;
             }
             Element content = element.select("td[id^='postmessage']").first();
+            Element appendix = element.select("div.pattl").first();
+            if (appendix != null) {
+                content.appendChild(appendix);
+            }
             for (Element image : content.select("img")) {
                 image.attr("src", image.attr("abs:src"));
-                image.removeAttr("onmouseover");
-                image.removeAttr("initialized");
-                image.removeAttr("lazyloaded");
-            }
-            for (Element image : content.select("img[file]")) {
-                String imgUrl = (image.attr("file").startsWith("http") ? "" : HttpUtil.BASE_URL)
-                        + image.attr("file");
-                image.attr("src", imgUrl);
-                image.attr("style", "max-width: 100% !important; height:auto;");
 
-                image.attr("onclick", "window.imageListener.openImage(this.src);");
-                imgUrlList.add(imgUrl);
+                if (image.hasAttr("file")) {
+                    String imgUrl = (image.attr("file").startsWith("http") ? "" : HttpUtil.BASE_URL)
+                            + image.attr("file");
+                    image.attr("src", imgUrl);
+                    imgUrlList.add(imgUrl);
+                }
             }
             String contentHTML = "<p style=\"word-break:break-all;\">" + content.html() + "</p>";
+            Log.d(TAG, "parsePost: " + contentHTML);
             String postDate = element.select("em[id^='authorposton']").text();
             replyList.add(new Reply(author, avatarUrl, contentHTML, postDate, floorNum));
             Log.d(TAG, "parsePost: " + author + avatarUrl + postDate);
