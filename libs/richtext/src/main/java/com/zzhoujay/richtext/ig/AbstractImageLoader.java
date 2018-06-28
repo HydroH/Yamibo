@@ -249,7 +249,6 @@ abstract class AbstractImageLoader<T> implements ImageLoader {
                 @Override
                 public void run() {
                     CharSequence cs = tv.getText();
-                    Log.d(TAG, "run: CharSequence " + cs.hashCode());
                     tv.setText(cs);
                 }
             });

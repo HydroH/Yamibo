@@ -5,14 +5,15 @@
     android:gravity="center">
 
     <RelativeLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
         <com.github.chrisbanes.photoview.PhotoView
             android:id="@+id/image_browser_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/black"/>
+            android:background="@android:color/black" />
     </RelativeLayout>
 </RelativeLayout>

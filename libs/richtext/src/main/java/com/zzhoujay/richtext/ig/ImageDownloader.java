@@ -3,7 +3,6 @@ package com.zzhoujay.richtext.ig;
 import com.zzhoujay.richtext.callback.BitmapStream;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * Created by zhou on 2017/9/11.

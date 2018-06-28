@@ -90,7 +90,7 @@ public class CachedSpannedParser {
                     }
                     Drawable drawable = imageGetterWrapper.getDrawable(ci.getSource());
                     if (drawable == null) {
-                        Log.d(TAG, "handleImage: Null drawable, default to transparent.");
+                        Log.d(TAG, "handleImage: Drawable is null, default to transparent.");
                         drawable = new ColorDrawable(Color.TRANSPARENT);
                     }
                     ClickableImageSpan nci = new ClickableImageSpan(drawable, ci, onImageClickListener, onImageLongClickListener);

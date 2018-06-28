@@ -10,8 +10,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:foreground="?android:attr/selectableItemBackground"
         android:background="#f7f7f7"
+        android:foreground="?android:attr/selectableItemBackground"
         android:orientation="vertical">
 
         <TextView
