@@ -8,6 +8,7 @@ import android.text.Spanned;
 import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.text.style.URLSpan;
+import android.util.Log;
 
 import com.zzhoujay.richtext.LinkHolder;
 import com.zzhoujay.richtext.RichTextConfig;
@@ -17,6 +18,8 @@ import com.zzhoujay.richtext.spans.ClickableImageSpan;
 import com.zzhoujay.richtext.spans.LongClickableURLSpan;
 
 import java.util.ArrayList;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by zhou on 2016/12/5.
@@ -87,6 +90,7 @@ public class CachedSpannedParser {
                     }
                     Drawable drawable = imageGetterWrapper.getDrawable(ci.getSource());
                     if (drawable == null) {
+                        Log.d(TAG, "handleImage: Null drawable, default to transparent.");
                         drawable = new ColorDrawable(Color.TRANSPARENT);
                     }
                     ClickableImageSpan nci = new ClickableImageSpan(drawable, ci, onImageClickListener, onImageLongClickListener);
@@ -119,6 +123,7 @@ public class CachedSpannedParser {
                     }
                     Drawable drawable = imageGetterWrapper.getDrawable(imageUrl);
                     if (drawable == null) {
+                        Log.d(TAG, "handleImage: Drawable is null, default to transparent.");
                         drawable = new ColorDrawable(Color.TRANSPARENT);
                     }
                     ClickableImageSpan cacheImageSpan = new ClickableImageSpan(drawable, imageUrls, i, onImageClickListener, onImageLongClickListener);

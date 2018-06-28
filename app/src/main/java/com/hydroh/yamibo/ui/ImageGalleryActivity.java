@@ -1,21 +1,14 @@
 package com.hydroh.yamibo.ui;
 
 import android.app.Activity;
-import android.content.Context;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
+import android.support.v4.view.ViewPager;
 import android.widget.Toast;
 
 import com.hydroh.yamibo.R;
 import com.hydroh.yamibo.ui.adapter.ImageBrowserAdapter;
 
-import java.util.HashMap;
 import java.util.List;
-
-import static android.content.ContentValues.TAG;
 
 public class ImageGalleryActivity extends Activity {
 
@@ -24,7 +17,6 @@ public class ImageGalleryActivity extends Activity {
     ImageBrowserAdapter adapter;
     String url;
     List<String> urlList;
-    HashMap<String, String> urlKeyMap;
 
     Toast toast;
 
@@ -36,10 +28,9 @@ public class ImageGalleryActivity extends Activity {
 
         url = getIntent().getStringExtra("imgUrl");
         urlList = getIntent().getStringArrayListExtra("imgUrlList");
-        urlKeyMap = (HashMap<String, String>) getIntent().getSerializableExtra("urlKeyMap");
 
         int position = urlList.indexOf(url);
-        adapter = new ImageBrowserAdapter(this, urlList, urlKeyMap);
+        adapter = new ImageBrowserAdapter(this, urlList);
         imageBrowserPager = findViewById(R.id.image_viewpager);
         imageBrowserPager.setAdapter(adapter);
         final int size = urlList.size();

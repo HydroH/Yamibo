@@ -116,7 +116,7 @@ public class HomeActivity extends AppCompatActivity
                                 layoutManager.getOrientation()
                         );
                         dividerItemDecoration.setDrawable(ContextCompat.getDrawable(recyclerView.getContext(), R.drawable.divider_horizontal_thin));
-                        if (recyclerView.getItemDecorationAt(0) == null) {
+                        if (recyclerView.getItemDecorationCount() == 0) {
                             recyclerView.addItemDecoration(dividerItemDecoration);
                         }
 

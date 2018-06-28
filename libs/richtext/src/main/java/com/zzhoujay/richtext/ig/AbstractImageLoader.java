@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.zzhoujay.richtext.CacheType;
@@ -17,6 +18,8 @@ import com.zzhoujay.richtext.exceptions.ImageDecodeException;
 import com.zzhoujay.richtext.ext.ContextKit;
 
 import java.lang.ref.WeakReference;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by zhou on 2016/12/9.
@@ -246,6 +249,7 @@ abstract class AbstractImageLoader<T> implements ImageLoader {
                 @Override
                 public void run() {
                     CharSequence cs = tv.getText();
+                    Log.d(TAG, "run: CharSequence " + cs.hashCode());
                     tv.setText(cs);
                 }
             });
