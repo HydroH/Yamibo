@@ -22,6 +22,7 @@ import android.widget.TextView
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.ui.adapter.HomeAdapter
+import com.hydroh.yamibo.ui.view.ToggledLoadMoreView
 import com.hydroh.yamibo.util.CookieUtil
 import com.hydroh.yamibo.util.DocumentParser
 import com.hydroh.yamibo.util.HttpCallbackListener
@@ -34,8 +35,8 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var nextPageUrl: String? = null
 
     private val swipeRefreshLayout by lazy { findViewById<SwipeRefreshLayout>(R.id.refresh_common) }
-    private val toolbar by lazy { findViewById<Toolbar>(R.id.nav_toolbar) }
-    private val drawerLayout by lazy { findViewById<DrawerLayout>(R.id.drawer_layout) }
+    private val toolbar by lazy { findViewById<Toolbar>(R.id.toolbar_home) }
+    private val drawerLayout by lazy { findViewById<DrawerLayout>(R.id.layout_home) }
     private val navigationView by lazy { findViewById<NavigationView>(R.id.nav_view) }
     private val hintTextView by lazy { findViewById<TextView>(R.id.hint_text) }
     private val hintProgressBar by lazy { findViewById<ProgressBar>(R.id.hint_progressbar) }
@@ -88,6 +89,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                     val adapter = HomeAdapter(homeItemList)
                     recyclerView.adapter = adapter
+                    adapter.setLoadMoreView(ToggledLoadMoreView(!url.startsWith(DEFAULT_URL)))
                     adapter.setOnLoadMoreListener({
                         if (nextPageUrl != null) {
                             HttpUtil.getHtmlDocument(nextPageUrl!!, false, object : HttpCallbackListener {

@@ -21,7 +21,7 @@
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="12dp"
-            android:textColor="@android:color/black"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="16sp"
             tools:text="[测试文字]你好世界你好世界你好世界你好世界你好世界你好世界" />
 

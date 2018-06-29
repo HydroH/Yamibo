@@ -6,6 +6,7 @@ import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
@@ -26,6 +27,7 @@ class PostActivity : AppCompatActivity() {
     private var nextPageUrl: String? = null
 
     private val swipeRefreshLayout by lazy { findViewById<SwipeRefreshLayout>(R.id.refresh_common) }
+    private val toolbar by lazy { findViewById<Toolbar>(R.id.toolbar_post) }
     private val hintTextView by lazy { findViewById<TextView>(R.id.hint_text) }
     private val hintProgressBar by lazy { findViewById<ProgressBar>(R.id.hint_progressbar) }
     private val recyclerView by lazy { findViewById<RecyclerView>(R.id.list_common) }
@@ -33,7 +35,10 @@ class PostActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_post)
+
         swipeRefreshLayout.setOnRefreshListener { loadPosts(swipeRefreshLayout) }
+        setSupportActionBar(toolbar)
+        toolbar.inflateMenu(R.menu.post_toolbar_menu)
 
         val extras = intent?.extras
         extras?.let {

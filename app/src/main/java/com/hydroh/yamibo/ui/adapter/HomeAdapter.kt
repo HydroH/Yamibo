@@ -37,9 +37,9 @@ class HomeAdapter(data: List<MultiItemEntity>) : BaseMultiItemQuickAdapter<Multi
                 holder.setText(R.id.group_title, group.title)
 
                 if (group.isExpanded) {
-                    holder.setImageResource(R.id.group_expand, R.drawable.ic_expand_less_black_24dp)
+                    holder.setImageResource(R.id.group_expand, R.drawable.ic_expand_less)
                 } else {
-                    holder.setImageResource(R.id.group_expand, R.drawable.ic_expand_more_black_24dp)
+                    holder.setImageResource(R.id.group_expand, R.drawable.ic_expand_more)
                 }
 
                 holder.itemView.setOnClickListener {
@@ -47,10 +47,10 @@ class HomeAdapter(data: List<MultiItemEntity>) : BaseMultiItemQuickAdapter<Multi
                     Log.d(TAG, "Sector group position $position clicked.")
                     if (group.isExpanded) {
                         collapse(position)
-                        holder.setImageResource(R.id.group_expand, R.drawable.ic_expand_more_black_24dp)
+                        holder.setImageResource(R.id.group_expand, R.drawable.ic_expand_more)
                     } else {
                         expand(position)
-                        holder.setImageResource(R.id.group_expand, R.drawable.ic_expand_less_black_24dp)
+                        holder.setImageResource(R.id.group_expand, R.drawable.ic_expand_less)
                     }
                 }
             }
