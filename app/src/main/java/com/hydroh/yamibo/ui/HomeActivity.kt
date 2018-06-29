@@ -28,8 +28,18 @@ import com.hydroh.yamibo.util.HttpCallbackListener
 import com.hydroh.yamibo.util.HttpUtil
 
 class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+
     private lateinit var homeItemList: List<MultiItemEntity>
     private var url: String = DEFAULT_URL
+    private var nextPageUrl: String? = null
+
+    private val swipeRefreshLayout by lazy { findViewById<SwipeRefreshLayout>(R.id.refresh_common) }
+    private val toolbar by lazy { findViewById<Toolbar>(R.id.nav_toolbar) }
+    private val drawerLayout by lazy { findViewById<DrawerLayout>(R.id.drawer_layout) }
+    private val navigationView by lazy { findViewById<NavigationView>(R.id.nav_view) }
+    private val hintTextView by lazy { findViewById<TextView>(R.id.hint_text) }
+    private val hintProgressBar by lazy { findViewById<ProgressBar>(R.id.hint_progressbar) }
+    private val recyclerView by lazy { findViewById<RecyclerView>(R.id.list_common) }
 
     companion object {
         const val DEFAULT_URL = "forum.php"
@@ -39,19 +49,12 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        val sectionRefresh = findViewById<SwipeRefreshLayout>(R.id.refresh_common)
-        sectionRefresh.setOnRefreshListener { loadHome(findViewById(R.id.refresh_common)) }
-
-        val toolbar = findViewById<Toolbar>(R.id.nav_toolbar)
+        swipeRefreshLayout.setOnRefreshListener { loadHome(swipeRefreshLayout) }
         setSupportActionBar(toolbar)
-
-        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
         val toggle = ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        drawer.addDrawerListener(toggle)
+                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
-
-        val navigationView = findViewById<NavigationView>(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
 
         val extras = intent?.extras
@@ -62,33 +65,56 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         CookieUtil.instance.getCookiePreference(this)
 
         Log.d(TAG, "onCreate: URL: $url")
-        loadHome(findViewById(R.id.hint_text))
+        loadHome(hintTextView)
     }
 
     private fun loadHome(view: View) {
         Log.d(TAG, "refreshNetwork: URL: $url")
 
         if (view.id == R.id.hint_text) {
-            val hintText = findViewById<TextView>(R.id.hint_text)
-            hintText.visibility = View.GONE
-            val hintProgressBar = findViewById<ProgressBar>(R.id.hint_progressbar)
+            hintTextView.visibility = View.GONE
             hintProgressBar.visibility = View.VISIBLE
         }
 
         HttpUtil.getHtmlDocument(url, false, object : HttpCallbackListener {
             override fun onFinish(docParser: DocumentParser) {
                 homeItemList = docParser.parseHome()
+                nextPageUrl = docParser.nextPageUrl
                 runOnUiThread {
-                    val hintProgressBar = findViewById<ProgressBar>(R.id.hint_progressbar)
                     hintProgressBar.visibility = View.GONE
-                    val recyclerView = findViewById<RecyclerView>(R.id.list_common)
-                    val sectionRefresh = findViewById<SwipeRefreshLayout>(R.id.refresh_common)
-                    sectionRefresh.isRefreshing = false
+                    swipeRefreshLayout.isRefreshing = false
                     val layoutManager = LinearLayoutManager(recyclerView.context)
                     recyclerView.layoutManager = layoutManager
 
                     val adapter = HomeAdapter(homeItemList)
                     recyclerView.adapter = adapter
+                    adapter.setOnLoadMoreListener({
+                        if (nextPageUrl != null) {
+                            HttpUtil.getHtmlDocument(nextPageUrl!!, false, object : HttpCallbackListener {
+                                override fun onFinish(docParser: DocumentParser) {
+                                    val homeMoreSubItemList = docParser.parseHome(true)
+                                    runOnUiThread {
+                                        Log.d(TAG, "post: LoadMore Complete.")
+                                        nextPageUrl = docParser.nextPageUrl
+                                        adapter.addData(homeMoreSubItemList)
+                                        adapter.loadMoreComplete()
+                                    }
+                                }
+                                override fun onError(e: Exception) {
+                                    runOnUiThread {
+                                        Log.d(TAG, "post: LoadMore failed.")
+                                        adapter.loadMoreFail()
+                                    }
+                                }
+                            })
+                        } else {
+                            runOnUiThread {
+                                Log.d(TAG, "post: LoadMore End.")
+                                adapter.loadMoreEnd()
+                            }
+                        }
+                    }, recyclerView)
+
                     adapter.expandAll()
                     adapter.collapseSticky()
 
@@ -106,15 +132,11 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             override fun onError(e: Exception) {
                 e.printStackTrace()
                 runOnUiThread {
-                    val recyclerView = findViewById<RecyclerView>(R.id.list_common)
                     val adapter = recyclerView.adapter as HomeAdapter
                     adapter.clear()
-                    val hintText = findViewById<TextView>(R.id.hint_text)
-                    hintText.visibility = View.VISIBLE
-                    val hintProgressBar = findViewById<ProgressBar>(R.id.hint_progressbar)
+                    hintTextView.visibility = View.VISIBLE
                     hintProgressBar.visibility = View.GONE
-                    val sectionRefresh = findViewById<SwipeRefreshLayout>(R.id.refresh_common)
-                    sectionRefresh.isRefreshing = false
+                    swipeRefreshLayout.isRefreshing = false
                 }
             }
         })
@@ -126,9 +148,8 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onBackPressed() {
-        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START)
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START)
         } else {
             super.onBackPressed()
         }
@@ -152,8 +173,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         }
 
-        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-        drawer.closeDrawer(GravityCompat.START)
+        drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
 }

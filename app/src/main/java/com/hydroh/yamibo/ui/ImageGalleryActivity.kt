@@ -10,13 +10,12 @@ import com.hydroh.yamibo.ui.adapter.ImageBrowserAdapter
 
 class ImageGalleryActivity : Activity() {
 
-    private lateinit var imageBrowserPager: ViewPager
     private lateinit var adapter: ImageBrowserAdapter
-
     private var position: Int = -1
     private var urlList: ArrayList<String> = ArrayList()
 
     private var toast: Toast? = null
+    private val imageBrowserPager by lazy { findViewById<ViewPager>(R.id.image_viewpager) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +25,6 @@ class ImageGalleryActivity : Activity() {
         urlList = intent.getStringArrayListExtra("imgUrlList")
 
         adapter = ImageBrowserAdapter(this, urlList)
-        imageBrowserPager = findViewById(R.id.image_viewpager)
         imageBrowserPager.adapter = adapter
         showToast("${position + 1} / ${urlList.size}")
 

@@ -8,39 +8,45 @@ import com.hydroh.yamibo.model.Reply
 import com.hydroh.yamibo.model.Sector
 import com.hydroh.yamibo.model.SectorGroup
 import org.jsoup.nodes.Document
-import kotlin.collections.ArrayList
 
 class DocumentParser(private val doc: Document, private val isMobile: Boolean) {
     internal var imgUrlList: ArrayList<String> = ArrayList()
         private set
+    internal var nextPageUrl: String? = null
+        private set
 
-    fun parseHome(): List<MultiItemEntity> {
+    fun parseHome(isProgressive: Boolean = false): List<MultiItemEntity> {
         if (isMobile) {
             throw RuntimeException("Incompatible viewport!")
         }
-        val groupList = ArrayList<MultiItemEntity>()
-        val elemGroupHeads = doc.select("div.bm.bmw div.bm_h.cl")
-        for (elemGroupHead in elemGroupHeads) {
-            val title = elemGroupHead.select("h2").first().text()
-            val group = SectorGroup(title)
+        nextPageUrl = doc.select("div.pg a.nxt").first()?.attr("href")
 
-            val elemSectors = elemGroupHead.nextElementSibling()
-            for (elemSector in elemSectors.select("div.bm_c tr")) {
-                if (elemSector.children().size >= 2) {
-                    val elemSectorMain = elemSector.child(1)
-                    val sectorTitle = elemSectorMain.select("h2 a").first().ownText()
-                    val sectorUrl = elemSectorMain.select("h2 a").first().attr("href")
-                    val sectorUnreadNum = elemSectorMain.select("h2 em").first()?.ownText()
-                            ?.replace("[^\\d]".toRegex(), "")?.toIntOrNull() ?: 0
-                    val sectorDescription = elemSectorMain.select("p.xg2").first()?.ownText() ?: sectorTitle
-                    group.addSubItem(Sector(sectorTitle, sectorUnreadNum, sectorDescription, sectorUrl))
+        val groupList = ArrayList<MultiItemEntity>()
+        if (!isProgressive) {
+            val elemGroupHeads = doc.select("div.bm.bmw div.bm_h.cl")
+            for (elemGroupHead in elemGroupHeads) {
+                val title = elemGroupHead.select("h2").first().text()
+                val group = SectorGroup(title)
+
+                val elemSectors = elemGroupHead.nextElementSibling()
+                for (elemSector in elemSectors.select("div.bm_c tr")) {
+                    if (elemSector.children().size >= 2) {
+                        val elemSectorMain = elemSector.child(1)
+                        val sectorTitle = elemSectorMain.select("h2 a").first().ownText()
+                        val sectorUrl = elemSectorMain.select("h2 a").first().attr("href")
+                        val sectorUnreadNum = elemSectorMain.select("h2 em").first()?.ownText()
+                                ?.replace("[^\\d]".toRegex(), "")?.toIntOrNull() ?: 0
+                        val sectorDescription = elemSectorMain.select("p.xg2").first()?.ownText()
+                                ?: sectorTitle
+                        group.addSubItem(Sector(sectorTitle, sectorUnreadNum, sectorDescription, sectorUrl))
+                    }
                 }
+                groupList.add(group)
             }
-            groupList.add(group)
         }
 
         val elemPosts = doc.select("table#threadlisttableid tbody")
-        elemPosts.first() ?: return groupList
+        elemPosts.first() ?: if (!isProgressive) return groupList
         val groupStick = SectorGroup("置顶主题")
         val groupNormal = SectorGroup("版块主题")
 
@@ -61,12 +67,13 @@ class DocumentParser(private val doc: Document, private val isMobile: Boolean) {
 
             val post = Post(title, tag, author, replyNum, url)
 
-            if (elemID.startsWith("stickthread")) {
+            if (!isProgressive && elemID.startsWith("stickthread")) {
                 groupStick.addSubItem(post)
             } else if (elemID.startsWith("normalthread")) {
                 groupNormal.addSubItem(post)
             }
         }
+        if (isProgressive) return groupNormal.subItems
         if (groupStick.hasSubItem()) {
             groupList.add(groupStick)
         }
@@ -80,6 +87,8 @@ class DocumentParser(private val doc: Document, private val isMobile: Boolean) {
         if (isMobile) {
             throw RuntimeException("Incompatible viewport!")
         }
+        nextPageUrl = doc.select("div.pg a.nxt").first()?.attr("href")
+
         val replyList = ArrayList<MultiItemEntity>()
         doc.select("div[style*=\"display: none\"]").remove()
         doc.select("dl.tattl.attm dd p.mbn").remove()

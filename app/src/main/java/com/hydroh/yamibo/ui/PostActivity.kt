@@ -23,13 +23,17 @@ class PostActivity : AppCompatActivity() {
     private lateinit var replyList: List<MultiItemEntity>
     private lateinit var imgUrlList: ArrayList<String>
     private var url: String = ""
+    private var nextPageUrl: String? = null
+
+    private val swipeRefreshLayout by lazy { findViewById<SwipeRefreshLayout>(R.id.refresh_common) }
+    private val hintTextView by lazy { findViewById<TextView>(R.id.hint_text) }
+    private val hintProgressBar by lazy { findViewById<ProgressBar>(R.id.hint_progressbar) }
+    private val recyclerView by lazy { findViewById<RecyclerView>(R.id.list_common) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_post)
-
-        val sectionRefresh = findViewById<SwipeRefreshLayout>(R.id.refresh_common)
-        sectionRefresh.setOnRefreshListener { loadPosts(findViewById(R.id.refresh_common)) }
+        swipeRefreshLayout.setOnRefreshListener { loadPosts(swipeRefreshLayout) }
 
         val extras = intent?.extras
         extras?.let {
@@ -39,16 +43,14 @@ class PostActivity : AppCompatActivity() {
         Log.d(TAG, "onCreate: URL: $url")
 
         RichText.initCacheDir(this)
-        loadPosts(findViewById(R.id.hint_text))
+        loadPosts(hintTextView)
     }
 
     private fun loadPosts(view: View) {
         Log.d(TAG, "refreshNetwork: URL: $url")
 
         if (view.id == R.id.hint_text) {
-            val hintText = findViewById<TextView>(R.id.hint_text)
-            hintText.visibility = View.GONE
-            val hintProgressBar = findViewById<ProgressBar>(R.id.hint_progressbar)
+            hintTextView.visibility = View.GONE
             hintProgressBar.visibility = View.VISIBLE
         }
 
@@ -56,32 +58,53 @@ class PostActivity : AppCompatActivity() {
             override fun onFinish(docParser: DocumentParser) {
                 replyList = docParser.parsePost()
                 imgUrlList = docParser.imgUrlList
+                nextPageUrl = docParser.nextPageUrl
                 runOnUiThread {
-                    val hintProgressBar = findViewById<ProgressBar>(R.id.hint_progressbar)
                     hintProgressBar.visibility = View.GONE
-                    val recyclerView = findViewById<RecyclerView>(R.id.list_common)
-                    val sectionRefresh = findViewById<SwipeRefreshLayout>(R.id.refresh_common)
-                    sectionRefresh.isRefreshing = false
+                    swipeRefreshLayout.isRefreshing = false
                     val layoutManager = LinearLayoutManager(recyclerView.context)
                     recyclerView.layoutManager = layoutManager
 
                     val adapter = PostAdapter(replyList, imgUrlList)
                     recyclerView.adapter = adapter
+                    adapter.setOnLoadMoreListener({
+                        if (nextPageUrl != null) {
+                            HttpUtil.getHtmlDocument(nextPageUrl!!, false, object : HttpCallbackListener {
+                                override fun onFinish(docParser: DocumentParser) {
+                                    val postMoreList = docParser.parsePost()
+                                    recyclerView.post {
+                                        Log.d(TAG, "post: LoadMore Complete.")
+                                        nextPageUrl = docParser.nextPageUrl
+                                        adapter.addData(postMoreList)
+                                        imgUrlList.addAll(docParser.imgUrlList)
+                                        adapter.loadMoreComplete()
+                                    }
+                                }
+                                override fun onError(e: Exception) {
+                                    recyclerView.post {
+                                        Log.d(TAG, "post: LoadMore failed.")
+                                        adapter.loadMoreFail()
+                                    }
+                                }
+                            })
+                        } else {
+                            recyclerView.post {
+                                Log.d(TAG, "post: LoadMore End.")
+                                adapter.loadMoreEnd()
+                            }
+                        }
+                    }, recyclerView)
                 }
             }
 
             override fun onError(e: Exception) {
                 e.printStackTrace()
                 runOnUiThread {
-                    val recyclerView = findViewById<RecyclerView>(R.id.list_common)
                     val adapter = recyclerView.adapter as PostAdapter
                     adapter.clear()
-                    val hintText = findViewById<TextView>(R.id.hint_text)
-                    hintText.visibility = View.VISIBLE
-                    val hintProgressBar = findViewById<ProgressBar>(R.id.hint_progressbar)
+                    hintTextView.visibility = View.VISIBLE
                     hintProgressBar.visibility = View.GONE
-                    val sectionRefresh = findViewById<SwipeRefreshLayout>(R.id.refresh_common)
-                    sectionRefresh.isRefreshing = false
+                    swipeRefreshLayout.isRefreshing = false
                 }
             }
         })

@@ -3,8 +3,6 @@ package com.hydroh.yamibo.ui.adapter
 import android.content.Intent
 import android.graphics.Color
 import android.util.Log
-import android.widget.ImageView
-import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.chad.library.adapter.base.BaseMultiItemQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
@@ -64,7 +62,12 @@ class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList
                                     holder.width = width * 2
                                 }
                             }
-                            override fun onFailure(holder: ImageHolder, e: Exception) {}
+                            override fun onFailure(holder: ImageHolder, e: Exception?) {
+                                Log.d(TAG, "onFailure: ${holder.source}")
+                                holder.isAutoFix = false
+                                holder.width = 50
+                                holder.height = 50
+                            }
                         })
                         .imageClick { imageUrls, position ->
                             val imgUrl = imageUrls[position]
