@@ -15,8 +15,8 @@ import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.ui.adapter.PostAdapter
 import com.hydroh.yamibo.util.DocumentParser
-import com.hydroh.yamibo.util.HttpCallbackListener
-import com.hydroh.yamibo.util.HttpUtil
+import com.hydroh.yamibo.network.callback.DocumentCallbackListener
+import com.hydroh.yamibo.network.WebRequest
 import com.zzhoujay.richtext.RichText
 
 class PostActivity : AppCompatActivity() {
@@ -59,7 +59,7 @@ class PostActivity : AppCompatActivity() {
             hintProgressBar.visibility = View.VISIBLE
         }
 
-        HttpUtil.getHtmlDocument(url, false, object : HttpCallbackListener {
+        WebRequest.getHtmlDocument(url, false, this, object : DocumentCallbackListener {
             override fun onFinish(docParser: DocumentParser) {
                 replyList = docParser.parsePost()
                 imgUrlList = docParser.imgUrlList
@@ -74,7 +74,7 @@ class PostActivity : AppCompatActivity() {
                     recyclerView.adapter = adapter
                     adapter.setOnLoadMoreListener({
                         if (nextPageUrl != null) {
-                            HttpUtil.getHtmlDocument(nextPageUrl!!, false, object : HttpCallbackListener {
+                            WebRequest.getHtmlDocument(nextPageUrl!!, false, recyclerView.context, object : DocumentCallbackListener {
                                 override fun onFinish(docParser: DocumentParser) {
                                     val postMoreList = docParser.parsePost()
                                     recyclerView.post {

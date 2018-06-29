@@ -7,6 +7,7 @@ import com.hydroh.yamibo.model.Post
 import com.hydroh.yamibo.model.Reply
 import com.hydroh.yamibo.model.Sector
 import com.hydroh.yamibo.model.SectorGroup
+import com.hydroh.yamibo.network.WebRequest
 import org.jsoup.nodes.Document
 
 class DocumentParser(private val doc: Document, private val isMobile: Boolean) {
@@ -107,7 +108,7 @@ class DocumentParser(private val doc: Document, private val isMobile: Boolean) {
                 image.attr("src", image.attr("abs:src"))
 
                 if (image.hasAttr("file")) {
-                    val imgUrl = (if (image.attr("file").startsWith("http")) "" else HttpUtil.BASE_URL) + image.attr("file")
+                    val imgUrl = (if (image.attr("file").startsWith("http")) "" else WebRequest.BASE_URL) + image.attr("file")
                     image.attr("src", imgUrl)
                     imgUrlList.add(imgUrl)
                 }

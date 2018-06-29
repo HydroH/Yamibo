@@ -1,39 +1,29 @@
 package com.hydroh.yamibo.util
 
-
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.util.*
 
-class CookieUtil private constructor() {
-    var cookie: Map<String, String>? = null
-        private set
-    var isCookieSet: Boolean? = null
-        private set
+object CookieUtil {
 
-    init {
-        Log.d(TAG, "CookieUtil: Initiated.")
-        isCookieSet = false
-    }
-
-
-    fun setCookiePreference(context: Context, cookie: Map<String, String>) {
+    fun setCookiePreference(context: Context, cookie: MutableMap<String, String>) {
         val preference = context.getSharedPreferences("cookie", Context.MODE_PRIVATE)
         val editor = preference.edit()
-        val gson = Gson()
-        editor.putString("cookie", gson.toJson(cookie))
+        editor.putString("cookie", Gson().toJson(cookie))
         editor.apply()
-        this.cookie = cookie
         Log.d(TAG, "setCookiePreference: $cookie")
     }
 
-    fun getCookiePreference(context: Context): Map<String, String>? {
+    fun getCookiePreference(context: Context): MutableMap<String, String>? {
         val preference = context.getSharedPreferences("cookie", Context.MODE_PRIVATE)
-        val gson = Gson()
-        //cookie = gson.fromJson(preference.getString("cookie", ""),
-        //        new TypeToken<Map<String, String>>() {}.getType());
+        val cookie: MutableMap<String, String> =
+                Gson().fromJson(preference.getString("cookie", ""), object : TypeToken<MutableMap<String, String>>() {}.type)
+        Log.d(TAG, "getCookiePreference: $cookie")
+
+        /*
         val cookieObj = HashMap<String, String>()
         cookieObj["EeqY_2132_saltkey"] = "JZ00iabf"
         cookieObj["EeqY_2132_lastvisit"] = "1524034182"
@@ -46,12 +36,7 @@ class CookieUtil private constructor() {
         cookieObj["EeqY_2132_lip"] = "101.81.14.238%2C1524040836"
         cookieObj["EeqY_2132_onlineusernum"] = "396"
         cookie = cookieObj
-        isCookieSet = cookie != null
-        Log.d(TAG, "getCookiePreference: " + preference.getString("cookie", "")!!)
+        */
         return cookie
-    }
-
-    companion object {
-        val instance = CookieUtil()
     }
 }

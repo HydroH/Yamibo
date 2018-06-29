@@ -53,14 +53,19 @@ public class GlideImageGetter implements ImageGetter, ImageLoadNotify {
 
     private void checkTag(TextView textView) {
         //noinspection unchecked
-        HashSet<ImageTarget> ts = (HashSet<ImageTarget>) textView.getTag(TARGET_TAG);
+        final HashSet<ImageTarget> ts = (HashSet<ImageTarget>) textView.getTag(TARGET_TAG);
         if (ts != null) {
             if (ts == targets) {
                 return;
             }
-            for (ImageTarget target : ts) {
-                target.recycle();
-            }
+            textView.post(new Runnable() {
+                @Override
+                public void run() {
+                    for (ImageTarget target : ts) {
+                        target.recycle();
+                    }
+                }
+            });
             ts.clear();
         }
         textView.setTag(TARGET_TAG, targets);

@@ -21,12 +21,10 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
+import com.hydroh.yamibo.network.WebRequest
+import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.adapter.HomeAdapter
-import com.hydroh.yamibo.ui.view.ToggledLoadMoreView
-import com.hydroh.yamibo.util.CookieUtil
 import com.hydroh.yamibo.util.DocumentParser
-import com.hydroh.yamibo.util.HttpCallbackListener
-import com.hydroh.yamibo.util.HttpUtil
 
 class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -63,7 +61,6 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             url = extras.getString("url", DEFAULT_URL)
             title = extras.getString("title", "百合会")
         }
-        CookieUtil.instance.getCookiePreference(this)
 
         Log.d(TAG, "onCreate: URL: $url")
         loadHome(hintTextView)
@@ -77,11 +74,12 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             hintProgressBar.visibility = View.VISIBLE
         }
 
-        HttpUtil.getHtmlDocument(url, false, object : HttpCallbackListener {
+        WebRequest.getHtmlDocument(url, false, this, object : DocumentCallbackListener {
             override fun onFinish(docParser: DocumentParser) {
                 homeItemList = docParser.parseHome()
                 nextPageUrl = docParser.nextPageUrl
                 runOnUiThread {
+                    hintTextView.visibility = View.GONE
                     hintProgressBar.visibility = View.GONE
                     swipeRefreshLayout.isRefreshing = false
                     val layoutManager = LinearLayoutManager(recyclerView.context)
@@ -89,34 +87,34 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                     val adapter = HomeAdapter(homeItemList)
                     recyclerView.adapter = adapter
-                    adapter.setLoadMoreView(ToggledLoadMoreView(!url.startsWith(DEFAULT_URL)))
-                    adapter.setOnLoadMoreListener({
-                        if (nextPageUrl != null) {
-                            HttpUtil.getHtmlDocument(nextPageUrl!!, false, object : HttpCallbackListener {
-                                override fun onFinish(docParser: DocumentParser) {
-                                    val homeMoreSubItemList = docParser.parseHome(true)
-                                    runOnUiThread {
-                                        Log.d(TAG, "post: LoadMore Complete.")
-                                        nextPageUrl = docParser.nextPageUrl
-                                        adapter.addData(homeMoreSubItemList)
-                                        adapter.loadMoreComplete()
+                    if (!url.startsWith(DEFAULT_URL)) {
+                        adapter.setOnLoadMoreListener({
+                            if (nextPageUrl != null) {
+                                WebRequest.getHtmlDocument(nextPageUrl!!, false, recyclerView.context, object : DocumentCallbackListener {
+                                    override fun onFinish(docParser: DocumentParser) {
+                                        val homeMoreSubItemList = docParser.parseHome(true)
+                                        runOnUiThread {
+                                            Log.d(TAG, "post: LoadMore Complete.")
+                                            nextPageUrl = docParser.nextPageUrl
+                                            adapter.addData(homeMoreSubItemList)
+                                            adapter.loadMoreComplete()
+                                        }
                                     }
-                                }
-                                override fun onError(e: Exception) {
-                                    runOnUiThread {
-                                        Log.d(TAG, "post: LoadMore failed.")
-                                        adapter.loadMoreFail()
+                                    override fun onError(e: Exception) {
+                                        runOnUiThread {
+                                            Log.d(TAG, "post: LoadMore failed.")
+                                            adapter.loadMoreFail()
+                                        }
                                     }
+                                })
+                            } else {
+                                runOnUiThread {
+                                    Log.d(TAG, "post: LoadMore End.")
+                                    adapter.loadMoreEnd()
                                 }
-                            })
-                        } else {
-                            runOnUiThread {
-                                Log.d(TAG, "post: LoadMore End.")
-                                adapter.loadMoreEnd()
                             }
-                        }
-                    }, recyclerView)
-
+                        }, recyclerView)
+                    }
                     adapter.expandAll()
                     adapter.collapseSticky()
 
@@ -134,8 +132,8 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             override fun onError(e: Exception) {
                 e.printStackTrace()
                 runOnUiThread {
-                    val adapter = recyclerView.adapter as HomeAdapter
-                    adapter.clear()
+                    val adapter = recyclerView.adapter as HomeAdapter?
+                    adapter?.clear()
                     hintTextView.visibility = View.VISIBLE
                     hintProgressBar.visibility = View.GONE
                     swipeRefreshLayout.isRefreshing = false
