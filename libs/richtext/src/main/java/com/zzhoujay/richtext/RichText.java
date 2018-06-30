@@ -262,10 +262,8 @@ public class RichText implements ImageGetterWrapper, ImageLoadNotify {
 
         // 删除多余的换行
         int pos = spannableStringBuilder.length() - 1;
-        if (pos > 0) {
-            while (spannableStringBuilder.charAt(pos) == '\n') {
-                pos--;
-            }
+        while (pos > 0 && spannableStringBuilder.charAt(pos) == '\n') {
+            pos--;
         }
         spannableStringBuilder.delete(pos + 1, spannableStringBuilder.length());
         return spannableStringBuilder;

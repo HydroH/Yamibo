@@ -30,4 +30,5 @@
     <style name="YamiboTheme.Button" parent="Widget.AppCompat.Button.Colored">
         <item name="android:foreground">?android:attr/selectableItemBackground</item>
     </style>
+
 </resources>

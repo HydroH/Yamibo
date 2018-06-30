@@ -3,8 +3,6 @@ package com.hydroh.yamibo.ui.adapter
 import android.content.Intent
 import android.graphics.Color
 import android.util.Log
-import android.view.View
-import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.chad.library.adapter.base.BaseMultiItemQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
@@ -42,10 +40,9 @@ class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList
                         .into(holder.getView(R.id.reply_avatar))
                 Log.d(TAG, "convert: Loading avatar: ${reply.avatarUrl}")
 
-                holder.getView<TextView>(R.id.reply_content).setLayerType(View.LAYER_TYPE_SOFTWARE, null)
                 RichText.fromHtml(reply.contentHTML)
                         .imageGetter(GlideImageGetter())
-                        .cache(CacheType.layout)
+                        .cache(CacheType.none)
                         .singleLoad(false)
                         .autoFix(false)
                         .resetSize(true)

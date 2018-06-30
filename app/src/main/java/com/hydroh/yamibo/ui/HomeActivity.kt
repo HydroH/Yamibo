@@ -20,8 +20,10 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.google.gson.internal.LinkedTreeMap
 import com.hydroh.yamibo.R
@@ -41,6 +43,8 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val toolbar by lazy { findViewById<Toolbar>(R.id.toolbar_home) }
     private val drawerLayout by lazy { findViewById<DrawerLayout>(R.id.layout_home) }
     private val navigationView by lazy { findViewById<NavigationView>(R.id.nav_view) }
+    private val navHeaderAvatar by lazy { findViewById<ImageView>(R.id.nav_header_avatar) }
+    private val navHeaderUsername by lazy { findViewById<TextView>(R.id.nav_header_username) }
     private val hintTextView by lazy { findViewById<TextView>(R.id.hint_text) }
     private val hintProgressBar by lazy { findViewById<ProgressBar>(R.id.hint_progressbar) }
     private val recyclerView by lazy { findViewById<RecyclerView>(R.id.list_common) }
@@ -48,7 +52,8 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val refreshBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             drawerLayout.closeDrawers()
-            loadHome(hintTextView)
+            swipeRefreshLayout.isRefreshing = true
+            loadHome(swipeRefreshLayout)
         }
     }
 
@@ -68,6 +73,10 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         navigationView.setNavigationItemSelectedListener(this)
+
+        hintTextView.setOnClickListener {
+            loadHome(it)
+        }
 
         val extras = intent?.extras
         extras?.let {
@@ -102,6 +111,8 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     swipeRefreshLayout.isRefreshing = false
                     val layoutManager = LinearLayoutManager(recyclerView.context)
                     recyclerView.layoutManager = layoutManager
+
+                    setupNavDrawer(docParser.isLoggedIn, docParser.avatarUrl, docParser.username)
 
                     val adapter = HomeAdapter(homeItemList)
                     recyclerView.adapter = adapter
@@ -160,11 +171,6 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
     }
 
-    fun startLoginActivity(view: View) {
-        val intent = Intent(view.context, LoginActivity::class.java)
-        view.context.startActivity(intent)
-    }
-
     override fun onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
@@ -191,5 +197,24 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    private fun setupNavDrawer(isLoggedIn: Boolean, avatarUrl: String?, username: String?) {
+        if (isLoggedIn) {
+            Glide.with(this).load(avatarUrl).crossFade().into(navHeaderAvatar)
+            navHeaderUsername.text = username ?: navHeaderUsername.text
+            navHeaderAvatar.setOnClickListener(null)
+        } else {
+            navHeaderAvatar.setImageResource(R.mipmap.ic_launcher_round)
+            navHeaderUsername.setText(R.string.nav_header_username_hint)
+            navHeaderAvatar.setOnClickListener {
+                startLoginActivity(it)
+            }
+        }
+    }
+
+    private fun startLoginActivity(view: View) {
+        val intent = Intent(view.context, LoginActivity::class.java)
+        view.context.startActivity(intent)
     }
 }

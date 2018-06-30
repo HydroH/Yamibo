@@ -11,6 +11,8 @@
         android:layout_height="wrap_content"
         android:paddingBottom="6dp"
         android:paddingTop="6dp"
+        android:clickable="true"
+        android:focusable="true"
         android:text="@string/network_error_hint"
         android:textSize="16sp"
         android:visibility="gone"

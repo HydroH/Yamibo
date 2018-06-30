@@ -11,6 +11,13 @@ import com.hydroh.yamibo.network.WebRequest
 import org.jsoup.nodes.Document
 
 class DocumentParser(private val doc: Document, private val isMobile: Boolean) {
+    internal var isLoggedIn: Boolean = false
+        private set
+    internal var username: String? = null
+        private set
+    internal var avatarUrl: String? = null
+        private set
+
     internal var imgUrlList: ArrayList<String> = ArrayList()
         private set
     internal var nextPageUrl: String? = null
@@ -21,6 +28,12 @@ class DocumentParser(private val doc: Document, private val isMobile: Boolean) {
             throw RuntimeException("Incompatible viewport!")
         }
         nextPageUrl = doc.select("div.pg a.nxt").first()?.attr("href")
+
+        avatarUrl = doc.select("img.header-tu-img").first()?.attr("src")?.replace("small", "middle")
+        avatarUrl?.let {
+            isLoggedIn = true
+            username = doc.select("ul#mycp1_menu").first()?.child(0)?.ownText()
+        }
 
         val groupList = ArrayList<MultiItemEntity>()
         if (!isProgressive) {

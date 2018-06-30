@@ -20,6 +20,7 @@ object CookieUtil {
         val preference = context.getSharedPreferences("cookie", Context.MODE_PRIVATE)
         val cookie: MutableMap<String, String> =
                 Gson().fromJson(preference.getString("cookie", ""), object : TypeToken<MutableMap<String, String>>() {}.type)
+                        ?: LinkedHashMap()
         Log.d(TAG, "getCookiePreference: $cookie")
         return cookie
     }
