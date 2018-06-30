@@ -5,9 +5,9 @@ import android.content.Context
 import android.util.Log
 import com.google.gson.internal.LinkedTreeMap
 import com.hydroh.yamibo.network.callback.CookieCallbackListener
+import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.util.CookieUtil
 import com.hydroh.yamibo.util.DocumentParser
-import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 import java.util.*
@@ -46,7 +46,7 @@ object WebRequest {
     fun getLogonCookies(username: String, password: String, context: Context, listener: CookieCallbackListener?) {
         Thread(Runnable {
             try {
-                val cookies = CookieUtil.getCookiePreference(context) ?: LinkedTreeMap<String, String>()
+                val cookies = /*CookieUtil.getCookiePreference(context) ?:*/ LinkedTreeMap<String, String>()
                 var response = Jsoup.connect(LOGIN_FORM_URL)
                         .method(Connection.Method.GET)
                         .data(

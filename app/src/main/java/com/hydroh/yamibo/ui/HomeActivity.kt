@@ -1,7 +1,10 @@
 package com.hydroh.yamibo.ui
 
+import android.content.BroadcastReceiver
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
@@ -20,10 +23,12 @@ import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.chad.library.adapter.base.entity.MultiItemEntity
+import com.google.gson.internal.LinkedTreeMap
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.adapter.HomeAdapter
+import com.hydroh.yamibo.util.CookieUtil
 import com.hydroh.yamibo.util.DocumentParser
 
 class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -40,6 +45,13 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val hintProgressBar by lazy { findViewById<ProgressBar>(R.id.hint_progressbar) }
     private val recyclerView by lazy { findViewById<RecyclerView>(R.id.list_common) }
 
+    private val refreshBroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            drawerLayout.closeDrawers()
+            loadHome(hintTextView)
+        }
+    }
+
     companion object {
         const val DEFAULT_URL = "forum.php"
     }
@@ -47,6 +59,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+        registerReceiver(refreshBroadcastReceiver, IntentFilter("com.hydroh.yamibo.REFRESH"))
 
         swipeRefreshLayout.setOnRefreshListener { loadHome(swipeRefreshLayout) }
         setSupportActionBar(toolbar)
@@ -64,6 +77,11 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         Log.d(TAG, "onCreate: URL: $url")
         loadHome(hintTextView)
+    }
+
+    override fun onDestroy() {
+        unregisterReceiver(refreshBroadcastReceiver)
+        super.onDestroy()
     }
 
     private fun loadHome(view: View) {
@@ -159,20 +177,18 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Handle navigation view item clicks here.
         val id = item.itemId
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        when (id) {
+            R.id.nav_view -> { }
+            R.id.nav_gallery -> { }
+            R.id.nav_slideshow -> { }
+            R.id.nav_manage -> { }
+            R.id.nav_settings -> { }
+            R.id.nav_logout -> {
+                CookieUtil.setCookiePreference(this, LinkedTreeMap<String, String>())
+                val intent = Intent("com.hydroh.yamibo.REFRESH")
+                sendBroadcast(intent)
+            }
         }
-
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }

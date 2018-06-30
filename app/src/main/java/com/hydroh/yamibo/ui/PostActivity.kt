@@ -8,15 +8,16 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
+import com.hydroh.yamibo.network.WebRequest
+import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.adapter.PostAdapter
 import com.hydroh.yamibo.util.DocumentParser
-import com.hydroh.yamibo.network.callback.DocumentCallbackListener
-import com.hydroh.yamibo.network.WebRequest
 import com.zzhoujay.richtext.RichText
 
 class PostActivity : AppCompatActivity() {
@@ -39,6 +40,8 @@ class PostActivity : AppCompatActivity() {
         swipeRefreshLayout.setOnRefreshListener { loadPosts(swipeRefreshLayout) }
         setSupportActionBar(toolbar)
         toolbar.inflateMenu(R.menu.post_toolbar_menu)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
 
         val extras = intent?.extras
         extras?.let {
@@ -49,6 +52,15 @@ class PostActivity : AppCompatActivity() {
 
         RichText.initCacheDir(this)
         loadPosts(hintTextView)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun loadPosts(view: View) {

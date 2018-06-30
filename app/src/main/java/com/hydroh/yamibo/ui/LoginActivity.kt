@@ -4,20 +4,20 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.TargetApi
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.AppCompatEditText
 import android.text.TextUtils
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import com.hydroh.yamibo.R
-import com.hydroh.yamibo.util.CookieUtil
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.CookieCallbackListener
-import com.hydroh.yamibo.network.callback.ICallbackListener
+import com.hydroh.yamibo.util.CookieUtil
 
 class LoginActivity : AppCompatActivity() {
 
@@ -29,6 +29,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        actionBar?.setDisplayHomeAsUpEnabled(true)
 
         mPasswordView.setOnEditorActionListener(TextView.OnEditorActionListener { textView, id, keyEvent ->
             if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
@@ -40,6 +41,15 @@ class LoginActivity : AppCompatActivity() {
 
         val mUsernameSignInButton = findViewById<View>(R.id.sign_in_button) as Button
         mUsernameSignInButton.setOnClickListener { attemptLogin() }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     /**
@@ -89,6 +99,9 @@ class LoginActivity : AppCompatActivity() {
                     }
                     CookieUtil.setCookiePreference(this@LoginActivity, cookies)
                     Log.d(TAG, "onFinish: Login Success!")
+                    val intent = Intent("com.hydroh.yamibo.REFRESH")
+                    sendBroadcast(intent)
+                    finish()
                 }
 
                 override fun onError(e: Exception) {

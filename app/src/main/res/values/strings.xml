@@ -20,4 +20,6 @@
     <string name="nav_header_title">Android Studio</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
+    <string name="nav_menu_settings">设置</string>
+    <string name="nav_menu_logout">登出</string>
 </resources>
