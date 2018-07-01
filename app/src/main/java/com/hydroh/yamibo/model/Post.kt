@@ -7,11 +7,12 @@ data class Post(
         val title: String,
         val tag: String,
         val author: String,
+        val postTime: String,
         val replyNum: Int,
         val url: String
 ) : MultiItemEntity {
 
     override fun getItemType(): Int {
-        return HomeAdapter.TYPE_THREAD
+        return HomeAdapter.TYPE_POST
     }
 }

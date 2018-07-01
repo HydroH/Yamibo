@@ -42,6 +42,9 @@ class PostActivity : AppCompatActivity() {
         toolbar.inflateMenu(R.menu.post_toolbar_menu)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
+        toolbar.setOnClickListener {
+            recyclerView.scrollToPosition(0)
+        }
 
         val extras = intent?.extras
         extras?.let {

@@ -38,9 +38,11 @@ public class GlideImageGetter implements ImageGetter, ImageLoadNotify {
     private static void cache(String source, Rect rect) {
         imageBoundCache.put(source, rect);
     }
-
     private static Rect loadCache(String source) {
         return imageBoundCache.get(source);
+    }
+    public static void removeCache(String source) {
+        imageBoundCache.remove(source);
     }
 
     private HashSet<ImageTarget> targets;

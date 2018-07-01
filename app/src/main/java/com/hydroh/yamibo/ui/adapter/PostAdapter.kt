@@ -42,11 +42,11 @@ class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList
 
                 RichText.fromHtml(reply.contentHTML)
                         .imageGetter(GlideImageGetter())
-                        .cache(CacheType.none)
+                        .cache(CacheType.all)
                         .singleLoad(false)
                         .autoFix(false)
                         .resetSize(true)
-                        .autoPlay(true)
+                        .autoPlay(false)
                         .scaleType(ImageHolder.ScaleType.fit_auto)
                         .showBorder(false)
                         .borderColor(Color.argb(1, 1, 1, 1))
@@ -56,9 +56,12 @@ class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList
                             override fun onLoading(holder: ImageHolder) {}
                             override fun onSizeReady(holder: ImageHolder, imageWidth: Int, imageHeight: Int, sizeHolder: ImageHolder.SizeHolder) {}
                             override fun onImageReady(holder: ImageHolder, width: Int, height: Int) {
-                                if (imgUrlList.contains(holder.source)) {
+                                if (width > 100 && imgUrlList.contains(holder.source)) {
                                     holder.isAutoFix = true
                                 } else {
+                                    if (imgUrlList.contains(holder.source)) {
+                                        imgUrlList.remove(holder.source)
+                                    }
                                     holder.width = width * 2
                                 }
                             }
@@ -70,6 +73,7 @@ class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList
                                     holder.width = 50
                                     holder.height = 50
                                 }
+                                GlideImageGetter.removeCache(holder.source)
                             }
                         })
                         .imageClick { imageUrls, position ->

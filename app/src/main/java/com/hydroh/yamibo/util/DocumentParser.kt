@@ -29,7 +29,7 @@ class DocumentParser(private val doc: Document, private val isMobile: Boolean) {
         }
         nextPageUrl = doc.select("div.pg a.nxt").first()?.attr("href")
 
-        avatarUrl = doc.select("img.header-tu-img").first()?.attr("src")?.replace("small", "middle")
+        avatarUrl = doc.select("img.header-tu-img").first()?.attr("src")?.replace("small", "big")
         avatarUrl?.let {
             isLoggedIn = true
             username = doc.select("ul#mycp1_menu").first()?.child(0)?.ownText()
@@ -77,9 +77,10 @@ class DocumentParser(private val doc: Document, private val isMobile: Boolean) {
             elemTag?.let { tag = "[${elemTag.ownText()}]" }
 
             val author = elemPost.select("td.by cite a").first().ownText()
+            val postTime = elemPost.select("td.by em span").first().ownText()
             val replyNum = elemPost.select("td.num a").first().ownText().toIntOrNull() ?: 0
 
-            val post = Post(title, tag, author, replyNum, url)
+            val post = Post(title, tag, author, postTime, replyNum, url)
 
             if (!isProgressive && elemID.startsWith("stickthread")) {
                 groupStick.addSubItem(post)

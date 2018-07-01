@@ -38,6 +38,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     implementation project(':libs:richtext')
     implementation 'com.zzhoujay:html:1.0.2'
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

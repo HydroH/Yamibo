@@ -16,6 +16,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/YamiboTheme.NoActionBar">
+        <meta-data
+            android:name="com.hydroh.yamibo.module.LimitedGlideModule"
+            android:value="GlideModule" />
         <activity
             android:name=".ui.HomeActivity"
             android:label="@string/app_name">

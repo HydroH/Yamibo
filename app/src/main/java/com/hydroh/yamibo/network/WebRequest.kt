@@ -8,10 +8,12 @@ import com.hydroh.yamibo.network.callback.CookieCallbackListener
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.util.CookieUtil
 import com.hydroh.yamibo.util.DocumentParser
+import com.hydroh.yamibo.util.removeScripts
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 import java.util.*
 import javax.security.auth.login.LoginException
+
 
 object WebRequest {
     const val BASE_URL = "https://bbs.yamibo.com/"
@@ -92,7 +94,9 @@ object WebRequest {
                 cookies.values.removeAll(Collections.singleton("deleted"))
 
                 if (!response.parse().outerHtml().contains("欢迎")) {
-                    throw LoginException("Wrong Password!")
+                    val doc = response.parse()
+                    val message = doc.select("p").first()?.text() ?: doc.text().removeScripts()
+                    throw LoginException(message)
                 }
                 listener?.onFinish(cookies)
             } catch (e: Exception) {

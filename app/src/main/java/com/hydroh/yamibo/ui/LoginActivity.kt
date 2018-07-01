@@ -25,6 +25,7 @@ class LoginActivity : AppCompatActivity() {
     private val mPasswordView by lazy { findViewById<EditText>(R.id.password) }
     private val mProgressView by lazy { findViewById<ProgressBar>(R.id.login_progress) }
     private val mLoginFormView by lazy { findViewById<ScrollView>(R.id.login_form) }
+    private val mErrorHintView by lazy { findViewById<TextView>(R.id.error_hint_text) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,6 +93,7 @@ class LoginActivity : AppCompatActivity() {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true)
+            mErrorHintView.visibility = View.GONE
             WebRequest.getLogonCookies(username, password, this, object : CookieCallbackListener {
                 override fun onFinish(cookies: MutableMap<String, String>) {
                     runOnUiThread {
@@ -106,7 +108,11 @@ class LoginActivity : AppCompatActivity() {
                 }
 
                 override fun onError(e: Exception) {
-                    runOnUiThread { showProgress(false) }
+                    runOnUiThread {
+                        showProgress(false)
+                        mErrorHintView.text = e.message ?: "未知错误"
+                        mErrorHintView.visibility = View.VISIBLE
+                    }
                     Log.d(TAG, "onError: Login Failed!")
                 }
             })

@@ -20,7 +20,6 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.bumptech.glide.Glide
@@ -32,6 +31,7 @@ import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.adapter.HomeAdapter
 import com.hydroh.yamibo.util.CookieUtil
 import com.hydroh.yamibo.util.DocumentParser
+import de.hdodenhof.circleimageview.CircleImageView
 
 class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -43,7 +43,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val toolbar by lazy { findViewById<Toolbar>(R.id.toolbar_home) }
     private val drawerLayout by lazy { findViewById<DrawerLayout>(R.id.layout_home) }
     private val navigationView by lazy { findViewById<NavigationView>(R.id.nav_view) }
-    private val navHeaderAvatar by lazy { findViewById<ImageView>(R.id.nav_header_avatar) }
+    private val navHeaderAvatar by lazy { findViewById<CircleImageView>(R.id.nav_header_avatar) }
     private val navHeaderUsername by lazy { findViewById<TextView>(R.id.nav_header_username) }
     private val hintTextView by lazy { findViewById<TextView>(R.id.hint_text) }
     private val hintProgressBar by lazy { findViewById<ProgressBar>(R.id.hint_progressbar) }
@@ -73,6 +73,10 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         navigationView.setNavigationItemSelectedListener(this)
+
+        toolbar.setOnClickListener {
+            recyclerView.scrollToPosition(0)
+        }
 
         hintTextView.setOnClickListener {
             loadHome(it)
@@ -202,12 +206,12 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun setupNavDrawer(isLoggedIn: Boolean, avatarUrl: String?, username: String?) {
         if (isLoggedIn) {
             Glide.with(this).load(avatarUrl).crossFade().into(navHeaderAvatar)
-            navHeaderUsername.text = username ?: navHeaderUsername.text
-            navHeaderAvatar.setOnClickListener(null)
+            navHeaderUsername?.text = username ?: navHeaderUsername.text
+            navHeaderAvatar?.setOnClickListener(null)
         } else {
-            navHeaderAvatar.setImageResource(R.mipmap.ic_launcher_round)
-            navHeaderUsername.setText(R.string.nav_header_username_hint)
-            navHeaderAvatar.setOnClickListener {
+            navHeaderAvatar?.setImageResource(R.mipmap.ic_launcher_round)
+            navHeaderUsername?.setText(R.string.nav_header_username_hint)
+            navHeaderAvatar?.setOnClickListener {
                 startLoginActivity(it)
             }
         }

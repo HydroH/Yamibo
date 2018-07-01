@@ -10,13 +10,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.hydroh.yamibo.ui.LoginActivity">
 
-    <!-- Login progress -->
-    <ProgressBar
-        android:id="@+id/login_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:visibility="gone" />
 
     <ScrollView
         android:id="@+id/login_form"
@@ -24,10 +17,37 @@
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/username_login_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="32dp"
+            android:src="@mipmap/ic_launcher_round" />
+
+        <!-- Login progress -->
+        <ProgressBar
+            android:id="@+id/login_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="40dp"
+            android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/error_hint_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:paddingEnd="32dp"
+                android:paddingStart="32dp"
+                android:visibility="gone"
+                tools:text="登录失败！您还可以尝试4次" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -38,9 +58,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_username"
+                    android:inputType="text"
                     android:maxLines="1"
-                    android:singleLine="true"
-                    android:inputType="text" />
+                    android:singleLine="true" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -66,8 +86,8 @@
                 android:id="@+id/sign_in_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
                 android:text="@string/action_sign_in" />
-
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

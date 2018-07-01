@@ -20,13 +20,13 @@ class HomeAdapter(data: List<MultiItemEntity>) : BaseMultiItemQuickAdapter<Multi
 
         const val TYPE_GROUP = 0
         const val TYPE_SECTOR = 1
-        const val TYPE_THREAD = 2
+        const val TYPE_POST = 2
     }
 
     init {
         addItemType(TYPE_GROUP, R.layout.item_group)
         addItemType(TYPE_SECTOR, R.layout.item_sector)
-        addItemType(TYPE_THREAD, R.layout.item_post)
+        addItemType(TYPE_POST, R.layout.item_post)
     }
 
     @Suppress("DEPRECATION")
@@ -76,11 +76,12 @@ class HomeAdapter(data: List<MultiItemEntity>) : BaseMultiItemQuickAdapter<Multi
                 }
             }
 
-            TYPE_THREAD -> {
+            TYPE_POST -> {
                 val post = item as Post
                 val spanned = Html.fromHtml("<font color='#0099cc'>${post.tag}</font>${post.title}")
                 holder.setText(R.id.post_title, spanned)
                         .setText(R.id.post_author, post.author)
+                        .setText(R.id.post_datetime, post.postTime)
                         .setText(R.id.post_replyNum, post.replyNum.toString())
 
                 holder.itemView.setOnClickListener {
