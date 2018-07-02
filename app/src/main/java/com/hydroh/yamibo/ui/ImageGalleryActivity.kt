@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.support.v4.view.ViewPager
 import android.widget.Toast
+import com.anthonycr.grant.PermissionsManager
 
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.ui.adapter.ImageBrowserAdapter
@@ -47,6 +48,10 @@ class ImageGalleryActivity : Activity() {
     public override fun onStop() {
         super.onStop()
         toast?.let { toast!!.cancel() }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        PermissionsManager.getInstance().notifyPermissionsChange(permissions, grantResults)
     }
 
     private fun showToast(text: String) {

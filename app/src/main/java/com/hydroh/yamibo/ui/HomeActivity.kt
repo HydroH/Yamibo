@@ -205,7 +205,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun setupNavDrawer(isLoggedIn: Boolean, avatarUrl: String?, username: String?) {
         if (isLoggedIn) {
-            Glide.with(this).load(avatarUrl).crossFade().into(navHeaderAvatar)
+            this?.let { Glide.with(this).load(avatarUrl).crossFade().into(navHeaderAvatar) }
             navHeaderUsername?.text = username ?: navHeaderUsername.text
             navHeaderAvatar?.setOnClickListener(null)
         } else {

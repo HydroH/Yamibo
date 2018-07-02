@@ -122,6 +122,10 @@ class DocumentParser(private val doc: Document, private val isMobile: Boolean) {
                 image.attr("src", image.attr("abs:src"))
 
                 if (image.hasAttr("file")) {
+                    if (image.attr("file").contains("bbs.yamibo.com/images/common")) {
+                        image.remove()
+                        continue
+                    }
                     val imgUrl = (if (image.attr("file").startsWith("http")) "" else WebRequest.BASE_URL) + image.attr("file")
                     image.attr("src", imgUrl)
                     imgUrlList.add(imgUrl)
