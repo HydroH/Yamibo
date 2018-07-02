@@ -94,8 +94,8 @@ object WebRequest {
                 cookies.values.removeAll(Collections.singleton("deleted"))
 
                 if (!response.parse().outerHtml().contains("欢迎")) {
-                    val doc = response.parse()
-                    val message = doc.select("p").first()?.text() ?: doc.text().removeScripts()
+                    val docRes = response.parse()
+                    val message = docRes.select("p").first()?.text() ?: docRes.text().removeScripts()
                     throw LoginException(message)
                 }
                 listener?.onFinish(cookies)

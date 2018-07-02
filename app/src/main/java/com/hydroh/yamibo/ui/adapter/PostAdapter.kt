@@ -8,6 +8,7 @@ import com.chad.library.adapter.base.BaseMultiItemQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
+import com.hydroh.yamibo.common.TextDrawable
 import com.hydroh.yamibo.model.Reply
 import com.hydroh.yamibo.ui.ImageGalleryActivity
 import com.zzhoujay.richtext.CacheType
@@ -51,6 +52,36 @@ class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList
                         .showBorder(false)
                         .borderColor(Color.argb(1, 1, 1, 1))
                         .borderSize(0f)
+                        .placeHolder{ imageHolder, config, textView ->
+                            var hintText =  ""
+                            var width = 50
+                            var height = 50
+                            if (imgUrlList.contains(imageHolder.source)) {
+                                hintText = mContext.getString(R.string.image_loading_hint)
+                                width = textView.width
+                                height = width / 2
+                            }
+                            imageHolder.width = width
+                            imageHolder.height = height
+                            val textDrawable = TextDrawable(textView.resources, hintText, Color.GRAY, Color.LTGRAY)
+                            textDrawable.setBounds(0, 0, width, height)
+                            textDrawable
+                        }
+                        .errorImage{ imageHolder, config, textView ->
+                            var hintText =  ""
+                            var width = 50
+                            var height = 50
+                            if (imgUrlList.contains(imageHolder.source)) {
+                                hintText = mContext.getString(R.string.image_load_fail_hint)
+                                width = textView.width
+                                height = width / 2
+                            }
+                            imageHolder.width = width
+                            imageHolder.height = height
+                            val textDrawable = TextDrawable(textView.resources, hintText, Color.GRAY, Color.LTGRAY)
+                            textDrawable.setBounds(0, 0, width, height)
+                            textDrawable
+                        }
                         .fix(object : ImageFixCallback {
                             override fun onInit(holder: ImageHolder) {}
                             override fun onLoading(holder: ImageHolder) {}
@@ -67,12 +98,6 @@ class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList
                             }
                             override fun onFailure(holder: ImageHolder, e: Exception?) {
                                 Log.d(TAG, "onFailure: ${holder.source}")
-                                if (imgUrlList.contains(holder.source)) {
-                                    holder.isAutoFix = true
-                                } else {
-                                    holder.width = 50
-                                    holder.height = 50
-                                }
                                 GlideImageGetter.removeCache(holder.source)
                             }
                         })

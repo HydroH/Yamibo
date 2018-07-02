@@ -1,7 +1,12 @@
 package com.hydroh.yamibo.ui
 
+import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ContentValues.TAG
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -10,6 +15,9 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.chad.library.adapter.base.entity.MultiItemEntity
@@ -17,6 +25,7 @@ import com.hydroh.yamibo.R
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.adapter.PostAdapter
+import com.hydroh.yamibo.ui.common.ModalFrameLayout
 import com.hydroh.yamibo.util.DocumentParser
 import com.zzhoujay.richtext.RichText
 
@@ -32,6 +41,13 @@ class PostActivity : AppCompatActivity() {
     private val hintTextView by lazy { findViewById<TextView>(R.id.hint_text) }
     private val hintProgressBar by lazy { findViewById<ProgressBar>(R.id.hint_progressbar) }
     private val recyclerView by lazy { findViewById<RecyclerView>(R.id.list_common) }
+    private val replyEditText by lazy { findViewById<EditText>(R.id.edit_post_reply) }
+    private val replySendBtn by lazy { findViewById<ImageButton>(R.id.button_post_reply) }
+    private val postLayout by lazy { findViewById<ModalFrameLayout>(R.id.list_post) }
+
+    private val animatorDim by lazy {
+        ObjectAnimator.ofInt(postLayout.foreground, "alpha", 0, 255)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +61,10 @@ class PostActivity : AppCompatActivity() {
         toolbar.setOnClickListener {
             recyclerView.scrollToPosition(0)
         }
+        replyEditText.setOnFocusChangeListener { view, b -> setFocusEditReply(b) }
+        postLayout.foreground = ColorDrawable(ContextCompat.getColor(this, R.color.blackTransHalf))
+        postLayout.foreground.alpha = 0
+        animatorDim.duration = 200
 
         val extras = intent?.extras
         extras?.let {
@@ -129,6 +149,31 @@ class PostActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setFocusEditReply(focused: Boolean) {
+        if (focused) {
+            replyEditText.setLines(3)
+            replySendBtn.visibility = View.VISIBLE
+            postLayout.isInterCeptTouchEvent = true
+            postLayout.setOnTouchListener { view, motionEvent ->
+                val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(replyEditText.windowToken, 0)
+                replyEditText.clearFocus()
+                Log.d(TAG, "onTouch: Post Layout touched. Shrinking edittext...")
+                return@setOnTouchListener true
+            }
+            animatorDim.setIntValues(0, 255)
+            animatorDim.start()
+        } else {
+            replyEditText.setLines(1)
+            replySendBtn.visibility = View.GONE
+            postLayout.setOnTouchListener(null)
+            postLayout.isInterCeptTouchEvent = false
+            animatorDim.setIntValues(255, 0)
+            animatorDim.start()
+        }
     }
 
 }

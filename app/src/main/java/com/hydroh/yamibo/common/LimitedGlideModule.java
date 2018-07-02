@@ -1,4 +1,4 @@
-package com.hydroh.yamibo.module;
+package com.hydroh.yamibo.common;
 
 import android.content.Context;
 

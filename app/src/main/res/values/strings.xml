@@ -23,4 +23,7 @@
     <string name="nav_menu_settings">设置</string>
     <string name="nav_menu_logout">登出</string>
     <string name="nav_header_username_hint">点击头像以登录</string>
+    <string name="reply_edit_hint">回复</string>
+    <string name="image_load_fail_hint">图片加载失败</string>
+    <string name="image_loading_hint">图片加载失败</string>
 </resources>
