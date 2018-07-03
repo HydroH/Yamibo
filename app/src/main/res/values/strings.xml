@@ -26,7 +26,12 @@
     <string name="reply_edit_hint">回复</string>
     <string name="image_loading_hint">图片加载中…</string>>
     <string name="image_load_fail_hint">图片加载失败</string>
-    <string name="image_op_menu_title">选择操作</string>>
+    <string name="image_op_menu_title">选择操作</string>
+    <string name="title_activity_image_browser">图片浏览</string>
+    <string name="nav_menu_history">历史</string>
+    <string name="nav_menu_message">消息</string>
+    <string name="nav_menu_home">首页</string>
+    <string name="nav_menu_favorite">收藏</string>>
     <string-array name="image_op_menu_options">
         <item>保存图片</item>
         <item>分享图片</item>

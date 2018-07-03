@@ -24,6 +24,7 @@ import com.github.chrisbanes.photoview.PhotoView
 import com.github.chrisbanes.photoview.PhotoViewAttacher
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.io.SaveImageTask
+import com.hydroh.yamibo.ui.ImageGalleryActivity
 import java.io.File
 
 class ImageBrowserAdapter(private val context: Activity, private var imgUrlList: List<String>) : PagerAdapter() {
@@ -46,8 +47,14 @@ class ImageBrowserAdapter(private val context: Activity, private var imgUrlList:
         val textHintError = view.findViewById<TextView>(R.id.text_image_error)
         val imgUrl = imgUrlList[position]
         val photoViewAttacher = PhotoViewAttacher(imageBrowserView)
-        imageBrowserView.setOnScaleChangeListener { scaleFactor, focusX, focusY ->
-            Log.d(TAG, "onScaleChange: test")
+
+        photoViewAttacher.setOnClickListener {
+            if (it.context is ImageGalleryActivity) {
+                val activity = it.context as ImageGalleryActivity
+                activity.toggleToolbar()
+            } else {
+                Log.d(TAG, "instantiateItem: Failed to toggle toolbar.")
+            }
         }
 
         Glide.with(context)
@@ -103,7 +110,7 @@ class ImageBrowserAdapter(private val context: Activity, private var imgUrlList:
                                                     }
                                                 })
                                     }
-                                    1 -> TODO()
+                                    1 -> TODO("Image share function")
                                 }
                             }
                             it.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)

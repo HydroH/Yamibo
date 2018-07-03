@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -66,10 +67,16 @@ class PostActivity : AppCompatActivity() {
         postLayout.foreground.alpha = 0
         animatorDim.duration = 200
 
-        val extras = intent?.extras
-        extras?.let {
-            url = extras.getString("url", "")
-            title = extras.getString("title", "百合会")
+        intent?.let {
+            if (intent.action == Intent.ACTION_VIEW) {
+                val uri = intent.data
+                url = uri.path
+            } else {
+                intent.extras?.let {
+                    url = it.getString("url", "")
+                    title = it.getString("title", "百合会")
+                }
+            }
         }
         Log.d(TAG, "onCreate: URL: $url")
 

@@ -82,10 +82,16 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             loadHome(it)
         }
 
-        val extras = intent?.extras
-        extras?.let {
-            url = extras.getString("url", DEFAULT_URL)
-            title = extras.getString("title", "百合会")
+        intent?.let {
+            if (intent.action == Intent.ACTION_VIEW) {
+                val uri = intent.data
+                url = uri.path.removePrefix("/")
+            } else {
+                intent.extras?.let {
+                    url = it.getString("url", DEFAULT_URL)
+                    title = it.getString("title", "百合会")
+                }
+            }
         }
 
         Log.d(TAG, "onCreate: URL: $url")
@@ -189,9 +195,9 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         when (id) {
             R.id.nav_view -> { }
-            R.id.nav_gallery -> { }
-            R.id.nav_slideshow -> { }
-            R.id.nav_manage -> { }
+            R.id.nav_message -> { }
+            R.id.nav_history -> { }
+            R.id.nav_favorite -> { }
             R.id.nav_settings -> { }
             R.id.nav_logout -> {
                 CookieUtil.setCookiePreference(this, LinkedTreeMap<String, String>())
@@ -205,13 +211,17 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun setupNavDrawer(isLoggedIn: Boolean, avatarUrl: String?, username: String?) {
         if (isLoggedIn) {
-            this?.let { Glide.with(this).load(avatarUrl).crossFade().into(navHeaderAvatar) }
-            navHeaderUsername?.text = username ?: navHeaderUsername.text
-            navHeaderAvatar?.setOnClickListener(null)
+            try {
+                Glide.with(this).load(avatarUrl).crossFade().into(navHeaderAvatar)
+            } catch (e: Exception) {
+                Log.d(TAG, "setupNavDrawer: Failed to load avatar.")
+            }
+            navHeaderUsername.text = username ?: navHeaderUsername.text
+            navHeaderAvatar.setOnClickListener(null)
         } else {
-            navHeaderAvatar?.setImageResource(R.mipmap.ic_launcher_round)
-            navHeaderUsername?.setText(R.string.nav_header_username_hint)
-            navHeaderAvatar?.setOnClickListener {
+            navHeaderAvatar.setImageResource(R.mipmap.ic_launcher_round)
+            navHeaderUsername.setText(R.string.nav_header_username_hint)
+            navHeaderAvatar.setOnClickListener {
                 startLoginActivity(it)
             }
         }

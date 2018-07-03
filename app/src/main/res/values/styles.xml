@@ -17,6 +17,8 @@
 
     <style name="YamiboTheme.FullScreen" parent="YamiboTheme.NoActionBar">
         <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="toolbarStyle">@style/YamiboTheme.Toolbar.Transparent</item>
     </style>
 
     <style name="YamiboTheme.ActionBar" parent="Widget.AppCompat.ActionBar" />
@@ -25,6 +27,10 @@
 
     <style name="YamiboTheme.Toolbar" parent="Widget.AppCompat.Toolbar">
         <item name="android:background">@color/colorPrimary</item>
+    </style>
+
+    <style name="YamiboTheme.Toolbar.Transparent" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">@color/blackTransHalf</item>
     </style>
 
     <style name="YamiboTheme.Button" parent="Widget.AppCompat.Button.Colored">
