@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
+import android.text.TextUtils
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -45,6 +46,7 @@ class PostActivity : AppCompatActivity() {
     private val replyEditText by lazy { findViewById<EditText>(R.id.edit_post_reply) }
     private val replySendBtn by lazy { findViewById<ImageButton>(R.id.button_post_reply) }
     private val postLayout by lazy { findViewById<ModalFrameLayout>(R.id.list_post) }
+    private var titleTextView : TextView? = null
 
     private val animatorDim by lazy {
         ObjectAnimator.ofInt(postLayout.foreground, "alpha", 0, 255)
@@ -80,6 +82,22 @@ class PostActivity : AppCompatActivity() {
         }
         Log.d(TAG, "onCreate: URL: $url")
 
+        try {
+            val field = toolbar::class.java.getDeclaredField("mTitleTextView")
+            field.isAccessible = true
+            titleTextView = field.get(toolbar) as TextView
+
+            titleTextView!!.ellipsize = TextUtils.TruncateAt.MARQUEE
+            titleTextView!!.isFocusable = true
+            titleTextView!!.isFocusableInTouchMode = true
+            titleTextView!!.requestFocus()
+            titleTextView!!.setSingleLine(true)
+            titleTextView!!.isSelected = true
+            titleTextView!!.marqueeRepeatLimit = -1
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
         RichText.initCacheDir(this)
         loadPosts(hintTextView)
     }
@@ -112,6 +130,12 @@ class PostActivity : AppCompatActivity() {
                     swipeRefreshLayout.isRefreshing = false
                     val layoutManager = LinearLayoutManager(recyclerView.context)
                     recyclerView.layoutManager = layoutManager
+
+                    docParser.title?.let {
+                        if (title != it) {
+                            title = it
+                        }
+                    }
 
                     val adapter = PostAdapter(replyList, imgUrlList)
                     recyclerView.adapter = adapter

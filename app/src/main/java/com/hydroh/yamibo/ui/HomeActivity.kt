@@ -29,7 +29,7 @@ import com.hydroh.yamibo.R
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.adapter.HomeAdapter
-import com.hydroh.yamibo.util.CookieUtil
+import com.hydroh.yamibo.util.PrefUtils
 import com.hydroh.yamibo.util.DocumentParser
 import de.hdodenhof.circleimageview.CircleImageView
 
@@ -122,6 +122,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     val layoutManager = LinearLayoutManager(recyclerView.context)
                     recyclerView.layoutManager = layoutManager
 
+                    docParser.title?.let { title = docParser.title }
                     setupNavDrawer(docParser.isLoggedIn, docParser.avatarUrl, docParser.username)
 
                     val adapter = HomeAdapter(homeItemList)
@@ -200,7 +201,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_favorite -> { }
             R.id.nav_settings -> { }
             R.id.nav_logout -> {
-                CookieUtil.setCookiePreference(this, LinkedTreeMap<String, String>())
+                PrefUtils.setCookiePreference(this, LinkedTreeMap<String, String>())
                 val intent = Intent("com.hydroh.yamibo.REFRESH")
                 sendBroadcast(intent)
             }

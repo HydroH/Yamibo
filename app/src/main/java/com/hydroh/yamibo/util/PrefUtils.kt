@@ -6,7 +6,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-object CookieUtil {
+object PrefUtils {
 
     fun setCookiePreference(context: Context, cookie: MutableMap<String, String>) {
         val preference = context.getSharedPreferences("cookie", Context.MODE_PRIVATE)

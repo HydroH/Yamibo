@@ -6,7 +6,7 @@ import android.util.Log
 import com.google.gson.internal.LinkedTreeMap
 import com.hydroh.yamibo.network.callback.CookieCallbackListener
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
-import com.hydroh.yamibo.util.CookieUtil
+import com.hydroh.yamibo.util.PrefUtils
 import com.hydroh.yamibo.util.DocumentParser
 import com.hydroh.yamibo.util.removeScripts
 import org.jsoup.Connection
@@ -33,7 +33,7 @@ object WebRequest {
                 }
                 val ua = if (isMobile) UA_MOBILE else UA_DESKTOP
                 val conn = Jsoup.connect(fullUrl).header("User-Agent", ua)
-                val cookies = CookieUtil.getCookiePreference(context)
+                val cookies = PrefUtils.getCookiePreference(context)
                 cookies?.let {
                     Log.d(TAG, "run: Cookies loaded: $cookies")
                     conn.cookies(cookies)
@@ -48,7 +48,7 @@ object WebRequest {
     fun getLogonCookies(username: String, password: String, context: Context, listener: CookieCallbackListener?) {
         Thread(Runnable {
             try {
-                val cookies = /*CookieUtil.getCookiePreference(context) ?:*/ LinkedTreeMap<String, String>()
+                val cookies = /*PrefUtils.getCookiePreference(context) ?:*/ LinkedTreeMap<String, String>()
                 var response = Jsoup.connect(LOGIN_FORM_URL)
                         .method(Connection.Method.GET)
                         .data(

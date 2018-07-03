@@ -17,7 +17,7 @@ import android.widget.*
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.CookieCallbackListener
-import com.hydroh.yamibo.util.CookieUtil
+import com.hydroh.yamibo.util.PrefUtils
 
 class LoginActivity : AppCompatActivity() {
 
@@ -100,7 +100,7 @@ class LoginActivity : AppCompatActivity() {
                         showProgress(false)
                         Toast.makeText(mUsernameView!!.context, R.string.login_success, Toast.LENGTH_SHORT).show()
                     }
-                    CookieUtil.setCookiePreference(this@LoginActivity, cookies)
+                    PrefUtils.setCookiePreference(this@LoginActivity, cookies)
                     Log.d(TAG, "onFinish: Login Success!")
                     val intent = Intent("com.hydroh.yamibo.REFRESH")
                     sendBroadcast(intent)

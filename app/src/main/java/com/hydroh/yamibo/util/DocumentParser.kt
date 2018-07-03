@@ -13,6 +13,8 @@ import org.jsoup.nodes.Document
 class DocumentParser(private val doc: Document, private val isMobile: Boolean) {
     internal var isLoggedIn: Boolean = false
         private set
+    internal var title: String? = null
+        private set
     internal var username: String? = null
         private set
     internal var avatarUrl: String? = null
@@ -27,6 +29,7 @@ class DocumentParser(private val doc: Document, private val isMobile: Boolean) {
         if (isMobile) {
             throw RuntimeException("Incompatible viewport!")
         }
+        title = doc.select("div.bm_h.cl h1.xs2 a").first()?.ownText()
         nextPageUrl = doc.select("div.pg a.nxt").first()?.attr("href")
 
         avatarUrl = doc.select("img.header-tu-img").first()?.attr("src")?.replace("small", "big")
@@ -102,6 +105,7 @@ class DocumentParser(private val doc: Document, private val isMobile: Boolean) {
         if (isMobile) {
             throw RuntimeException("Incompatible viewport!")
         }
+        title = doc.select("span#thread_subject").first()?.ownText()
         nextPageUrl = doc.select("div.pg a.nxt").first()?.attr("href")
 
         val replyList = ArrayList<MultiItemEntity>()
