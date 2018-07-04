@@ -27,7 +27,7 @@ import com.hydroh.yamibo.R
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.adapter.PostAdapter
-import com.hydroh.yamibo.ui.common.ModalFrameLayout
+import com.hydroh.yamibo.ui.view.ModalFrameLayout
 import com.hydroh.yamibo.util.DocumentParser
 import com.zzhoujay.richtext.RichText
 

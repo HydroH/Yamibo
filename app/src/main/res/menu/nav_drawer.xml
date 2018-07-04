@@ -26,13 +26,11 @@
             android:title="@string/nav_menu_settings" />
     </group>
 
-    <item android:title="">
-        <menu>
-            <item
-                android:id="@+id/nav_logout"
-                android:icon="@drawable/ic_menu_logout"
-                android:title="@string/nav_menu_logout" />
-        </menu>
-    </item>
+    <group>
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_menu_logout"
+            android:title="@string/nav_menu_logout" />
+    </group>
 
 </menu>

@@ -15,7 +15,7 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <com.hydroh.yamibo.ui.common.ModalFrameLayout
+    <com.hydroh.yamibo.ui.view.ModalFrameLayout
         android:id="@+id/list_post"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,10 +23,10 @@
         android:layout_below="@id/toolbar_post" >
 
         <include
-            layout="@layout/content_common"
+            layout="@layout/list_common"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-    </com.hydroh.yamibo.ui.common.ModalFrameLayout>
+    </com.hydroh.yamibo.ui.view.ModalFrameLayout>
 
     <RelativeLayout
         android:id="@+id/layout_post_reply"

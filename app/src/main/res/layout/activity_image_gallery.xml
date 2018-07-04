@@ -8,7 +8,7 @@
     android:fitsSystemWindows="true"
     tools:context="com.hydroh.yamibo.ui.ImageGalleryActivity">
 
-    <com.hydroh.yamibo.ui.common.HackyViewPager
+    <com.hydroh.yamibo.ui.view.HackyViewPager
         android:id="@+id/image_viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

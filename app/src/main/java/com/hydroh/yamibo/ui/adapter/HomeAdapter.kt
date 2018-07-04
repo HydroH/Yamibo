@@ -10,8 +10,10 @@ import com.hydroh.yamibo.R
 import com.hydroh.yamibo.model.Post
 import com.hydroh.yamibo.model.Sector
 import com.hydroh.yamibo.model.SectorGroup
-import com.hydroh.yamibo.ui.HomeActivity
 import com.hydroh.yamibo.ui.PostActivity
+import com.hydroh.yamibo.ui.SectorActivity
+import com.hydroh.yamibo.ui.fragment.ARG_TITLE
+import com.hydroh.yamibo.ui.fragment.ARG_URL
 
 class HomeAdapter(data: List<MultiItemEntity>) : BaseMultiItemQuickAdapter<MultiItemEntity, BaseViewHolder>(data) {
 
@@ -69,9 +71,9 @@ class HomeAdapter(data: List<MultiItemEntity>) : BaseMultiItemQuickAdapter<Multi
                     val position = holder.adapterPosition
                     Log.d(TAG, "Sector position $position clicked.")
                     val clickedSector = mData[position] as Sector
-                    val intent = Intent(mContext, HomeActivity::class.java)
-                    intent.putExtra("url", clickedSector.url)
-                    intent.putExtra("title", clickedSector.title)
+                    val intent = Intent(mContext, SectorActivity::class.java)
+                            .putExtra(ARG_URL, clickedSector.url)
+                            .putExtra(ARG_TITLE, clickedSector.title)
                     mContext.startActivity(intent)
                 }
             }
@@ -89,8 +91,8 @@ class HomeAdapter(data: List<MultiItemEntity>) : BaseMultiItemQuickAdapter<Multi
                     Log.d(TAG, "Post position $position clicked.")
                     val clickedPost = mData[position] as Post
                     val intent = Intent(mContext, PostActivity::class.java)
-                    intent.putExtra("url", clickedPost.url)
-                    intent.putExtra("title", clickedPost.title)
+                            .putExtra("url", clickedPost.url)
+                            .putExtra("title", clickedPost.title)
                     mContext.startActivity(intent)
                 }
             }

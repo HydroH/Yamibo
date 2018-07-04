@@ -1,4 +1,4 @@
-package com.hydroh.yamibo.ui.common
+package com.hydroh.yamibo.ui.view
 
 import android.content.ContentValues.TAG
 import android.content.Context

@@ -9,7 +9,7 @@ import android.view.animation.DecelerateInterpolator
 import com.anthonycr.grant.PermissionsManager
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.ui.adapter.ImageBrowserAdapter
-import com.hydroh.yamibo.ui.common.HackyViewPager
+import com.hydroh.yamibo.ui.view.HackyViewPager
 
 class ImageGalleryActivity : AppCompatActivity() {
     private val TAG = this::class.java.simpleName
