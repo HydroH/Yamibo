@@ -28,8 +28,9 @@ import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.adapter.PostAdapter
 import com.hydroh.yamibo.ui.view.ModalFrameLayout
-import com.hydroh.yamibo.util.DocumentParser
+import com.hydroh.yamibo.util.parser.PostParser
 import com.zzhoujay.richtext.RichText
+import org.jsoup.nodes.Document
 
 class PostActivity : AppCompatActivity() {
 
@@ -121,17 +122,18 @@ class PostActivity : AppCompatActivity() {
         }
 
         WebRequest.getHtmlDocument(url, false, this, object : DocumentCallbackListener {
-            override fun onFinish(docParser: DocumentParser) {
-                replyList = docParser.parsePost()
-                imgUrlList = docParser.imgUrlList
-                nextPageUrl = docParser.nextPageUrl
+            override fun onFinish(document: Document) {
+                val postParser = PostParser(document)
+                replyList = postParser.replyList
+                imgUrlList = postParser.imgUrlList
+                nextPageUrl = postParser.nextPageUrl
                 runOnUiThread {
                     hintProgressBar.visibility = View.GONE
                     swipeRefreshLayout.isRefreshing = false
                     val layoutManager = LinearLayoutManager(recyclerView.context)
                     recyclerView.layoutManager = layoutManager
 
-                    docParser.title?.let {
+                    postParser.title?.let {
                         if (title != it) {
                             title = it
                         }
@@ -142,13 +144,13 @@ class PostActivity : AppCompatActivity() {
                     adapter.setOnLoadMoreListener({
                         if (nextPageUrl != null) {
                             WebRequest.getHtmlDocument(nextPageUrl!!, false, recyclerView.context, object : DocumentCallbackListener {
-                                override fun onFinish(docParser: DocumentParser) {
-                                    val postMoreList = docParser.parsePost()
+                                override fun onFinish(document: Document) {
+                                    val postMoreParser = PostParser(document)
                                     recyclerView.post {
                                         Log.d(TAG, "post: LoadMore Complete.")
-                                        nextPageUrl = docParser.nextPageUrl
-                                        adapter.addData(postMoreList)
-                                        imgUrlList.addAll(docParser.imgUrlList)
+                                        nextPageUrl = postMoreParser.nextPageUrl
+                                        adapter.addData(postMoreParser.replyList)
+                                        imgUrlList.addAll(postMoreParser.imgUrlList)
                                         adapter.loadMoreComplete()
                                     }
                                 }

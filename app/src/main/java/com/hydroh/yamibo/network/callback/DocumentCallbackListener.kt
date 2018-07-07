@@ -1,8 +1,8 @@
 package com.hydroh.yamibo.network.callback
 
-import com.hydroh.yamibo.util.DocumentParser
+import org.jsoup.nodes.Document
 
 interface DocumentCallbackListener {
-    fun onFinish(docParser: DocumentParser)
+    fun onFinish(document: Document)
     fun onError(e: Exception)
 }

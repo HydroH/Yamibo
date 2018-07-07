@@ -21,7 +21,8 @@ import com.hydroh.yamibo.R
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.adapter.HomeAdapter
-import com.hydroh.yamibo.util.DocumentParser
+import com.hydroh.yamibo.util.parser.HomeParser
+import org.jsoup.nodes.Document
 
 const val DEFAULT_URL = "forum.php"
 
@@ -109,14 +110,15 @@ class HomeFragment : Fragment() {
         }
 
         WebRequest.getHtmlDocument(mPageUrl, false, activity!!, object : DocumentCallbackListener {
-            override fun onFinish(docParser: DocumentParser) {
-                mHomeItemList = docParser.parseHome()
-                mNextPageUrl = docParser.nextPageUrl
+            override fun onFinish(document: Document) {
+                val homeParser = HomeParser(document)
+                mHomeItemList = homeParser.groupList
+                mNextPageUrl = homeParser.nextPageUrl
                 activity!!.runOnUiThread {
                     mHintText.visibility = View.GONE
                     mLoadProgressBar.visibility = View.GONE
                     mSwipeRefreshLayout.isRefreshing = false
-                    docParser.run {
+                    homeParser.run {
                         mListener?.onUserStatReady(isLoggedIn, avatarUrl, username)
                     }
                     val layoutManager = LinearLayoutManager(mContentRecyclerView.context)
@@ -128,12 +130,12 @@ class HomeFragment : Fragment() {
                         adapter.setOnLoadMoreListener({
                             if (mNextPageUrl != null) {
                                 WebRequest.getHtmlDocument(mNextPageUrl!!, false, mContentRecyclerView.context, object : DocumentCallbackListener {
-                                    override fun onFinish(docParser: DocumentParser) {
-                                        val homeMoreSubItemList = docParser.parseHome(true)
+                                    override fun onFinish(document: Document) {
+                                        val homeMoreParser = HomeParser(document, true)
                                         activity!!.runOnUiThread {
                                             Log.d(ContentValues.TAG, "post: LoadMore Complete.")
-                                            mNextPageUrl = docParser.nextPageUrl
-                                            adapter.addData(homeMoreSubItemList)
+                                            mNextPageUrl = homeMoreParser.nextPageUrl
+                                            adapter.addData(homeMoreParser.groupList)
                                             adapter.loadMoreComplete()
                                         }
                                     }

@@ -6,9 +6,11 @@ import android.util.Log
 import com.google.gson.internal.LinkedTreeMap
 import com.hydroh.yamibo.network.callback.CookieCallbackListener
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
+import com.hydroh.yamibo.network.callback.JsonCallbackListener
 import com.hydroh.yamibo.util.PrefUtils
-import com.hydroh.yamibo.util.DocumentParser
 import com.hydroh.yamibo.util.removeScripts
+import org.json.JSONObject
+import org.json.JSONTokener
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 import java.util.*
@@ -16,6 +18,7 @@ import javax.security.auth.login.LoginException
 
 
 object WebRequest {
+    const val APP_UPDATE_URL = "http://hydroh.me/yamibo/version.json"
     const val BASE_URL = "https://bbs.yamibo.com/"
 
     private const val UA_DESKTOP = "Mozilla/5.0 (X11; Linux x86_64; rv:32.0) Gecko/    20100101 Firefox/32.0"
@@ -24,6 +27,19 @@ object WebRequest {
     private const val LOGIN_FORM_URL = "${BASE_URL}member.php"
     private const val LOGIN_REQUEST_URL = "$LOGIN_FORM_URL?mod=logging&action=login&loginsubmit=yes&handlekey=login&loginhash=%s&inajax=1"
 
+    @JvmStatic
+    fun checkVersion(listener: JsonCallbackListener?) {
+        Thread(Runnable {
+            try {
+                val result = Jsoup.connect(APP_UPDATE_URL).ignoreContentType(true).execute().body()
+                listener?.onFinish(JSONTokener(result).nextValue() as JSONObject)
+            } catch (e: Exception) {
+                listener?.onError(e)
+            }
+        }).start()
+    }
+
+    @JvmStatic
     fun getHtmlDocument(url: String, isMobile: Boolean, context: Context, listener: DocumentCallbackListener?) {
         Thread(Runnable {
             try {
@@ -32,19 +48,21 @@ object WebRequest {
                     fullUrl = BASE_URL + url
                 }
                 val ua = if (isMobile) UA_MOBILE else UA_DESKTOP
-                val conn = Jsoup.connect(fullUrl).header("User-Agent", ua)
+                val conn = Jsoup.connect(fullUrl)
+                        .header("User-Agent", ua)
                 val cookies = PrefUtils.getCookiePreference(context)
                 cookies?.let {
-                    Log.d(TAG, "run: Cookies loaded: $cookies")
-                    conn.cookies(cookies)
+                    Log.d(TAG, "run: Cookies loaded: $it")
+                    conn.cookies(it)
                 }
-                listener?.onFinish(DocumentParser(conn.get(), isMobile))
+                listener?.onFinish(conn.get())
             } catch (e: Exception) {
                 listener?.onError(e)
             }
         }).start()
     }
 
+    @JvmStatic
     fun getLogonCookies(username: String, password: String, context: Context, listener: CookieCallbackListener?) {
         Thread(Runnable {
             try {
@@ -99,6 +117,17 @@ object WebRequest {
                     throw LoginException(message)
                 }
                 listener?.onFinish(cookies)
+            } catch (e: Exception) {
+                listener?.onError(e)
+            }
+        }).start()
+    }
+
+    @JvmStatic
+    fun postReply(listener: DocumentCallbackListener?) {
+        Thread(Runnable {
+            try {
+                //TODO: listener?.onFinish()
             } catch (e: Exception) {
                 listener?.onError(e)
             }

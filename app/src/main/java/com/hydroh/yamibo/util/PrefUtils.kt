@@ -7,6 +7,17 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 object PrefUtils {
+    fun setFirstLaunch(context: Context, isFirstLaunch: Boolean) {
+        val preference = context.getSharedPreferences("application", Context.MODE_PRIVATE)
+        val editor = preference.edit()
+        editor.putBoolean("isFirstLaunch", isFirstLaunch)
+        editor.apply()
+    }
+
+    fun getFirstLaunch(context: Context): Boolean {
+        val preference = context.getSharedPreferences("application", Context.MODE_PRIVATE)
+        return preference.getBoolean("isFirstLaunch", true)
+    }
 
     fun setCookiePreference(context: Context, cookie: MutableMap<String, String>) {
         val preference = context.getSharedPreferences("cookie", Context.MODE_PRIVATE)
