@@ -3,6 +3,7 @@ package com.hydroh.yamibo.ui.adapter
 import android.content.Intent
 import android.graphics.Color
 import android.util.Log
+import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.chad.library.adapter.base.BaseViewHolder
 import com.chad.library.adapter.base.entity.MultiItemEntity
@@ -10,6 +11,7 @@ import com.hydroh.yamibo.R
 import com.hydroh.yamibo.common.TextDrawable
 import com.hydroh.yamibo.model.Reply
 import com.hydroh.yamibo.ui.ImageGalleryActivity
+import com.hydroh.yamibo.ui.ProfileActivity
 import com.hydroh.yamibo.ui.common.AbsMultiAdapter
 import com.hydroh.yamibo.ui.common.ItemType.TYPE_REPLY
 import com.zzhoujay.richtext.CacheType
@@ -36,8 +38,16 @@ class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList
                 holder.setText(R.id.reply_author, reply.author)
                         .setText(R.id.reply_date, reply.postDate)
                         .setText(R.id.reply_no, "#" + reply.floorNum)
+
                 Glide.with(mContext).load(reply.avatarUrl).crossFade()
                         .into(holder.getView(R.id.reply_avatar))
+                holder.getView<ImageView>(R.id.reply_avatar).setOnClickListener {
+                    val intent = Intent(mContext, ProfileActivity::class.java)
+                            .putExtra("uid", reply.authorUid)
+                            .putExtra("username", reply.author)
+                            .putExtra("avatarUrl", reply.avatarUrl)
+                    mContext.startActivity(intent)
+                }
                 Log.d(TAG, "convert: Loading avatar: ${reply.avatarUrl}")
 
                 RichText.fromHtml(reply.contentHTML)

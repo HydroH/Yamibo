@@ -6,6 +6,7 @@ import com.hydroh.yamibo.ui.common.ItemType
 data class Reply(
         val author: String,
         val avatarUrl: String,
+        val authorUid: String,
         val contentHTML: String,
         val postDate: String,
         val floorNum: Int

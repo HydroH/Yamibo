@@ -27,18 +27,19 @@ class PostParser {
         title = document.select("span#thread_subject").first()?.ownText()
         nextPageUrl = document.select("div.pg a.nxt").first()?.attr("href")
 
-        val elemForm = document.select("form#fastpostform").first()
-
-        replyUrl = elemForm?.attr("action")
-        formhash = elemForm?.select("input[name=\"formhash\"]")?.first()?.attr("value")
-
+        document.select("form#fastpostform").first().run {
+            replyUrl = attr("action")
+            formhash = select("input[name=\"formhash\"]")?.first()?.attr("value")
+        }
         document.select("div[style*=\"display: none\"]").remove()
         document.select("dl.tattl.attm dd p.mbn").remove()
 
         val elements = document.select("div#postlist > div[id^='post_']")
         for (element in elements) {
-            val author = element.select("div.pls.favatar div.authi a.xw1").text()
-            val avatarUrl = element.select("div.avatar a.avtm img").attr("abs:src")
+            val elemAuthor = element.select("div.pls.favatar div.authi a.xw1").first()
+            val author = elemAuthor.ownText()
+            val authorUid = elemAuthor.attr("href").replace("[^\\d]+".toRegex(), "")
+            val avatarUrl = element.select("div.avatar a.avtm img").first()?.attr("abs:src") ?: "https://bbs.yamibo.com/uc_server/images/noavatar_middle.gif"
             val floorNum = element.select("div.pi strong a em").first().ownText().toIntOrNull() ?: 0
 
             val content = element.select("td[id^='postmessage']").first()
@@ -60,7 +61,7 @@ class PostParser {
             }
             val contentHTML = "<p style=\"word-break:break-all;\">" + content.html() + "</p>"
             val postDate = element.select("em[id^='authorposton']").text()
-            replyList.add(Reply(author, avatarUrl, contentHTML, postDate, floorNum))
+            replyList.add(Reply(author, avatarUrl, authorUid, contentHTML, postDate, floorNum))
             Log.d(ContentValues.TAG, "parsePost: $author / $avatarUrl / $postDate")
         }
     }

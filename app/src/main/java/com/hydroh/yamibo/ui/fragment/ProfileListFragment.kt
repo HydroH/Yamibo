@@ -82,7 +82,7 @@ class ProfileListFragment : Fragment() {
                     mContentRecyclerView.adapter = adapter
                     adapter.setOnLoadMoreListener({
                         if (mNextPageUrl != null) {
-                            WebRequest.getHtmlDocument(mUrl, false, mContentRecyclerView.context, object : DocumentCallbackListener {
+                            WebRequest.getHtmlDocument(mNextPageUrl!!, false, mContentRecyclerView.context, object : DocumentCallbackListener {
                                 override fun onFinish(document: Document) {
                                     val profileListMoreParser = ProfileListParser(document)
                                     activity!!.runOnUiThread {
