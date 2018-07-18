@@ -23,91 +23,96 @@
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:scheme="http"
                     android:host="bbs.yamibo.com"
-                    android:pathPrefix="/forum.php" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                    android:path="/forum.php"
+                    android:scheme="http" />
                 <data
-                    android:scheme="https"
                     android:host="bbs.yamibo.com"
-                    android:pathPrefix="/forum.php" />
+                    android:path="/forum.php"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="com.hydroh.yamibo.REFRESH" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.SectorActivity"
             android:label="@string/title_activity_sector"
             android:parentActivityName=".ui.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:scheme="http"
                     android:host="bbs.yamibo.com"
-                    android:pathPrefix="/forum-" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                    android:pathPrefix="/forum-"
+                    android:scheme="http" />
                 <data
-                    android:scheme="https"
                     android:host="bbs.yamibo.com"
-                    android:pathPrefix="/forum-" />
+                    android:pathPrefix="/forum-"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="com.hydroh.yamibo.REFRESH" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.PostActivity"
             android:label="@string/title_activity_thread"
             android:parentActivityName=".ui.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:scheme="http"
                     android:host="bbs.yamibo.com"
-                    android:pathPrefix="/thread" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                    android:pathPrefix="/thread"
+                    android:scheme="http" />
                 <data
-                    android:scheme="https"
                     android:host="bbs.yamibo.com"
-                    android:pathPrefix="/thread" />
+                    android:pathPrefix="/thread"
+                    android:scheme="https" />
+                <data
+                    android:host="bbs.yamibo.com"
+                    android:pathPattern="/forum.php?.*mod=viewthread.*"
+                    android:scheme="http" />
+                <data
+                    android:host="bbs.yamibo.com"
+                    android:pathPattern="/forum.php?.*mod=viewthread.*"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.ImageGalleryActivity"
             android:label="@string/title_activity_image_browser"
-            android:theme="@style/YamiboTheme.FullScreen"
-            android:parentActivityName=".ui.PostActivity" />
-
+            android:parentActivityName=".ui.PostActivity"
+            android:theme="@style/YamiboTheme.FullScreen" />
         <activity
             android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/YamiboTheme"
-            android:parentActivityName=".ui.HomeActivity" />
+            android:parentActivityName=".ui.HomeActivity"
+            android:theme="@style/YamiboTheme" />
+        <activity
+            android:name=".ui.ProfileActivity"
+            android:label="@string/title_activity_profile"
+            android:parentActivityName=".ui.HomeActivity"
+            android:theme="@style/YamiboTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.hydroh.yamibo.ui.HomeActivity" />
+        </activity>
     </application>
 
 </manifest>

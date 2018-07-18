@@ -16,6 +16,8 @@ class HomeParser {
         private set
     var avatarUrl: String? = null
         private set
+    var uid: String? = null
+        private set
     var nextPageUrl: String? = null
         private set
     val groupList = ArrayList<MultiItemEntity>()
@@ -26,7 +28,10 @@ class HomeParser {
         avatarUrl = document.select("img.header-tu-img").first()?.attr("src")?.replace("small", "big")
         avatarUrl?.let {
             isLoggedIn = true
-            username = document.select("ul#mycp1_menu").first()?.child(0)?.ownText()
+            document.select("ul#mycp1_menu").first()?.child(0)?.run {
+                username = ownText()
+                uid = attr("href").replace("[^\\d]+".toRegex(), "")
+            }
         }
         if (!isProgressive) {
             val elemGroupHeads = document.select("div.bm.bmw div.bm_h.cl")
@@ -51,7 +56,7 @@ class HomeParser {
             }
         }
         val elemPosts = document.select("table#threadlisttableid tbody")
-        elemPosts.first() ?: if (!isProgressive) return
+        elemPosts.first() ?: return
         val groupStick = SectorGroup("置顶主题")
         val groupNormal = SectorGroup("版块主题")
         for (elemPost in elemPosts) {
@@ -70,12 +75,18 @@ class HomeParser {
             val postTime = elemPost.select("td.by em span").first().ownText()
             val replyNum = elemPost.select("td.num a").first().ownText().toIntOrNull() ?: 0
 
-            val post = Post(title, tag, author, postTime, replyNum, url)
+            val post = Post(title, tag, author, postTime, replyNum, url, "")
 
-            if (!isProgressive && elemID.startsWith("stickthread")) {
-                groupStick.addSubItem(post)
-            } else if (elemID.startsWith("normalthread")) {
-                groupNormal.addSubItem(post)
+            if (isProgressive) {
+                if (elemID.startsWith("normalthread")) {
+                    groupList.add(post)
+                }
+            } else {
+                if (elemID.startsWith("stickthread")) {
+                    groupStick.addSubItem(post)
+                } else if (elemID.startsWith("normalthread")) {
+                    groupNormal.addSubItem(post)
+                }
             }
         }
         if (isProgressive) return

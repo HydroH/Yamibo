@@ -17,11 +17,20 @@ class PostParser {
         private set
     var nextPageUrl: String? = null
         private set
+    var replyUrl: String? = null
+        private set
+    var formhash: String? = null
+        private set
     val replyList = ArrayList<MultiItemEntity>()
 
     constructor(document: Document) {
         title = document.select("span#thread_subject").first()?.ownText()
         nextPageUrl = document.select("div.pg a.nxt").first()?.attr("href")
+
+        val elemForm = document.select("form#fastpostform").first()
+
+        replyUrl = elemForm?.attr("action")
+        formhash = elemForm?.select("input[name=\"formhash\"]")?.first()?.attr("value")
 
         document.select("div[style*=\"display: none\"]").remove()
         document.select("dl.tattl.attm dd p.mbn").remove()

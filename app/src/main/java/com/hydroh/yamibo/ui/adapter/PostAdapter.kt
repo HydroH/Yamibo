@@ -4,13 +4,14 @@ import android.content.Intent
 import android.graphics.Color
 import android.util.Log
 import com.bumptech.glide.Glide
-import com.chad.library.adapter.base.BaseMultiItemQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.common.TextDrawable
 import com.hydroh.yamibo.model.Reply
 import com.hydroh.yamibo.ui.ImageGalleryActivity
+import com.hydroh.yamibo.ui.common.AbsMultiAdapter
+import com.hydroh.yamibo.ui.common.ItemType.TYPE_REPLY
 import com.zzhoujay.richtext.CacheType
 import com.zzhoujay.richtext.ImageHolder
 import com.zzhoujay.richtext.RichText
@@ -18,12 +19,10 @@ import com.zzhoujay.richtext.callback.ImageFixCallback
 import com.zzhoujay.richtext.ig.GlideImageGetter
 import java.util.*
 
-class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList<String>) : BaseMultiItemQuickAdapter<MultiItemEntity, BaseViewHolder>(data) {
+class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList<String>) : AbsMultiAdapter(data) {
 
     companion object {
-        private val TAG = PostAdapter::class.java.simpleName
-
-        const val TYPE_REPLY = 0
+        private val TAG = this::class.java.simpleName
     }
 
     init {
@@ -116,10 +115,5 @@ class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList
                         .into(holder.getView(R.id.reply_content))
             }
         }
-    }
-
-    fun clear() {
-        mData.clear()
-        notifyDataSetChanged()
     }
 }

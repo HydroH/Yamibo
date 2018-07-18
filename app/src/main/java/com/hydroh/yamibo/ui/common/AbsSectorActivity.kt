@@ -22,6 +22,7 @@ import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.JsonCallbackListener
 import com.hydroh.yamibo.ui.HomeActivity
 import com.hydroh.yamibo.ui.LoginActivity
+import com.hydroh.yamibo.ui.ProfileActivity
 import com.hydroh.yamibo.ui.fragment.ARG_TITLE
 import com.hydroh.yamibo.ui.fragment.ARG_URL
 import com.hydroh.yamibo.ui.fragment.HomeFragment
@@ -52,7 +53,7 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
                     val version = jsonObject.getString("version")
                     val description = jsonObject.getString("description")
                     val url = jsonObject.getString("url")
-                    Log.d(ContentValues.TAG, "onFinish: Remode build: $build, Local build: ${BuildConfig.VERSION_CODE}")
+                    Log.d(ContentValues.TAG, "onFinish: Remote build: $build, Local build: ${BuildConfig.VERSION_CODE}")
                     if (build > BuildConfig.VERSION_CODE) {
                         val dialogBuilder = AlertDialog.Builder(this@AbsSectorActivity).apply {
                             setTitle("发现新版本")
@@ -140,11 +141,6 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
         return true
     }
 
-    private fun startLoginActivity() {
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
-    }
-
     override fun onToolbarReady(toolbar: Toolbar) {
         val toggle = ActionBarDrawerToggle(
                 this, mLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -156,14 +152,20 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
         mLayout.closeDrawers()
     }
 
-    override fun onUserStatReady(isLoggedIn: Boolean, avatarUrl: String?, username: String?) {
+    override fun onUserStatReady(isLoggedIn: Boolean, avatarUrl: String?, username: String?, uid: String?) {
         if (isLoggedIn) {
             mNavView.menu.clear()
             mNavView.inflateMenu(R.menu.nav_drawer_logged)
             mNavView.menu.getItem(0).isChecked = layoutResId == R.layout.activity_home
             Glide.with(this).load(avatarUrl).crossFade().into(mNavHeaderAvatar)
             mNavHeaderUsername.text = username ?: mNavHeaderUsername.text
-            mNavHeaderAvatar.setOnClickListener(null)
+            mNavHeaderAvatar.setOnClickListener {
+                val intent = Intent(this, ProfileActivity::class.java)
+                intent.putExtra("uid", uid)
+                        .putExtra("username", username)
+                        .putExtra("avatarUrl", avatarUrl)
+                startActivity(intent)
+            }
         } else {
             mNavView.menu.clear()
             mNavView.inflateMenu(R.menu.nav_drawer)
@@ -171,7 +173,8 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
             mNavHeaderAvatar.setImageResource(R.mipmap.ic_launcher_round)
             mNavHeaderUsername.setText(R.string.nav_header_username_hint)
             mNavHeaderAvatar.setOnClickListener {
-                startLoginActivity()
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
             }
         }
     }

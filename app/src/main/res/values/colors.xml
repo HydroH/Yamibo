@@ -3,6 +3,7 @@
     <color name="colorPrimaryLight">#90caf9</color>
     <color name="colorPrimary">#42a5f5</color>
     <color name="colorPrimaryDark">#1e88e5</color>
-    <color name="colorAccent">#ff5a62</color>
+    <color name="colorAccent">#ff5252</color>
+    <color name="colorAccentLight">#ff8a80</color>
     <color name="blackTransHalf">#7F000000</color>
 </resources>

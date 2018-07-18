@@ -1,7 +1,7 @@
 package com.hydroh.yamibo.model
 
 import com.chad.library.adapter.base.entity.MultiItemEntity
-import com.hydroh.yamibo.ui.adapter.HomeAdapter
+import com.hydroh.yamibo.ui.common.ItemType
 
 data class Sector(
         val title: String,
@@ -11,7 +11,7 @@ data class Sector(
 ) : MultiItemEntity {
 
     override fun getItemType(): Int {
-        return HomeAdapter.TYPE_SECTOR
+        return ItemType.TYPE_SECTOR
     }
 }
 

@@ -3,7 +3,6 @@ package com.hydroh.yamibo.ui.adapter
 import android.content.Intent
 import android.text.Html
 import android.util.Log
-import com.chad.library.adapter.base.BaseMultiItemQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
@@ -12,17 +11,17 @@ import com.hydroh.yamibo.model.Sector
 import com.hydroh.yamibo.model.SectorGroup
 import com.hydroh.yamibo.ui.PostActivity
 import com.hydroh.yamibo.ui.SectorActivity
+import com.hydroh.yamibo.ui.common.AbsMultiAdapter
+import com.hydroh.yamibo.ui.common.ItemType.TYPE_GROUP
+import com.hydroh.yamibo.ui.common.ItemType.TYPE_POST
+import com.hydroh.yamibo.ui.common.ItemType.TYPE_SECTOR
 import com.hydroh.yamibo.ui.fragment.ARG_TITLE
 import com.hydroh.yamibo.ui.fragment.ARG_URL
 
-class HomeAdapter(data: List<MultiItemEntity>) : BaseMultiItemQuickAdapter<MultiItemEntity, BaseViewHolder>(data) {
+class HomeAdapter(data: List<MultiItemEntity>) : AbsMultiAdapter(data) {
 
     companion object {
-        private val TAG = HomeAdapter::class.java.simpleName
-
-        const val TYPE_GROUP = 0
-        const val TYPE_SECTOR = 1
-        const val TYPE_POST = 2
+        private val TAG = this::class.java.simpleName
     }
 
     init {
@@ -97,11 +96,6 @@ class HomeAdapter(data: List<MultiItemEntity>) : BaseMultiItemQuickAdapter<Multi
                 }
             }
         }
-    }
-
-    fun clear() {
-        mData.clear()
-        notifyDataSetChanged()
     }
 
     fun collapseSticky() {

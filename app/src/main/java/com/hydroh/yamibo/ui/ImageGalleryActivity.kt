@@ -3,13 +3,12 @@ package com.hydroh.yamibo.ui
 import android.os.Bundle
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.view.animation.DecelerateInterpolator
 import com.anthonycr.grant.PermissionsManager
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.ui.adapter.ImageBrowserAdapter
-import com.hydroh.yamibo.ui.view.HackyViewPager
+import kotlinx.android.synthetic.main.activity_image_gallery.*
 
 class ImageGalleryActivity : AppCompatActivity() {
     private val TAG = this::class.java.simpleName
@@ -18,13 +17,10 @@ class ImageGalleryActivity : AppCompatActivity() {
     private var position: Int = -1
     private var urlList: ArrayList<String> = ArrayList()
 
-    private val imageBrowserPager by lazy { findViewById<HackyViewPager>(R.id.image_viewpager) }
-    private val toolbar by lazy { findViewById<Toolbar>(R.id.toolbar_image_browser) }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image_gallery)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(toolbar_image_browser)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
@@ -32,17 +28,17 @@ class ImageGalleryActivity : AppCompatActivity() {
         urlList = intent.getStringArrayListExtra("imgUrlList")
 
         adapter = ImageBrowserAdapter(this, urlList)
-        imageBrowserPager.adapter = adapter
+        image_viewpager.adapter = adapter
         title = "${position + 1} / ${urlList.size}"
 
-        imageBrowserPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+        image_viewpager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
             override fun onPageSelected(position: Int) {
                 title = "${position + 1} / ${urlList.size}"
             }
             override fun onPageScrollStateChanged(state: Int) {}
         })
-        imageBrowserPager.currentItem = position
+        image_viewpager.currentItem = position
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -60,11 +56,11 @@ class ImageGalleryActivity : AppCompatActivity() {
     }
 
     fun toggleToolbar() {
-        val animation = toolbar.animate()
+        val animation = toolbar_image_browser.animate()
         animation.interpolator = DecelerateInterpolator()
         animation.duration = 350
-        if (toolbar.translationY >= 0) {
-            animation.translationY(-toolbar.height.toFloat())
+        if (toolbar_image_browser.translationY >= 0) {
+            animation.translationY(-toolbar_image_browser.height.toFloat())
             // TODO: Toggle status bar
         } else {
             // TODO: Toggle status bar

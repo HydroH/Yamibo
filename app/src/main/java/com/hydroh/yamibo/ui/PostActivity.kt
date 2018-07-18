@@ -8,28 +8,24 @@ import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.adapter.PostAdapter
-import com.hydroh.yamibo.ui.view.ModalFrameLayout
 import com.hydroh.yamibo.util.parser.PostParser
 import com.zzhoujay.richtext.RichText
+import kotlinx.android.synthetic.main.activity_post.*
+import kotlinx.android.synthetic.main.list_common.*
 import org.jsoup.nodes.Document
 
 class PostActivity : AppCompatActivity() {
@@ -38,36 +34,30 @@ class PostActivity : AppCompatActivity() {
     private lateinit var imgUrlList: ArrayList<String>
     private var url: String = ""
     private var nextPageUrl: String? = null
+    private var replyUrl: String? = null
+    private var formhash: String? = null
 
-    private val swipeRefreshLayout by lazy { findViewById<SwipeRefreshLayout>(R.id.refresh_common) }
-    private val toolbar by lazy { findViewById<Toolbar>(R.id.toolbar_post) }
-    private val hintTextView by lazy { findViewById<TextView>(R.id.hint_text) }
-    private val hintProgressBar by lazy { findViewById<ProgressBar>(R.id.hint_progressbar) }
-    private val recyclerView by lazy { findViewById<RecyclerView>(R.id.list_common) }
-    private val replyEditText by lazy { findViewById<EditText>(R.id.edit_post_reply) }
-    private val replySendBtn by lazy { findViewById<ImageButton>(R.id.button_post_reply) }
-    private val postLayout by lazy { findViewById<ModalFrameLayout>(R.id.list_post) }
     private var titleTextView : TextView? = null
 
     private val animatorDim by lazy {
-        ObjectAnimator.ofInt(postLayout.foreground, "alpha", 0, 255)
+        ObjectAnimator.ofInt(list_post.foreground, "alpha", 0, 255)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_post)
 
-        swipeRefreshLayout.setOnRefreshListener { loadPosts(swipeRefreshLayout) }
-        setSupportActionBar(toolbar)
-        toolbar.inflateMenu(R.menu.post_toolbar_menu)
+        refresh_common.setOnRefreshListener { loadPosts(refresh_common) }
+        setSupportActionBar(toolbar_post)
+        toolbar_post.inflateMenu(R.menu.post_toolbar_menu)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-        toolbar.setOnClickListener {
-            recyclerView.scrollToPosition(0)
+        toolbar_post.setOnClickListener {
+            list_common.scrollToPosition(0)
         }
-        replyEditText.setOnFocusChangeListener { view, b -> setFocusEditReply(b) }
-        postLayout.foreground = ColorDrawable(ContextCompat.getColor(this, R.color.blackTransHalf))
-        postLayout.foreground.alpha = 0
+        edit_post_reply.setOnFocusChangeListener { view, b -> setFocusEditReply(b) }
+        list_post.foreground = ColorDrawable(ContextCompat.getColor(this, R.color.blackTransHalf))
+        list_post.foreground.alpha = 0
         animatorDim.duration = 200
 
         intent?.let {
@@ -84,9 +74,9 @@ class PostActivity : AppCompatActivity() {
         Log.d(TAG, "onCreate: URL: $url")
 
         try {
-            val field = toolbar::class.java.getDeclaredField("mTitleTextView")
+            val field = toolbar_post::class.java.getDeclaredField("mTitleTextView")
             field.isAccessible = true
-            titleTextView = field.get(toolbar) as TextView
+            titleTextView = field.get(toolbar_post) as TextView
 
             titleTextView!!.ellipsize = TextUtils.TruncateAt.MARQUEE
             titleTextView!!.isFocusable = true
@@ -100,7 +90,7 @@ class PostActivity : AppCompatActivity() {
         }
 
         RichText.initCacheDir(this)
-        loadPosts(hintTextView)
+        loadPosts(hint_text)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -117,8 +107,8 @@ class PostActivity : AppCompatActivity() {
         Log.d(TAG, "refreshNetwork: URL: $url")
 
         if (view.id == R.id.hint_text) {
-            hintTextView.visibility = View.GONE
-            hintProgressBar.visibility = View.VISIBLE
+            hint_text.visibility = View.GONE
+            hint_progressbar.visibility = View.VISIBLE
         }
 
         WebRequest.getHtmlDocument(url, false, this, object : DocumentCallbackListener {
@@ -127,11 +117,35 @@ class PostActivity : AppCompatActivity() {
                 replyList = postParser.replyList
                 imgUrlList = postParser.imgUrlList
                 nextPageUrl = postParser.nextPageUrl
+
+                replyUrl = postParser.replyUrl
+                formhash = postParser.formhash
+                if (replyUrl != null && formhash != null) {
+                    button_post_reply.setOnClickListener {
+                        if (edit_post_reply.text.isEmpty()) return@setOnClickListener
+                        WebRequest.postReply(replyUrl!!, edit_post_reply.text.toString(), formhash!!,
+                                this@PostActivity, object : DocumentCallbackListener {
+                            override fun onFinish(document: Document) {
+                                runOnUiThread {
+                                    Toast.makeText(this@PostActivity, "回复成功", Toast.LENGTH_SHORT).show()
+                                    edit_post_reply.clearComposingText()
+                                    setFocusEditReply(false)
+                                }
+                            }
+                            override fun onError(e: Exception) {
+                                runOnUiThread {
+                                    Toast.makeText(this@PostActivity, "回复失败", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        })
+                    }
+                }
+
                 runOnUiThread {
-                    hintProgressBar.visibility = View.GONE
-                    swipeRefreshLayout.isRefreshing = false
-                    val layoutManager = LinearLayoutManager(recyclerView.context)
-                    recyclerView.layoutManager = layoutManager
+                    hint_progressbar.visibility = View.GONE
+                    refresh_common.isRefreshing = false
+                    val layoutManager = LinearLayoutManager(list_common.context)
+                    list_common.layoutManager = layoutManager
 
                     postParser.title?.let {
                         if (title != it) {
@@ -140,13 +154,13 @@ class PostActivity : AppCompatActivity() {
                     }
 
                     val adapter = PostAdapter(replyList, imgUrlList)
-                    recyclerView.adapter = adapter
+                    list_common.adapter = adapter
                     adapter.setOnLoadMoreListener({
                         if (nextPageUrl != null) {
-                            WebRequest.getHtmlDocument(nextPageUrl!!, false, recyclerView.context, object : DocumentCallbackListener {
+                            WebRequest.getHtmlDocument(nextPageUrl!!, false, list_common.context, object : DocumentCallbackListener {
                                 override fun onFinish(document: Document) {
                                     val postMoreParser = PostParser(document)
-                                    recyclerView.post {
+                                    list_common.post {
                                         Log.d(TAG, "post: LoadMore Complete.")
                                         nextPageUrl = postMoreParser.nextPageUrl
                                         adapter.addData(postMoreParser.replyList)
@@ -155,30 +169,30 @@ class PostActivity : AppCompatActivity() {
                                     }
                                 }
                                 override fun onError(e: Exception) {
-                                    recyclerView.post {
+                                    list_common.post {
                                         Log.d(TAG, "post: LoadMore failed.")
                                         adapter.loadMoreFail()
                                     }
                                 }
                             })
                         } else {
-                            recyclerView.post {
+                            list_common.post {
                                 Log.d(TAG, "post: LoadMore End.")
                                 adapter.loadMoreEnd()
                             }
                         }
-                    }, recyclerView)
+                    }, list_common)
                 }
             }
 
             override fun onError(e: Exception) {
                 e.printStackTrace()
                 runOnUiThread {
-                    val adapter = recyclerView.adapter as PostAdapter
+                    val adapter = list_common.adapter as PostAdapter
                     adapter.clear()
-                    hintTextView.visibility = View.VISIBLE
-                    hintProgressBar.visibility = View.GONE
-                    swipeRefreshLayout.isRefreshing = false
+                    hint_text.visibility = View.VISIBLE
+                    hint_progressbar.visibility = View.GONE
+                    refresh_common.isRefreshing = false
                 }
             }
         })
@@ -187,23 +201,23 @@ class PostActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     private fun setFocusEditReply(focused: Boolean) {
         if (focused) {
-            replyEditText.setLines(3)
-            replySendBtn.visibility = View.VISIBLE
-            postLayout.isInterCeptTouchEvent = true
-            postLayout.setOnTouchListener { view, motionEvent ->
+            edit_post_reply.setLines(3)
+            button_post_reply.visibility = View.VISIBLE
+            list_post.isInterCeptTouchEvent = true
+            list_post.setOnTouchListener { view, motionEvent ->
                 val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(replyEditText.windowToken, 0)
-                replyEditText.clearFocus()
+                imm.hideSoftInputFromWindow(edit_post_reply.windowToken, 0)
+                edit_post_reply.clearFocus()
                 Log.d(TAG, "onTouch: Post Layout touched. Shrinking edittext...")
                 return@setOnTouchListener true
             }
             animatorDim.setIntValues(0, 255)
             animatorDim.start()
         } else {
-            replyEditText.setLines(1)
-            replySendBtn.visibility = View.GONE
-            postLayout.setOnTouchListener(null)
-            postLayout.isInterCeptTouchEvent = false
+            edit_post_reply.setLines(1)
+            button_post_reply.visibility = View.GONE
+            list_post.setOnTouchListener(null)
+            list_post.isInterCeptTouchEvent = false
             animatorDim.setIntValues(255, 0)
             animatorDim.start()
         }

@@ -22,7 +22,9 @@
     </style>
 
     <style name="YamiboTheme.ActionBar" parent="Widget.AppCompat.ActionBar" />
+
     <style name="YamiboTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
     <style name="YamiboTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="YamiboTheme.Toolbar" parent="Widget.AppCompat.Toolbar">
@@ -35,6 +37,14 @@
 
     <style name="YamiboTheme.Button" parent="Widget.AppCompat.Button.Colored">
         <item name="android:foreground">?android:attr/selectableItemBackground</item>
+    </style>
+
+    <style name="YamiboTheme.NoActionBar.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="YamiboTheme.NoActionBar.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="YamiboTheme.ExpandedTitleTheme">
+        <item name="android:textSize">24sp</item>
     </style>
 
 </resources>

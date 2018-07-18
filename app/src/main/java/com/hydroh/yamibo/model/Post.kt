@@ -1,7 +1,7 @@
 package com.hydroh.yamibo.model
 
 import com.chad.library.adapter.base.entity.MultiItemEntity
-import com.hydroh.yamibo.ui.adapter.HomeAdapter
+import com.hydroh.yamibo.ui.common.ItemType
 
 data class Post(
         val title: String,
@@ -9,10 +9,11 @@ data class Post(
         val author: String,
         val postTime: String,
         val replyNum: Int,
-        val url: String
+        val url: String,
+        val sector: String
 ) : MultiItemEntity {
 
     override fun getItemType(): Int {
-        return HomeAdapter.TYPE_POST
+        return ItemType.TYPE_POST
     }
 }

@@ -13,26 +13,23 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.*
+import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.network.WebRequest
-import com.hydroh.yamibo.network.callback.CookieCallbackListener
-import com.hydroh.yamibo.util.PrefUtils
+import com.hydroh.yamibo.network.callback.DocumentCallbackListener
+import kotlinx.android.synthetic.main.activity_login.*
+import org.jsoup.nodes.Document
 
 class LoginActivity : AppCompatActivity() {
-
-    private val mUsernameView by lazy { findViewById<EditText>(R.id.username) }
-    private val mPasswordView by lazy { findViewById<EditText>(R.id.password) }
-    private val mProgressView by lazy { findViewById<ProgressBar>(R.id.login_progress) }
-    private val mLoginFormView by lazy { findViewById<ScrollView>(R.id.login_form) }
-    private val mErrorHintView by lazy { findViewById<TextView>(R.id.error_hint_text) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         actionBar?.setDisplayHomeAsUpEnabled(true)
 
-        mPasswordView.setOnEditorActionListener(TextView.OnEditorActionListener { textView, id, keyEvent ->
+        password.setOnEditorActionListener(TextView.OnEditorActionListener { textView, id, keyEvent ->
             if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
                 attemptLogin()
                 return@OnEditorActionListener true
@@ -61,27 +58,27 @@ class LoginActivity : AppCompatActivity() {
      */
     private fun attemptLogin() {
         // Reset errors.
-        mUsernameView.error = null
-        mPasswordView.error = null
+        username.error = null
+        password.error = null
 
         // Store values at the time of the login attempt.
-        val username = mUsernameView.text.toString()
-        val password = mPasswordView.text.toString()
+        val username = username.text.toString()
+        val password = password.text.toString()
 
         var cancel = false
         var focusView: View? = null
 
         // Check for a valid password, if the user entered one.
         if (TextUtils.isEmpty(password)) {
-            mPasswordView.error = getString(R.string.error_password_required)
-            focusView = mPasswordView
+            this.password.error = getString(R.string.error_password_required)
+            focusView = this.password
             cancel = true
         }
 
         // Check for a valid username.
         if (TextUtils.isEmpty(username)) {
-            mUsernameView.error = getString(R.string.error_username_required)
-            focusView = mUsernameView
+            this.username.error = getString(R.string.error_username_required)
+            focusView = this.username
             cancel = true
         }
 
@@ -93,14 +90,13 @@ class LoginActivity : AppCompatActivity() {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true)
-            mErrorHintView.visibility = View.GONE
-            WebRequest.getLogonCookies(username, password, this, object : CookieCallbackListener {
-                override fun onFinish(cookies: MutableMap<String, String>) {
+            error_hint_text.visibility = View.GONE
+            WebRequest.getLogonCookies(username, password, this, object : DocumentCallbackListener {
+                override fun onFinish(document: Document) {
                     runOnUiThread {
                         showProgress(false)
-                        Toast.makeText(mUsernameView!!.context, R.string.login_success, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@LoginActivity, R.string.login_success, Toast.LENGTH_SHORT).show()
                     }
-                    PrefUtils.setCookiePreference(this@LoginActivity, cookies)
                     Log.d(TAG, "onFinish: Login Success!")
                     val intent = Intent("com.hydroh.yamibo.REFRESH")
                     sendBroadcast(intent)
@@ -110,8 +106,8 @@ class LoginActivity : AppCompatActivity() {
                 override fun onError(e: Exception) {
                     runOnUiThread {
                         showProgress(false)
-                        mErrorHintView.text = e.message ?: "未知错误"
-                        mErrorHintView.visibility = View.VISIBLE
+                        error_hint_text.text = e.message ?: "未知错误"
+                        error_hint_text.visibility = View.VISIBLE
                     }
                     Log.d(TAG, "onError: Login Failed!")
                 }
@@ -129,19 +125,19 @@ class LoginActivity : AppCompatActivity() {
         // the progress spinner.
         val shortAnimTime = resources.getInteger(android.R.integer.config_shortAnimTime)
 
-        mLoginFormView.visibility = if (show) View.GONE else View.VISIBLE
-        mLoginFormView.animate().setDuration(shortAnimTime.toLong()).alpha(
+        login_form.visibility = if (show) View.GONE else View.VISIBLE
+        login_form.animate().setDuration(shortAnimTime.toLong()).alpha(
                 (if (show) 0 else 1).toFloat()).setListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
-                mLoginFormView.visibility = if (show) View.GONE else View.VISIBLE
+                login_form.visibility = if (show) View.GONE else View.VISIBLE
             }
         })
 
-        mProgressView.visibility = if (show) View.VISIBLE else View.GONE
-        mProgressView.animate().setDuration(shortAnimTime.toLong()).alpha(
+        login_progress.visibility = if (show) View.VISIBLE else View.GONE
+        login_progress.animate().setDuration(shortAnimTime.toLong()).alpha(
                 (if (show) 1 else 0).toFloat()).setListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
-                mProgressView.visibility = if (show) View.VISIBLE else View.GONE
+                login_progress.visibility = if (show) View.VISIBLE else View.GONE
             }
         })
     }

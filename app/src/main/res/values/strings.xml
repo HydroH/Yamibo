@@ -37,4 +37,9 @@
         <item>保存图片</item>
         <item>分享图片</item>
     </string-array>
+
+    <string name="title_activity_profile">个人资料</string>
+    <string name="profile_tab_info">个人资料</string>
+    <string name="profile_tab_post">主题</string>
+    <string name="profile_tab_reply">回复</string>
 </resources>

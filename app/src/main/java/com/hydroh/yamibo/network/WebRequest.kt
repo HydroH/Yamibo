@@ -4,7 +4,6 @@ import android.content.ContentValues.TAG
 import android.content.Context
 import android.util.Log
 import com.google.gson.internal.LinkedTreeMap
-import com.hydroh.yamibo.network.callback.CookieCallbackListener
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.network.callback.JsonCallbackListener
 import com.hydroh.yamibo.util.PrefUtils
@@ -48,14 +47,18 @@ object WebRequest {
                     fullUrl = BASE_URL + url
                 }
                 val ua = if (isMobile) UA_MOBILE else UA_DESKTOP
-                val conn = Jsoup.connect(fullUrl)
+                val cookies = PrefUtils.getCookiePreference(context) ?: LinkedTreeMap<String, String>()
+                val response = Jsoup.connect(fullUrl)
+                        .method(Connection.Method.GET)
                         .header("User-Agent", ua)
-                val cookies = PrefUtils.getCookiePreference(context)
-                cookies?.let {
-                    Log.d(TAG, "run: Cookies loaded: $it")
-                    conn.cookies(it)
-                }
-                listener?.onFinish(conn.get())
+                        .cookies(cookies)
+                        .execute()
+
+                cookies.putAll(response.cookies())
+                cookies.values.removeAll(Collections.singleton("deleted"))
+                PrefUtils.setCookiePreference(context, cookies)
+
+                listener?.onFinish(response.parse())
             } catch (e: Exception) {
                 listener?.onError(e)
             }
@@ -63,7 +66,7 @@ object WebRequest {
     }
 
     @JvmStatic
-    fun getLogonCookies(username: String, password: String, context: Context, listener: CookieCallbackListener?) {
+    fun getLogonCookies(username: String, password: String, context: Context, listener: DocumentCallbackListener?) {
         Thread(Runnable {
             try {
                 val cookies = /*PrefUtils.getCookiePreference(context) ?:*/ LinkedTreeMap<String, String>()
@@ -110,13 +113,14 @@ object WebRequest {
                 Log.d(TAG, "run: " + response.parse().outerHtml())
                 cookies.putAll(response.cookies())
                 cookies.values.removeAll(Collections.singleton("deleted"))
+                PrefUtils.setCookiePreference(context, cookies)
 
                 if (!response.parse().outerHtml().contains("欢迎")) {
                     val docRes = response.parse()
                     val message = docRes.select("p").first()?.text() ?: docRes.text().removeScripts()
                     throw LoginException(message)
                 }
-                listener?.onFinish(cookies)
+                listener?.onFinish(response.parse())
             } catch (e: Exception) {
                 listener?.onError(e)
             }
@@ -124,10 +128,35 @@ object WebRequest {
     }
 
     @JvmStatic
-    fun postReply(listener: DocumentCallbackListener?) {
+    fun postReply(url: String, content: String, formhash: String, context: Context, listener: DocumentCallbackListener?) {
         Thread(Runnable {
             try {
-                //TODO: listener?.onFinish()
+                var fullUrl = url
+                if (!url.startsWith("http")) {
+                    fullUrl = BASE_URL + url
+                }
+                val cookies = PrefUtils.getCookiePreference(context) ?: LinkedTreeMap<String, String>()
+
+                val response = Jsoup.connect(fullUrl)
+                        .method(Connection.Method.POST)
+                        .header("Content-Type", "application/x-www-form-urlencoded")
+                        .postDataCharset("GBK")
+                        .data(
+                                "message", content,
+                                "posttime", (System.currentTimeMillis() / 1000).toString(),
+                                "formhash", formhash,
+                                "usesig", "1",
+                                "subject", "  "
+                        )
+                        .cookies(cookies)
+                        .timeout(8000)
+                        .execute()
+
+                cookies.putAll(response.cookies())
+                cookies.values.removeAll(Collections.singleton("deleted"))
+                
+                Log.d(TAG, "postReply: ${response.parse().outerHtml()}")
+                listener?.onFinish(response.parse())
             } catch (e: Exception) {
                 listener?.onError(e)
             }

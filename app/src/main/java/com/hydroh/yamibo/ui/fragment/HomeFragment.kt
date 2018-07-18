@@ -20,6 +20,7 @@ import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
+import com.hydroh.yamibo.ui.SectorActivity
 import com.hydroh.yamibo.ui.adapter.HomeAdapter
 import com.hydroh.yamibo.util.parser.HomeParser
 import org.jsoup.nodes.Document
@@ -119,14 +120,15 @@ class HomeFragment : Fragment() {
                     mLoadProgressBar.visibility = View.GONE
                     mSwipeRefreshLayout.isRefreshing = false
                     homeParser.run {
-                        mListener?.onUserStatReady(isLoggedIn, avatarUrl, username)
+                        mListener?.onUserStatReady(isLoggedIn, avatarUrl, username, uid)
                     }
+
                     val layoutManager = LinearLayoutManager(mContentRecyclerView.context)
                     mContentRecyclerView.layoutManager = layoutManager
 
                     val adapter = HomeAdapter(mHomeItemList)
                     mContentRecyclerView.adapter = adapter
-                    if (!mPageUrl.startsWith(DEFAULT_URL)) {
+                    if (activity!! is SectorActivity) {
                         adapter.setOnLoadMoreListener({
                             if (mNextPageUrl != null) {
                                 WebRequest.getHtmlDocument(mNextPageUrl!!, false, mContentRecyclerView.context, object : DocumentCallbackListener {
@@ -185,7 +187,7 @@ class HomeFragment : Fragment() {
     interface InteractListener {
         fun onHomeRefresh()
         fun onToolbarReady(toolbar: Toolbar)
-        fun onUserStatReady(isLoggedIn: Boolean, avatarUrl: String?, username: String?)
+        fun onUserStatReady(isLoggedIn: Boolean, avatarUrl: String?, username: String?, uid: String?)
     }
 
     companion object {
