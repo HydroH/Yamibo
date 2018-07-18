@@ -113,6 +113,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.hydroh.yamibo.ui.HomeActivity" />
         </activity>
+        <activity
+            android:name=".ui.SearchActivity"
+            android:parentActivityName=".ui.HomeActivity"
+            android:theme="@style/YamiboTheme.NoActionBar" />
     </application>
 
 </manifest>

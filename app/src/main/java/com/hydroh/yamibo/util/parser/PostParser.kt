@@ -15,6 +15,8 @@ class PostParser {
         private set
     var imgUrlList: ArrayList<String> = ArrayList()
         private set
+    var prevPageUrl: String? = null
+        private set
     var nextPageUrl: String? = null
         private set
     var replyUrl: String? = null
@@ -25,6 +27,7 @@ class PostParser {
 
     constructor(document: Document) {
         title = document.select("span#thread_subject").first()?.ownText()
+        prevPageUrl = document.select("div.pg a.prev").first()?.attr("href")
         nextPageUrl = document.select("div.pg a.nxt").first()?.attr("href")
 
         document.select("form#fastpostform").first().run {

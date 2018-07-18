@@ -33,6 +33,7 @@ class PostActivity : AppCompatActivity() {
     private lateinit var replyList: List<MultiItemEntity>
     private lateinit var imgUrlList: ArrayList<String>
     private var url: String = ""
+    private var prevPageUrl: String? = null
     private var nextPageUrl: String? = null
     private var replyUrl: String? = null
     private var formhash: String? = null
@@ -49,7 +50,6 @@ class PostActivity : AppCompatActivity() {
 
         refresh_common.setOnRefreshListener { loadPosts(refresh_common) }
         setSupportActionBar(toolbar_post)
-        toolbar_post.inflateMenu(R.menu.post_toolbar_menu)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         toolbar_post.setOnClickListener {
@@ -116,6 +116,7 @@ class PostActivity : AppCompatActivity() {
                 val postParser = PostParser(document)
                 replyList = postParser.replyList
                 imgUrlList = postParser.imgUrlList
+                prevPageUrl = postParser.prevPageUrl
                 nextPageUrl = postParser.nextPageUrl
 
                 replyUrl = postParser.replyUrl
@@ -182,6 +183,41 @@ class PostActivity : AppCompatActivity() {
                             }
                         }
                     }, list_common)
+
+                    if (prevPageUrl != null) {
+                        refresh_common.isEnabled = false
+                        adapter.isUpFetchEnable = true
+                        adapter.setUpFetchListener {
+                            adapter.isUpFetching = true
+
+                            WebRequest.getHtmlDocument(prevPageUrl!!, false, list_common.context, object : DocumentCallbackListener {
+                                override fun onFinish(document: Document) {
+                                    val postMoreParser = PostParser(document)
+                                    list_common.post {
+                                        Log.d(TAG, "post: LoadMore Complete.")
+                                        prevPageUrl = postMoreParser.prevPageUrl
+                                        adapter.addData(0, postMoreParser.replyList)
+                                        imgUrlList.addAll(0, postMoreParser.imgUrlList)
+                                        adapter.isUpFetching = false
+                                        if (prevPageUrl == null) {
+                                            adapter.isUpFetchEnable = false
+                                            refresh_common.isEnabled = true
+                                        }
+                                    }
+                                }
+
+                                override fun onError(e: Exception) {
+                                    list_common.post {
+                                        Log.d(TAG, "post: LoadMore failed.")
+                                        adapter.isUpFetching = false
+                                    }
+                                }
+                            })
+                        }
+                    } else {
+                        adapter.isUpFetchEnable = false
+                        refresh_common.isEnabled = true
+                    }
                 }
             }
 
