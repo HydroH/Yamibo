@@ -12,7 +12,11 @@ class ProfileListParser {
     val profilePostList = ArrayList<MultiItemEntity>()
 
     constructor(document: Document) {
-        nextPageUrl = document.select("div.pgs.cl.mtm div.pg a").first()?.attr("href")
+        document.select("div.pgs.cl.mtm div.pg a").first()?.run {
+            if (ownText() == "下一页") {
+                nextPageUrl = attr("href")
+            }
+        }
         document.select("div.bm_c").first()?.run {
             for (elemPost in select("div.tl tbody tr")) {
                 if (elemPost.attr("class") == "th") continue

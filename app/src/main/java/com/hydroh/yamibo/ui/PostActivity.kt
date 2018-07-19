@@ -3,7 +3,10 @@ package com.hydroh.yamibo.ui
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -21,6 +24,7 @@ import android.widget.Toast
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.common.Constants
+import com.hydroh.yamibo.network.UrlUtils
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.adapter.PostAdapter
@@ -105,6 +109,11 @@ class PostActivity : AppCompatActivity() {
             android.R.id.home -> {
                 onBackPressed()
                 return true
+            }
+            R.id.menu_link -> {
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                clipboard.primaryClip = ClipData.newPlainText("网页地址", UrlUtils.getFullUrl(mPageUrl))
+                Toast.makeText(this, "链接已复制", Toast.LENGTH_SHORT).show()
             }
         }
         return super.onOptionsItemSelected(item)

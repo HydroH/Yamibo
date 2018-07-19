@@ -196,3 +196,6 @@
   **[] $VALUES;
   public *;
 }
+
+# RichText
+-keep class com.zzhoujay.**

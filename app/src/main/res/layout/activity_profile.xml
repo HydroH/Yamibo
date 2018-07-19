@@ -58,8 +58,7 @@
             <android.support.design.widget.TabLayout
                 android:id="@+id/tab_profile"
                 android:layout_width="match_parent"
-                android:layout_height="36dp"
-                app:tabGravity="center" >
+                android:layout_height="36dp" >
 
                 <android.support.design.widget.TabItem
                     android:layout_width="match_parent"

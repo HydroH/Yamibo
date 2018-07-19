@@ -222,3 +222,6 @@
 -dontwarn okhttp3.**
 -dontwarn javax.annotation.Nullable
 -dontwarn javax.annotation.ParametersAreNonnullByDefault
+
+# RichText
+-keep class com.zzhoujay.** { *; }
