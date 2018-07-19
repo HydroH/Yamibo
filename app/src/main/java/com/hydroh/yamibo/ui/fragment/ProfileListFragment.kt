@@ -14,6 +14,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
+import com.hydroh.yamibo.common.Constants
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.adapter.ProfileListAdapter
@@ -34,7 +35,7 @@ class ProfileListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.run {
-            mUrl = getString(ARG_URL)
+            mUrl = getString(Constants.ARG_INTENT_URL)
         }
     }
 
@@ -128,7 +129,7 @@ class ProfileListFragment : Fragment() {
         fun newInstance(url: String) =
                 ProfileListFragment().apply {
                     arguments = Bundle().apply {
-                        putString(ARG_URL, url)
+                        putString(Constants.ARG_INTENT_URL, url)
                     }
                 }
     }

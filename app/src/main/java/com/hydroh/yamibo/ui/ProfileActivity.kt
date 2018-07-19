@@ -5,14 +5,15 @@ import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import com.bumptech.glide.Glide
 import com.hydroh.yamibo.R
+import com.hydroh.yamibo.common.Constants
 import com.hydroh.yamibo.ui.adapter.ProfileFragmentPagerAdapter
 import kotlinx.android.synthetic.main.activity_profile.*
 
 class ProfileActivity : AppCompatActivity() {
 
-    private val mUid by lazy { intent!!.extras!!.getString("uid") }
-    private val mUsername by lazy { intent!!.extras!!.getString("username") }
-    private val mAvatarUrl by lazy { intent!!.extras!!.getString("avatarUrl") }
+    private val mUid by lazy { intent!!.extras!!.getString(Constants.ARG_INTENT_UID) }
+    private val mUsername by lazy { intent!!.extras!!.getString(Constants.ARG_INTENT_USERNAME) }
+    private val mAvatarUrl by lazy { intent!!.extras!!.getString(Constants.ARG_INTENT_AVATAR_URL) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

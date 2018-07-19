@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.animation.DecelerateInterpolator
 import com.anthonycr.grant.PermissionsManager
 import com.hydroh.yamibo.R
+import com.hydroh.yamibo.common.Constants
 import com.hydroh.yamibo.ui.adapter.ImageBrowserAdapter
 import kotlinx.android.synthetic.main.activity_image_gallery.*
 
@@ -24,8 +25,8 @@ class ImageGalleryActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        position = intent.getIntExtra("imgPosition", -1)
-        urlList = intent.getStringArrayListExtra("imgUrlList")
+        position = intent.getIntExtra(Constants.ARG_INTENT_IMG_POS, -1)
+        urlList = intent.getStringArrayListExtra(Constants.ARG_INTENT_IMG_URL_LIST)
 
         adapter = ImageBrowserAdapter(this, urlList)
         image_viewpager.adapter = adapter

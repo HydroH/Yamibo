@@ -25,7 +25,7 @@ class ProfileListParser {
                             ?: 0
                     val author = elemPost.select("td.by cite a").first().ownText()
                     val postTime = elemPost.select("td.by em a").first().ownText()
-                    profilePostList.add(Post(title, "", author, postTime, replyNum, url, sector))
+                    profilePostList.add(Post(title, "", author, postTime, replyNum, url, sector, ""))
                 } else {
                     val elemReply = elemPost.select("td.xg1 a").first()
                     val text = elemReply.ownText()

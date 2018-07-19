@@ -5,6 +5,7 @@ import android.util.Log
 import com.chad.library.adapter.base.BaseViewHolder
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
+import com.hydroh.yamibo.common.Constants
 import com.hydroh.yamibo.model.Post
 import com.hydroh.yamibo.model.ReplyMini
 import com.hydroh.yamibo.ui.PostActivity
@@ -38,8 +39,8 @@ class ProfileListAdapter(data: List<MultiItemEntity>) : AbsMultiAdapter(data)  {
                     Log.d(TAG, "Sector position $position clicked.")
                     val clickedPost = mData[position] as Post
                     val intent = Intent(mContext, PostActivity::class.java)
-                            .putExtra("url", clickedPost.url)
-                            .putExtra("title", clickedPost.title)
+                            .putExtra(Constants.ARG_INTENT_URL, clickedPost.url)
+                            .putExtra(Constants.ARG_INTENT_TITLE, clickedPost.title)
                     mContext.startActivity(intent)
                 }
 
@@ -53,7 +54,7 @@ class ProfileListAdapter(data: List<MultiItemEntity>) : AbsMultiAdapter(data)  {
                     Log.d(TAG, "Sector position $position clicked.")
                     val clickedPost = mData[position] as ReplyMini
                     val intent = Intent(mContext, PostActivity::class.java)
-                            .putExtra("url", clickedPost.url)
+                            .putExtra(Constants.ARG_INTENT_URL, clickedPost.url)
                     mContext.startActivity(intent)
                 }
             }

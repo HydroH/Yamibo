@@ -11,30 +11,26 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
+import com.hydroh.yamibo.common.Constants
+import com.hydroh.yamibo.network.UrlUtils
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
+import com.hydroh.yamibo.ui.SearchActivity
 import com.hydroh.yamibo.ui.SectorActivity
 import com.hydroh.yamibo.ui.adapter.HomeAdapter
 import com.hydroh.yamibo.util.parser.HomeParser
 import org.jsoup.nodes.Document
 
-const val DEFAULT_URL = "forum.php"
-
-const val ARG_URL = "url"
-const val ARG_TITLE = "title"
-
 class HomeFragment : Fragment() {
 
     private lateinit var mHomeItemList: List<MultiItemEntity>
     private var mPageTitle: String? = null
-    private var mPageUrl: String = DEFAULT_URL
+    private var mPageUrl: String = UrlUtils.getDefaultUrl()
     private var mNextPageUrl: String? = null
     private var mListener: InteractListener? = null
 
@@ -53,9 +49,10 @@ class HomeFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.run {
-            mPageUrl = getString(ARG_URL, DEFAULT_URL)
-            mPageTitle = getString(ARG_TITLE)
+            mPageUrl = getString(Constants.ARG_INTENT_URL, UrlUtils.getDefaultUrl())
+            mPageTitle = getString(Constants.ARG_INTENT_TITLE)
         }
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -98,6 +95,26 @@ class HomeFragment : Fragment() {
         mListener = null
         activity!!.unregisterReceiver(mRefreshBroadcastReceiver)
         super.onDetach()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        inflater?.inflate(R.menu.menu_toolbar_home, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_search -> {
+                val intent = Intent(activity!!, SearchActivity::class.java)
+                if (UrlUtils.isDefaultUrl(mPageUrl)) {
+                    Regex("-(\\d)+-").find(mPageUrl)?.groupValues?.get(1)?.let {
+                        intent.putExtra(Constants.ARG_INTENT_FID, it)
+                    }
+                }
+                startActivity(intent)
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun loadHome(view: View) {
@@ -196,10 +213,10 @@ class HomeFragment : Fragment() {
                 HomeFragment().apply {
                     arguments = Bundle().apply {
                         url?.let {
-                            putString(ARG_URL, it)
+                            putString(Constants.ARG_INTENT_URL, it)
                         }
                         title?.let {
-                            putString(ARG_TITLE, it)
+                            putString(Constants.ARG_INTENT_TITLE, it)
                         }
                     }
                 }

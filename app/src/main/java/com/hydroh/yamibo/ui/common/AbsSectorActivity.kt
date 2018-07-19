@@ -18,13 +18,12 @@ import com.bumptech.glide.Glide
 import com.google.gson.internal.LinkedTreeMap
 import com.hydroh.yamibo.BuildConfig
 import com.hydroh.yamibo.R
+import com.hydroh.yamibo.common.Constants
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.JsonCallbackListener
 import com.hydroh.yamibo.ui.HomeActivity
 import com.hydroh.yamibo.ui.LoginActivity
 import com.hydroh.yamibo.ui.ProfileActivity
-import com.hydroh.yamibo.ui.fragment.ARG_TITLE
-import com.hydroh.yamibo.ui.fragment.ARG_URL
 import com.hydroh.yamibo.ui.fragment.HomeFragment
 import com.hydroh.yamibo.util.PrefUtils
 import de.hdodenhof.circleimageview.CircleImageView
@@ -49,10 +48,10 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
             PrefUtils.setFirstLaunch(this, false)
             WebRequest.checkVersion(object : JsonCallbackListener {
                 override fun onFinish(jsonObject: JSONObject) {
-                    val build = jsonObject.getInt("build")
-                    val version = jsonObject.getString("version")
-                    val description = jsonObject.getString("description")
-                    val url = jsonObject.getString("url")
+                    val build = jsonObject.getInt(Constants.ARG_JSON_BUILD)
+                    val version = jsonObject.getString(Constants.ARG_JSON_VERSION)
+                    val description = jsonObject.getString(Constants.ARG_JSON_DESC)
+                    val url = jsonObject.getString(Constants.ARG_JSON_URL)
                     Log.d(ContentValues.TAG, "onFinish: Remote build: $build, Local build: ${BuildConfig.VERSION_CODE}")
                     if (build > BuildConfig.VERSION_CODE) {
                         val dialogBuilder = AlertDialog.Builder(this@AbsSectorActivity).apply {
@@ -95,8 +94,8 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
                 url = uri.path.removePrefix("/")
             } else {
                 it.extras?.let {
-                    url = it.getString(ARG_URL)
-                    title = it.getString(ARG_TITLE)
+                    url = it.getString(Constants.ARG_INTENT_URL)
+                    title = it.getString(Constants.ARG_INTENT_TITLE)
                 }
             }
         }
@@ -161,9 +160,9 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
             mNavHeaderUsername.text = username ?: mNavHeaderUsername.text
             mNavHeaderAvatar.setOnClickListener {
                 val intent = Intent(this, ProfileActivity::class.java)
-                intent.putExtra("uid", uid)
-                        .putExtra("username", username)
-                        .putExtra("avatarUrl", avatarUrl)
+                intent.putExtra(Constants.ARG_INTENT_UID, uid)
+                        .putExtra(Constants.ARG_INTENT_USERNAME, username)
+                        .putExtra(Constants.ARG_INTENT_AVATAR_URL, avatarUrl)
                 startActivity(intent)
             }
         } else {

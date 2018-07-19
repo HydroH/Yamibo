@@ -10,7 +10,8 @@ data class Post(
         val postTime: String,
         val replyNum: Int,
         val url: String,
-        val sector: String
+        val sector: String,
+        val abstract: String
 ) : MultiItemEntity {
 
     override fun getItemType(): Int {

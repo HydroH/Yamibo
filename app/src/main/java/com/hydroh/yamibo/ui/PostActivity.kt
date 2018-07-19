@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -19,6 +20,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
+import com.hydroh.yamibo.common.Constants
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.adapter.PostAdapter
@@ -66,8 +68,8 @@ class PostActivity : AppCompatActivity() {
                 url = uri.path
             } else {
                 intent.extras?.let {
-                    url = it.getString("url", "")
-                    title = it.getString("title", "百合会")
+                    url = it.getString(Constants.ARG_INTENT_URL, "")
+                    title = it.getString(Constants.ARG_INTENT_TITLE, "百合会")
                 }
             }
         }
@@ -91,6 +93,11 @@ class PostActivity : AppCompatActivity() {
 
         RichText.initCacheDir(this)
         loadPosts(hint_text)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_toolbar_post, menu)
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

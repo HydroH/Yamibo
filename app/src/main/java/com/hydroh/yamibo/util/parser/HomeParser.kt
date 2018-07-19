@@ -34,8 +34,7 @@ class HomeParser {
             }
         }
         if (!isProgressive) {
-            val elemGroupHeads = document.select("div.bm.bmw div.bm_h.cl")
-            for (elemGroupHead in elemGroupHeads) {
+            for (elemGroupHead in document.select("div.bm.bmw div.bm_h.cl")) {
                 val title = elemGroupHead.select("h2").first().text()
                 val group = SectorGroup(title)
 
@@ -75,7 +74,7 @@ class HomeParser {
             val postTime = elemPost.select("td.by em span").first().ownText()
             val replyNum = elemPost.select("td.num a").first().ownText().toIntOrNull() ?: 0
 
-            val post = Post(title, tag, author, postTime, replyNum, url, "")
+            val post = Post(title, tag, author, postTime, replyNum, url, "", "")
 
             if (isProgressive) {
                 if (elemID.startsWith("normalthread")) {

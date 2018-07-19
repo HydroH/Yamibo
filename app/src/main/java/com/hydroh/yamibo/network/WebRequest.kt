@@ -17,20 +17,15 @@ import javax.security.auth.login.LoginException
 
 
 object WebRequest {
-    const val APP_UPDATE_URL = "http://hydroh.me/yamibo/version.json"
-    const val BASE_URL = "https://bbs.yamibo.com/"
 
     private const val UA_DESKTOP = "Mozilla/5.0 (X11; Linux x86_64; rv:32.0) Gecko/    20100101 Firefox/32.0"
     private const val UA_MOBILE = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Mobile Safari/537.36"
-
-    private const val LOGIN_FORM_URL = "${BASE_URL}member.php"
-    private const val LOGIN_REQUEST_URL = "$LOGIN_FORM_URL?mod=logging&action=login&loginsubmit=yes&handlekey=login&loginhash=%s&inajax=1"
 
     @JvmStatic
     fun checkVersion(listener: JsonCallbackListener?) {
         Thread(Runnable {
             try {
-                val result = Jsoup.connect(APP_UPDATE_URL).ignoreContentType(true).execute().body()
+                val result = Jsoup.connect(UrlUtils.getAppUpdateUrl()).ignoreContentType(true).execute().body()
                 listener?.onFinish(JSONTokener(result).nextValue() as JSONObject)
             } catch (e: Exception) {
                 listener?.onError(e)
@@ -42,10 +37,7 @@ object WebRequest {
     fun getHtmlDocument(url: String, isMobile: Boolean, context: Context, listener: DocumentCallbackListener?) {
         Thread(Runnable {
             try {
-                var fullUrl = url
-                if (!url.startsWith("http")) {
-                    fullUrl = BASE_URL + url
-                }
+                val fullUrl = UrlUtils.getFullUrl(url)
                 val ua = if (isMobile) UA_MOBILE else UA_DESKTOP
                 val cookies = PrefUtils.getCookiePreference(context) ?: LinkedTreeMap<String, String>()
                 val response = Jsoup.connect(fullUrl)
@@ -70,7 +62,7 @@ object WebRequest {
         Thread(Runnable {
             try {
                 val cookies = /*PrefUtils.getCookiePreference(context) ?:*/ LinkedTreeMap<String, String>()
-                var response = Jsoup.connect(LOGIN_FORM_URL)
+                var response = Jsoup.connect(UrlUtils.getLoginFormUrl())
                         .method(Connection.Method.GET)
                         .data(
                                 "mod", "logging",
@@ -93,7 +85,7 @@ object WebRequest {
                 val loginHash = rawHtml.substring(index + 10, index + 15)
                 Log.d(TAG, "run: $formHash $loginHash")
 
-                response = Jsoup.connect(LOGIN_REQUEST_URL.format(loginHash))
+                response = Jsoup.connect(UrlUtils.getLoginRequestUrl(loginHash))
                         .method(Connection.Method.POST)
                         .header("Content-Type", "application/x-www-form-urlencoded")
                         .postDataCharset("GBK")
@@ -128,13 +120,21 @@ object WebRequest {
     }
 
     @JvmStatic
+    fun getSearchResult(keyword: String, fid: String, context: Context, listener: DocumentCallbackListener?) {
+        Thread(Runnable {
+            try {
+
+            } catch (e: Exception) {
+
+            }
+        }).start()
+    }
+
+    @JvmStatic
     fun postReply(url: String, content: String, formhash: String, context: Context, listener: DocumentCallbackListener?) {
         Thread(Runnable {
             try {
-                var fullUrl = url
-                if (!url.startsWith("http")) {
-                    fullUrl = BASE_URL + url
-                }
+                val fullUrl = UrlUtils.getFullUrl(url)
                 val cookies = PrefUtils.getCookiePreference(context) ?: LinkedTreeMap<String, String>()
 
                 val response = Jsoup.connect(fullUrl)

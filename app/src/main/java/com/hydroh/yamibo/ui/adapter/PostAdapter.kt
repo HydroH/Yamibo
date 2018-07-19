@@ -8,6 +8,7 @@ import com.bumptech.glide.Glide
 import com.chad.library.adapter.base.BaseViewHolder
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
+import com.hydroh.yamibo.common.Constants
 import com.hydroh.yamibo.common.TextDrawable
 import com.hydroh.yamibo.model.Reply
 import com.hydroh.yamibo.ui.ImageGalleryActivity
@@ -43,9 +44,9 @@ class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList
                         .into(holder.getView(R.id.reply_avatar))
                 holder.getView<ImageView>(R.id.reply_avatar).setOnClickListener {
                     val intent = Intent(mContext, ProfileActivity::class.java)
-                            .putExtra("uid", reply.authorUid)
-                            .putExtra("username", reply.author)
-                            .putExtra("avatarUrl", reply.avatarUrl)
+                            .putExtra(Constants.ARG_INTENT_UID, reply.authorUid)
+                            .putExtra(Constants.ARG_INTENT_USERNAME, reply.author)
+                            .putExtra(Constants.ARG_INTENT_AVATAR_URL, reply.avatarUrl)
                     mContext.startActivity(intent)
                 }
                 Log.d(TAG, "convert: Loading avatar: ${reply.avatarUrl}")
@@ -116,8 +117,8 @@ class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList
                             if (imgPosition >= 0) {
                                 Log.d(TAG, "openImage: $imgUrl")
                                 val intent = Intent()
-                                intent.putExtra("imgPosition", imgPosition)
-                                intent.putStringArrayListExtra("imgUrlList", imgUrlList)
+                                intent.putExtra(Constants.ARG_INTENT_IMG_POS, imgPosition)
+                                intent.putStringArrayListExtra(Constants.ARG_INTENT_IMG_URL_LIST, imgUrlList)
                                 intent.setClass(mContext, ImageGalleryActivity::class.java)
                                 mContext.startActivity(intent)
                             }

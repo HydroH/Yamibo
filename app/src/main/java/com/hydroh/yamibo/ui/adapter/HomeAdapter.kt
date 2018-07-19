@@ -6,6 +6,7 @@ import android.util.Log
 import com.chad.library.adapter.base.BaseViewHolder
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
+import com.hydroh.yamibo.common.Constants
 import com.hydroh.yamibo.model.Post
 import com.hydroh.yamibo.model.Sector
 import com.hydroh.yamibo.model.SectorGroup
@@ -15,8 +16,6 @@ import com.hydroh.yamibo.ui.common.AbsMultiAdapter
 import com.hydroh.yamibo.ui.common.ItemType.TYPE_GROUP
 import com.hydroh.yamibo.ui.common.ItemType.TYPE_POST
 import com.hydroh.yamibo.ui.common.ItemType.TYPE_SECTOR
-import com.hydroh.yamibo.ui.fragment.ARG_TITLE
-import com.hydroh.yamibo.ui.fragment.ARG_URL
 
 class HomeAdapter(data: List<MultiItemEntity>) : AbsMultiAdapter(data) {
 
@@ -71,8 +70,8 @@ class HomeAdapter(data: List<MultiItemEntity>) : AbsMultiAdapter(data) {
                     Log.d(TAG, "Sector position $position clicked.")
                     val clickedSector = mData[position] as Sector
                     val intent = Intent(mContext, SectorActivity::class.java)
-                            .putExtra(ARG_URL, clickedSector.url)
-                            .putExtra(ARG_TITLE, clickedSector.title)
+                            .putExtra(Constants.ARG_INTENT_URL, clickedSector.url)
+                            .putExtra(Constants.ARG_INTENT_TITLE, clickedSector.title)
                     mContext.startActivity(intent)
                 }
             }
@@ -90,8 +89,8 @@ class HomeAdapter(data: List<MultiItemEntity>) : AbsMultiAdapter(data) {
                     Log.d(TAG, "Post position $position clicked.")
                     val clickedPost = mData[position] as Post
                     val intent = Intent(mContext, PostActivity::class.java)
-                            .putExtra("url", clickedPost.url)
-                            .putExtra("title", clickedPost.title)
+                            .putExtra(Constants.ARG_INTENT_URL, clickedPost.url)
+                            .putExtra(Constants.ARG_INTENT_TITLE, clickedPost.title)
                     mContext.startActivity(intent)
                 }
             }

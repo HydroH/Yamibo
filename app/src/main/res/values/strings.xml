@@ -43,4 +43,5 @@
     <string name="profile_tab_post">主题</string>
     <string name="profile_tab_reply">回复</string>
     <string name="title_menu_search">搜索</string>
+    <string name="title_menu_link">复制链接</string>
 </resources>
