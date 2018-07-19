@@ -1,26 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-    tools:context=".ui.SearchActivity">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.SearchActivity" >
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar_search"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
-        app:contentInsetStartWithNavigation="0dp" >
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-        <android.support.v7.widget.SearchView
-            android:id="@+id/search_common"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar_search"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:imeOptions="actionSearch"
-            android:inputType="text"
-            app:iconifiedByDefault="false" />
+            android:layout_height="?android:attr/actionBarSize"
+            app:contentInsetStartWithNavigation="0dp" >
 
-    </android.support.v7.widget.Toolbar>
+            <android.support.v7.widget.SearchView
+                android:id="@+id/search_common"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                app:iconifiedByDefault="false" />
 
-</android.support.design.widget.AppBarLayout>
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <include
+        layout="@layout/list_common"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

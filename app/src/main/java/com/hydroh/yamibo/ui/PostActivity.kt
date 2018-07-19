@@ -32,15 +32,15 @@ import org.jsoup.nodes.Document
 
 class PostActivity : AppCompatActivity() {
 
-    private lateinit var replyList: List<MultiItemEntity>
-    private lateinit var imgUrlList: ArrayList<String>
-    private var url: String = ""
-    private var prevPageUrl: String? = null
-    private var nextPageUrl: String? = null
-    private var replyUrl: String? = null
-    private var formhash: String? = null
+    private lateinit var mReplyList: List<MultiItemEntity>
+    private lateinit var mImgUrlList: ArrayList<String>
+    private var mPageUrl: String = ""
+    private var mPrevPageUrl: String? = null
+    private var mNextPageUrl: String? = null
+    private var mReplyUrl: String? = null
+    private var mFormHash: String? = null
 
-    private var titleTextView : TextView? = null
+    private var mTitleTextView : TextView? = null
 
     private val animatorDim by lazy {
         ObjectAnimator.ofInt(list_post.foreground, "alpha", 0, 255)
@@ -65,28 +65,28 @@ class PostActivity : AppCompatActivity() {
         intent?.let {
             if (intent.action == Intent.ACTION_VIEW) {
                 val uri = intent.data
-                url = uri.path
+                mPageUrl = uri.path
             } else {
-                intent.extras?.let {
-                    url = it.getString(Constants.ARG_INTENT_URL, "")
-                    title = it.getString(Constants.ARG_INTENT_TITLE, "百合会")
+                intent.extras?.run {
+                    mPageUrl = getString(Constants.ARG_INTENT_URL, "")
+                    title = getString(Constants.ARG_INTENT_TITLE, "百合会")
                 }
             }
         }
-        Log.d(TAG, "onCreate: URL: $url")
+        Log.d(TAG, "onCreate: URL: $mPageUrl")
 
         try {
             val field = toolbar_post::class.java.getDeclaredField("mTitleTextView")
             field.isAccessible = true
-            titleTextView = field.get(toolbar_post) as TextView
+            mTitleTextView = field.get(toolbar_post) as TextView
 
-            titleTextView!!.ellipsize = TextUtils.TruncateAt.MARQUEE
-            titleTextView!!.isFocusable = true
-            titleTextView!!.isFocusableInTouchMode = true
-            titleTextView!!.requestFocus()
-            titleTextView!!.setSingleLine(true)
-            titleTextView!!.isSelected = true
-            titleTextView!!.marqueeRepeatLimit = -1
+            mTitleTextView!!.ellipsize = TextUtils.TruncateAt.MARQUEE
+            mTitleTextView!!.isFocusable = true
+            mTitleTextView!!.isFocusableInTouchMode = true
+            mTitleTextView!!.requestFocus()
+            mTitleTextView!!.setSingleLine(true)
+            mTitleTextView!!.isSelected = true
+            mTitleTextView!!.marqueeRepeatLimit = -1
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -111,27 +111,27 @@ class PostActivity : AppCompatActivity() {
     }
 
     private fun loadPosts(view: View) {
-        Log.d(TAG, "refreshNetwork: URL: $url")
+        Log.d(TAG, "refreshNetwork: URL: $mPageUrl")
 
         if (view.id == R.id.hint_text) {
             hint_text.visibility = View.GONE
             hint_progressbar.visibility = View.VISIBLE
         }
 
-        WebRequest.getHtmlDocument(url, false, this, object : DocumentCallbackListener {
+        WebRequest.getHtmlDocument(mPageUrl, false, this, object : DocumentCallbackListener {
             override fun onFinish(document: Document) {
                 val postParser = PostParser(document)
-                replyList = postParser.replyList
-                imgUrlList = postParser.imgUrlList
-                prevPageUrl = postParser.prevPageUrl
-                nextPageUrl = postParser.nextPageUrl
+                mReplyList = postParser.replyList
+                mImgUrlList = postParser.imgUrlList
+                mPrevPageUrl = postParser.prevPageUrl
+                mNextPageUrl = postParser.nextPageUrl
 
-                replyUrl = postParser.replyUrl
-                formhash = postParser.formhash
-                if (replyUrl != null && formhash != null) {
+                mReplyUrl = postParser.replyUrl
+                mFormHash = postParser.formhash
+                if (mReplyUrl != null && mFormHash != null) {
                     button_post_reply.setOnClickListener {
                         if (edit_post_reply.text.isEmpty()) return@setOnClickListener
-                        WebRequest.postReply(replyUrl!!, edit_post_reply.text.toString(), formhash!!,
+                        WebRequest.postReply(mReplyUrl!!, edit_post_reply.text.toString(), mFormHash!!,
                                 this@PostActivity, object : DocumentCallbackListener {
                             override fun onFinish(document: Document) {
                                 runOnUiThread {
@@ -161,18 +161,19 @@ class PostActivity : AppCompatActivity() {
                         }
                     }
 
-                    val adapter = PostAdapter(replyList, imgUrlList)
+                    val adapter = PostAdapter(mReplyList, mImgUrlList)
                     list_common.adapter = adapter
                     adapter.setOnLoadMoreListener({
-                        if (nextPageUrl != null) {
-                            WebRequest.getHtmlDocument(nextPageUrl!!, false, list_common.context, object : DocumentCallbackListener {
+                        if (mNextPageUrl != null) {
+                            WebRequest.getHtmlDocument(mNextPageUrl!!, false, list_common.context, object : DocumentCallbackListener {
                                 override fun onFinish(document: Document) {
                                     val postMoreParser = PostParser(document)
                                     list_common.post {
                                         Log.d(TAG, "post: LoadMore Complete.")
-                                        nextPageUrl = postMoreParser.nextPageUrl
+                                        mNextPageUrl = postMoreParser.nextPageUrl
+                                        mFormHash = postMoreParser.formhash
                                         adapter.addData(postMoreParser.replyList)
-                                        imgUrlList.addAll(postMoreParser.imgUrlList)
+                                        mImgUrlList.addAll(postMoreParser.imgUrlList)
                                         adapter.loadMoreComplete()
                                     }
                                 }
@@ -191,22 +192,23 @@ class PostActivity : AppCompatActivity() {
                         }
                     }, list_common)
 
-                    if (prevPageUrl != null) {
+                    if (mPrevPageUrl != null) {
                         refresh_common.isEnabled = false
                         adapter.isUpFetchEnable = true
                         adapter.setUpFetchListener {
                             adapter.isUpFetching = true
 
-                            WebRequest.getHtmlDocument(prevPageUrl!!, false, list_common.context, object : DocumentCallbackListener {
+                            WebRequest.getHtmlDocument(mPrevPageUrl!!, false, list_common.context, object : DocumentCallbackListener {
                                 override fun onFinish(document: Document) {
                                     val postMoreParser = PostParser(document)
                                     list_common.post {
                                         Log.d(TAG, "post: LoadMore Complete.")
-                                        prevPageUrl = postMoreParser.prevPageUrl
+                                        mPrevPageUrl = postMoreParser.prevPageUrl
+                                        mFormHash = postMoreParser.formhash
                                         adapter.addData(0, postMoreParser.replyList)
-                                        imgUrlList.addAll(0, postMoreParser.imgUrlList)
+                                        mImgUrlList.addAll(0, postMoreParser.imgUrlList)
                                         adapter.isUpFetching = false
-                                        if (prevPageUrl == null) {
+                                        if (mPrevPageUrl == null) {
                                             adapter.isUpFetchEnable = false
                                             refresh_common.isEnabled = true
                                         }

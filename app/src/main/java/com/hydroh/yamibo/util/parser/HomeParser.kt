@@ -20,6 +20,8 @@ class HomeParser {
         private set
     var nextPageUrl: String? = null
         private set
+    var formhash: String? = null
+        private set
     val groupList = ArrayList<MultiItemEntity>()
 
     constructor(document: Document, isProgressive: Boolean = false) {
@@ -33,6 +35,7 @@ class HomeParser {
                 uid = attr("href").replace("[^\\d]+".toRegex(), "")
             }
         }
+        formhash = document.select("form#scbar_form input[name=\"formhash\"]").first()?.attr("value")
         if (!isProgressive) {
             for (elemGroupHead in document.select("div.bm.bmw div.bm_h.cl")) {
                 val title = elemGroupHead.select("h2").first().text()

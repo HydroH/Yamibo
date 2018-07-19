@@ -6,6 +6,7 @@ object UrlUtils {
     private const val BASE_URL = "https://bbs.yamibo.com/"
     private const val DEFAULT_URL = "${BASE_URL}forum.php"
 
+    private const val SEARCH_FORUM_URL = "${BASE_URL}search.php?mod=forum"
     private const val LOGIN_FORM_URL = "${BASE_URL}member.php"
     private const val LOGIN_REQUEST_URL = "$LOGIN_FORM_URL?mod=logging&action=login&loginsubmit=yes&handlekey=login&loginhash=%s&inajax=1"
 
@@ -22,6 +23,9 @@ object UrlUtils {
 
     @JvmStatic
     fun getAppUpdateUrl() = APP_UPDATE_URL
+
+    @JvmStatic
+    fun getSearchForumUrl() = SEARCH_FORUM_URL
 
     @JvmStatic
     fun getLoginFormUrl() = LOGIN_FORM_URL

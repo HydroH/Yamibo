@@ -11,14 +11,21 @@ import kotlinx.android.synthetic.main.activity_profile.*
 
 class ProfileActivity : AppCompatActivity() {
 
-    private val mUid by lazy { intent!!.extras!!.getString(Constants.ARG_INTENT_UID) }
-    private val mUsername by lazy { intent!!.extras!!.getString(Constants.ARG_INTENT_USERNAME) }
-    private val mAvatarUrl by lazy { intent!!.extras!!.getString(Constants.ARG_INTENT_AVATAR_URL) }
+    private lateinit var mUid: String
+    private lateinit var mUsername: String
+    private lateinit var mAvatarUrl: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
         setSupportActionBar(toolbar_profile)
+
+        intent!!.extras!!.run {
+            mUid = getString(Constants.ARG_INTENT_UID)
+            mUsername = getString(Constants.ARG_INTENT_USERNAME)
+            mAvatarUrl = getString(Constants.ARG_INTENT_AVATAR_URL)
+        }
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = mUsername
 

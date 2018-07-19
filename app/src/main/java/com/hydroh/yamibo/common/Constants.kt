@@ -4,6 +4,8 @@ object Constants {
     const val ARG_INTENT_URL = "url"
     const val ARG_INTENT_TITLE = "title"
     const val ARG_INTENT_FID = "fid"
+    const val ARG_INTENT_FORMHASH = "formhash"
+    const val ARG_INTENT_NAME = "name"
     const val ARG_INTENT_UID = "uid"
     const val ARG_INTENT_USERNAME = "username"
     const val ARG_INTENT_AVATAR_URL = "avatarUrl"

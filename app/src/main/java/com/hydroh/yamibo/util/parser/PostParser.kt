@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.util.Log
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.model.Reply
-import com.hydroh.yamibo.network.WebRequest
+import com.hydroh.yamibo.network.UrlUtils
 import org.jsoup.nodes.Document
 
 class PostParser {
@@ -57,7 +57,7 @@ class PostParser {
                         image.remove()
                         continue
                     }
-                    val imgUrl = (if (image.attr("file").startsWith("http")) "" else WebRequest.BASE_URL) + image.attr("file")
+                    val imgUrl = UrlUtils.getFullUrl(image.attr("file"))
                     image.attr("src", imgUrl)
                     imgUrlList.add(imgUrl)
                 }

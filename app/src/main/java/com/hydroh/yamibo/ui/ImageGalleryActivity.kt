@@ -14,9 +14,9 @@ import kotlinx.android.synthetic.main.activity_image_gallery.*
 class ImageGalleryActivity : AppCompatActivity() {
     private val TAG = this::class.java.simpleName
 
-    private lateinit var adapter: ImageBrowserAdapter
-    private var position: Int = -1
-    private var urlList: ArrayList<String> = ArrayList()
+    private lateinit var mAdapter: ImageBrowserAdapter
+    private var mPosition: Int = -1
+    private var mUrlList: ArrayList<String> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,21 +25,21 @@ class ImageGalleryActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        position = intent.getIntExtra(Constants.ARG_INTENT_IMG_POS, -1)
-        urlList = intent.getStringArrayListExtra(Constants.ARG_INTENT_IMG_URL_LIST)
+        mPosition = intent.getIntExtra(Constants.ARG_INTENT_IMG_POS, -1)
+        mUrlList = intent.getStringArrayListExtra(Constants.ARG_INTENT_IMG_URL_LIST)
 
-        adapter = ImageBrowserAdapter(this, urlList)
-        image_viewpager.adapter = adapter
-        title = "${position + 1} / ${urlList.size}"
+        mAdapter = ImageBrowserAdapter(this, mUrlList)
+        image_viewpager.adapter = mAdapter
+        title = "${mPosition + 1} / ${mUrlList.size}"
 
         image_viewpager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
             override fun onPageSelected(position: Int) {
-                title = "${position + 1} / ${urlList.size}"
+                title = "${position + 1} / ${mUrlList.size}"
             }
             override fun onPageScrollStateChanged(state: Int) {}
         })
-        image_viewpager.currentItem = position
+        image_viewpager.currentItem = mPosition
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

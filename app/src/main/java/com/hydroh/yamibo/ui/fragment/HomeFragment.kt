@@ -32,6 +32,7 @@ class HomeFragment : Fragment() {
     private var mPageTitle: String? = null
     private var mPageUrl: String = UrlUtils.getDefaultUrl()
     private var mNextPageUrl: String? = null
+    private var mFormHash: String? = null
     private var mListener: InteractListener? = null
 
     private val mSwipeRefreshLayout by lazy { view!!.findViewById<SwipeRefreshLayout>(R.id.refresh_common) }
@@ -105,9 +106,11 @@ class HomeFragment : Fragment() {
         when (item.itemId) {
             R.id.menu_search -> {
                 val intent = Intent(activity!!, SearchActivity::class.java)
-                if (UrlUtils.isDefaultUrl(mPageUrl)) {
+                intent.putExtra(Constants.ARG_INTENT_FORMHASH, mFormHash)
+                if (!UrlUtils.isDefaultUrl(mPageUrl)) {
                     Regex("-(\\d)+-").find(mPageUrl)?.groupValues?.get(1)?.let {
                         intent.putExtra(Constants.ARG_INTENT_FID, it)
+                                .putExtra(Constants.ARG_INTENT_NAME, mPageTitle)
                     }
                 }
                 startActivity(intent)
@@ -132,6 +135,7 @@ class HomeFragment : Fragment() {
                 val homeParser = HomeParser(document)
                 mHomeItemList = homeParser.groupList
                 mNextPageUrl = homeParser.nextPageUrl
+                mFormHash = homeParser.formhash
                 activity!!.runOnUiThread {
                     mHintText.visibility = View.GONE
                     mLoadProgressBar.visibility = View.GONE
@@ -154,6 +158,7 @@ class HomeFragment : Fragment() {
                                         activity!!.runOnUiThread {
                                             Log.d(ContentValues.TAG, "post: LoadMore Complete.")
                                             mNextPageUrl = homeMoreParser.nextPageUrl
+                                            mFormHash = homeMoreParser.formhash
                                             adapter.addData(homeMoreParser.groupList)
                                             adapter.loadMoreComplete()
                                         }

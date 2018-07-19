@@ -120,12 +120,32 @@ object WebRequest {
     }
 
     @JvmStatic
-    fun getSearchResult(keyword: String, fid: String, context: Context, listener: DocumentCallbackListener?) {
+    fun getSearchResult(keyword: String, fid: String, formhash: String, context: Context, listener: DocumentCallbackListener?) {
         Thread(Runnable {
             try {
+                val cookies = PrefUtils.getCookiePreference(context) ?: LinkedTreeMap<String, String>()
 
+                val response = Jsoup.connect(UrlUtils.getSearchForumUrl())
+                        .method(Connection.Method.POST)
+                        .header("Content-Type", "application/x-www-form-urlencoded")
+                        .postDataCharset("GBK")
+                        .data(
+                                "srchtxt", keyword,
+                                "srchfid[]", fid,
+                                "formhash", formhash,
+                                "searchsubmit", "yes"
+                        )
+                        .cookies(cookies)
+                        .timeout(8000)
+                        .execute()
+
+                cookies.putAll(response.cookies())
+                cookies.values.removeAll(Collections.singleton("deleted"))
+                PrefUtils.setCookiePreference(context, cookies)
+
+                listener?.onFinish(response.parse())
             } catch (e: Exception) {
-
+                listener?.onError(e)
             }
         }).start()
     }
@@ -154,6 +174,7 @@ object WebRequest {
 
                 cookies.putAll(response.cookies())
                 cookies.values.removeAll(Collections.singleton("deleted"))
+                PrefUtils.setCookiePreference(context, cookies)
                 
                 Log.d(TAG, "postReply: ${response.parse().outerHtml()}")
                 listener?.onFinish(response.parse())
