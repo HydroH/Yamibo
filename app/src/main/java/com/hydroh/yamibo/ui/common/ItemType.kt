@@ -6,4 +6,6 @@ object ItemType {
     const val TYPE_POST = 2
     const val TYPE_REPLY = 3
     const val TYPE_REPLY_MINI = 4
+    const val TYPE_TAG = 5
+    const val TYPE_TAG_LIST = 6
 }

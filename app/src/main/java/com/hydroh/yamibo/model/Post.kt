@@ -14,7 +14,5 @@ data class Post(
         val abstract: String
 ) : MultiItemEntity {
 
-    override fun getItemType(): Int {
-        return ItemType.TYPE_POST
-    }
+    override fun getItemType(): Int = ItemType.TYPE_POST
 }

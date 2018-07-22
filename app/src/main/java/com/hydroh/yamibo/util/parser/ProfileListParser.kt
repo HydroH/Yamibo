@@ -18,25 +18,26 @@ class ProfileListParser {
             }
         }
         document.select("div.bm_c").first()?.run {
-            for (elemPost in select("div.tl tbody tr")) {
-                if (elemPost.attr("class") == "th") continue
-                if (elemPost.select("td.icn").first() != null) {
-                    val elemTitle = elemPost.select("th a").first()
-                    val title = elemTitle.ownText()
-                    val url = elemTitle.attr("href")
-                    val sector = elemPost.select("td a.xg1").first().ownText()
-                    val replyNum = elemPost.select("td.num a.xi2").first().ownText().toIntOrNull()
-                            ?: 0
-                    val author = elemPost.select("td.by cite a").first().ownText()
-                    val postTime = elemPost.select("td.by em a").first().ownText()
-                    profilePostList.add(Post(title, "", author, postTime, replyNum, url, sector, ""))
-                } else {
-                    val elemReply = elemPost.select("td.xg1 a").first()
-                    val text = elemReply.ownText()
-                    val url = elemReply.attr("href")
-                    profilePostList.add(ReplyMini(text, url))
-                }
-            }
+            select("div.tl tbody tr")
+                    .filter { it.attr("class") != "th" }
+                    .forEach {
+                        if (it.select("td.icn").first() != null) {
+                            val elemTitle = it.select("th a").first()
+                            val title = elemTitle.ownText()
+                            val url = elemTitle.attr("href")
+                            val sector = it.select("td a.xg1").first().ownText()
+                            val replyNum = it.select("td.num a.xi2").first().ownText().toIntOrNull()
+                                    ?: 0
+                            val author = it.select("td.by cite a").first().ownText()
+                            val postTime = it.select("td.by em a").first().ownText()
+                            profilePostList.add(Post(title, "", author, postTime, replyNum, url, sector, ""))
+                        } else {
+                            val elemReply = it.select("td.xg1 a").first()
+                            val text = elemReply.ownText()
+                            val url = elemReply.attr("href")
+                            profilePostList.add(ReplyMini(text, url))
+                        }
+                    }
         }
     }
 }

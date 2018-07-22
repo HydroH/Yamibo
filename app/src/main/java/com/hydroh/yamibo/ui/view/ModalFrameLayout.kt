@@ -22,7 +22,7 @@ class ModalFrameLayout : FrameLayout {
 
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         Log.d(TAG, "onInterceptTouchEvent: Intercepted touch event.")
-        this.onTouchEvent(ev)
+        onTouchEvent(ev)
         return isInterCeptTouchEvent
     }
 }

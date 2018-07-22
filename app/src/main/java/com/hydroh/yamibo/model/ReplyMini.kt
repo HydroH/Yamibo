@@ -8,7 +8,5 @@ data class ReplyMini(
         val url: String
 ) : MultiItemEntity {
 
-    override fun getItemType(): Int {
-        return ItemType.TYPE_REPLY_MINI
-    }
+    override fun getItemType(): Int = ItemType.TYPE_REPLY_MINI
 }

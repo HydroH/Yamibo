@@ -12,7 +12,5 @@ data class Reply(
         val floorNum: Int
 ) : MultiItemEntity {
 
-    override fun getItemType(): Int {
-        return ItemType.TYPE_REPLY
-    }
+    override fun getItemType(): Int = ItemType.TYPE_REPLY
 }

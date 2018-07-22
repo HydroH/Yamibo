@@ -59,9 +59,7 @@ class SearchActivity : AppCompatActivity() {
                 return loadResult(query)
             }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                return false
-            }
+            override fun onQueryTextChange(newText: String?): Boolean = false
         })
     }
 

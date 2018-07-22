@@ -23,8 +23,11 @@ import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.SearchActivity
 import com.hydroh.yamibo.ui.SectorActivity
 import com.hydroh.yamibo.ui.adapter.HomeAdapter
+import com.hydroh.yamibo.ui.common.PageReloadListener
 import com.hydroh.yamibo.util.parser.HomeParser
+import kotlinx.android.synthetic.main.list_common.*
 import org.jsoup.nodes.Document
+import java.lang.RuntimeException
 
 class HomeFragment : Fragment() {
 
@@ -56,17 +59,15 @@ class HomeFragment : Fragment() {
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_home, container, false)
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
+            = inflater.inflate(R.layout.fragment_home, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity.run {
             if (this is AppCompatActivity) {
                 setSupportActionBar(mToolbar)
-                title?.let { supportActionBar?.title = it }
+                mPageTitle?.let { supportActionBar?.title = it }
             }
         }
         mListener?.onToolbarReady(mToolbar)
@@ -148,6 +149,13 @@ class HomeFragment : Fragment() {
                     mContentRecyclerView.layoutManager = layoutManager
 
                     val adapter = HomeAdapter(mHomeItemList)
+                    adapter.pageReloadListener = object : PageReloadListener {
+                        override fun onPageReload(url: String) {
+                            mPageUrl = url
+                            loadHome(refresh_common)
+                        }
+                    }
+
                     mContentRecyclerView.adapter = adapter
                     if (activity!! is SectorActivity) {
                         adapter.setOnLoadMoreListener({

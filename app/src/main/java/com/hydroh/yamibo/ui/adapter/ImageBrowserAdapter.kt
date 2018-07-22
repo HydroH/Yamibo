@@ -32,13 +32,9 @@ class ImageBrowserAdapter(private val context: Activity, private var imgUrlList:
         private val TAG = this::class.java.simpleName
     }
 
-    override fun getCount(): Int {
-        return imgUrlList.size
-    }
+    override fun getCount(): Int = imgUrlList.size
 
-    override fun isViewFromObject(view: View, obj: Any): Boolean {
-        return view === obj
-    }
+    override fun isViewFromObject(view: View, obj: Any): Boolean = view === obj
 
     override fun instantiateItem(container: ViewGroup, position: Int): View {
         val view = View.inflate(context, R.layout.item_img_browser, null)

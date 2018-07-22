@@ -35,17 +35,11 @@ class TextDrawable(res: Resources, private val mText: CharSequence, mTextColor: 
                 bounds.centerX().toFloat(), bounds.centerY().toFloat() - ((mPaint.descent() + mPaint.ascent()) / 2), mPaint)
     }
 
-    override fun getOpacity(): Int {
-        return mPaint.alpha
-    }
+    override fun getOpacity(): Int = mPaint.alpha
 
-    override fun getIntrinsicWidth(): Int {
-        return mIntrinsicWidth
-    }
+    override fun getIntrinsicWidth(): Int = mIntrinsicWidth
 
-    override fun getIntrinsicHeight(): Int {
-        return mIntrinsicHeight
-    }
+    override fun getIntrinsicHeight(): Int = mIntrinsicHeight
 
     override fun setAlpha(alpha: Int) {
         mPaint.alpha = alpha

@@ -1,9 +1,7 @@
 package com.hydroh.yamibo.util.parser
 
 import com.chad.library.adapter.base.entity.MultiItemEntity
-import com.hydroh.yamibo.model.Post
-import com.hydroh.yamibo.model.Sector
-import com.hydroh.yamibo.model.SectorGroup
+import com.hydroh.yamibo.model.*
 import org.jsoup.nodes.Document
 
 class HomeParser {
@@ -37,11 +35,25 @@ class HomeParser {
         }
         formhash = document.select("form#scbar_form input[name=\"formhash\"]").first()?.attr("value")
         if (!isProgressive) {
-            for (elemGroupHead in document.select("div.bm.bmw div.bm_h.cl")) {
-                val title = elemGroupHead.select("h2").first().text()
+            val tagList = ArrayList<PostTag>()
+            var selectedPos = 0
+            document.select("ul#thread_types li a").forEachIndexed { index, element ->
+                element.run {
+                    val title = ownText()
+                    val url = attr("href")
+                    val postNum = select("span.xg1.num").first()?.ownText()?.toIntOrNull() ?: 0
+                    val selected = parent().hasClass("xw1")
+                    if (selected) selectedPos = index
+                    tagList.add(PostTag(title, url, postNum, selected))
+                }
+            }
+            groupList.add(PostTagList(tagList, selectedPos))
+
+            document.select("div.bm.bmw div.bm_h.cl").forEach {
+                val title = it.select("h2").first().text()
                 val group = SectorGroup(title)
 
-                val elemSectors = elemGroupHead.nextElementSibling()
+                val elemSectors = it.nextElementSibling()
                 for (elemSector in elemSectors.select("div.bm_c tr")) {
                     if (elemSector.children().size >= 2) {
                         val elemSectorMain = elemSector.child(1)

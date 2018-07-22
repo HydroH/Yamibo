@@ -1,6 +1,8 @@
 package com.hydroh.yamibo.ui.adapter
 
 import android.content.Intent
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.text.Html
 import android.util.Log
 import com.chad.library.adapter.base.BaseViewHolder
@@ -8,6 +10,7 @@ import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.common.Constants
 import com.hydroh.yamibo.model.Post
+import com.hydroh.yamibo.model.PostTagList
 import com.hydroh.yamibo.model.Sector
 import com.hydroh.yamibo.model.SectorGroup
 import com.hydroh.yamibo.ui.PostActivity
@@ -16,14 +19,19 @@ import com.hydroh.yamibo.ui.common.AbsMultiAdapter
 import com.hydroh.yamibo.ui.common.ItemType.TYPE_GROUP
 import com.hydroh.yamibo.ui.common.ItemType.TYPE_POST
 import com.hydroh.yamibo.ui.common.ItemType.TYPE_SECTOR
+import com.hydroh.yamibo.ui.common.ItemType.TYPE_TAG_LIST
+import com.hydroh.yamibo.ui.common.PageReloadListener
 
 class HomeAdapter(data: List<MultiItemEntity>) : AbsMultiAdapter(data) {
+
+    var pageReloadListener: PageReloadListener? = null
 
     companion object {
         private val TAG = this::class.java.simpleName
     }
 
     init {
+        addItemType(TYPE_TAG_LIST, R.layout.item_tag_list)
         addItemType(TYPE_GROUP, R.layout.item_group)
         addItemType(TYPE_SECTOR, R.layout.item_sector)
         addItemType(TYPE_POST, R.layout.item_post)
@@ -32,6 +40,20 @@ class HomeAdapter(data: List<MultiItemEntity>) : AbsMultiAdapter(data) {
     @Suppress("DEPRECATION")
     override fun convert(holder: BaseViewHolder, item: MultiItemEntity) {
         when (holder.itemViewType) {
+            TYPE_TAG_LIST -> {
+                val tagList = item as PostTagList
+                holder.setNestView(R.id.view_list_tag)
+                val tagRecyclerView = holder.getView<RecyclerView>(R.id.list_tag)
+                val layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false)
+                tagRecyclerView.layoutManager = layoutManager
+                tagRecyclerView.setHasFixedSize(true)
+
+                val tagAdapter = PostTagAdapter(tagList.tagList)
+                tagAdapter.pageReloadListener = pageReloadListener
+                tagRecyclerView.adapter = tagAdapter
+                tagRecyclerView.scrollToPosition(tagList.selectedPos)
+            }
+
             TYPE_GROUP -> {
                 val group = item as SectorGroup
                 holder.setText(R.id.group_title, group.title)
