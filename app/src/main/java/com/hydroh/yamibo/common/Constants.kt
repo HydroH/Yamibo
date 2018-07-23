@@ -21,4 +21,6 @@ object Constants {
     const val ARG_PREF_APP_FIRST_LAUNCH = "isFirstLaunch"
     const val ARG_PREF_COOKIE = "cookie"
     const val ARG_PREF_COOKIE_COOKIE = "cookie"
+    const val ARG_PREF_HISTORY = "history"
+    const val ARG_PREF_HISTORY_POST = "post"
 }

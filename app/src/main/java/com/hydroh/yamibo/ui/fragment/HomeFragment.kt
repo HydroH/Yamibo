@@ -1,8 +1,8 @@
 package com.hydroh.yamibo.ui.fragment
 
-import android.app.Fragment
 import android.content.*
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
@@ -24,6 +24,7 @@ import com.hydroh.yamibo.ui.SearchActivity
 import com.hydroh.yamibo.ui.SectorActivity
 import com.hydroh.yamibo.ui.adapter.HomeAdapter
 import com.hydroh.yamibo.ui.common.PageReloadListener
+import com.hydroh.yamibo.ui.fragment.listener.HomeInteractListener
 import com.hydroh.yamibo.util.parser.HomeParser
 import kotlinx.android.synthetic.main.list_common.*
 import org.jsoup.nodes.Document
@@ -36,7 +37,7 @@ class HomeFragment : Fragment() {
     private var mPageUrl: String = UrlUtils.getDefaultUrl()
     private var mNextPageUrl: String? = null
     private var mFormHash: String? = null
-    private var mListener: InteractListener? = null
+    private var mListener: HomeInteractListener? = null
 
     private val mSwipeRefreshLayout by lazy { view!!.findViewById<SwipeRefreshLayout>(R.id.refresh_common) }
     private val mToolbar by lazy { view!!.findViewById<Toolbar>(R.id.toolbar_home) }
@@ -86,7 +87,7 @@ class HomeFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if (context is InteractListener) {
+        if (context is HomeInteractListener) {
             mListener = context
         } else {
             throw RuntimeException(context.toString() + " must implement InteractListener")
@@ -212,12 +213,6 @@ class HomeFragment : Fragment() {
                 }
             }
         })
-    }
-
-    interface InteractListener {
-        fun onHomeRefresh()
-        fun onToolbarReady(toolbar: Toolbar)
-        fun onUserStatReady(isLoggedIn: Boolean, avatarUrl: String?, username: String?, uid: String?)
     }
 
     companion object {

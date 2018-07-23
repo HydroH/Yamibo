@@ -24,10 +24,13 @@ import android.widget.Toast
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.common.Constants
+import com.hydroh.yamibo.model.Post
+import com.hydroh.yamibo.model.Reply
 import com.hydroh.yamibo.network.UrlUtils
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.adapter.PostAdapter
+import com.hydroh.yamibo.util.PrefUtils
 import com.hydroh.yamibo.util.parser.PostParser
 import com.zzhoujay.richtext.RichText
 import kotlinx.android.synthetic.main.activity_post.*
@@ -130,6 +133,13 @@ class PostActivity : AppCompatActivity() {
         WebRequest.getHtmlDocument(mPageUrl, false, this, object : DocumentCallbackListener {
             override fun onFinish(document: Document) {
                 val postParser = PostParser(document)
+                val postInfo = postParser.run {
+                    (replyList.first() as Reply).run {
+                        Post(title ?: this@PostActivity.title.toString(), "", author, postDate, 0, mPageUrl, "", "")
+                    }
+                }
+                PrefUtils.updatePostHistory(this@PostActivity, postInfo)
+
                 mReplyList = postParser.replyList
                 mImgUrlList = postParser.imgUrlList
                 mPrevPageUrl = postParser.prevPageUrl

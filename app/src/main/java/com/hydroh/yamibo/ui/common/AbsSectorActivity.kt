@@ -24,12 +24,17 @@ import com.hydroh.yamibo.network.callback.JsonCallbackListener
 import com.hydroh.yamibo.ui.HomeActivity
 import com.hydroh.yamibo.ui.LoginActivity
 import com.hydroh.yamibo.ui.ProfileActivity
+import com.hydroh.yamibo.ui.fragment.HistoryFragment
 import com.hydroh.yamibo.ui.fragment.HomeFragment
+import com.hydroh.yamibo.ui.fragment.listener.HomeInteractListener
 import com.hydroh.yamibo.util.PrefUtils
 import de.hdodenhof.circleimageview.CircleImageView
 import org.json.JSONObject
 
-abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, HomeFragment.InteractListener {
+abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, HomeInteractListener {
+
+    private var mPageUrl: String? = null
+    private var mPageTitle: String? = null
 
     private val mLayout by lazy {
         findViewById<DrawerLayout>(
@@ -86,35 +91,39 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
             mNavHeaderUsername = getHeaderView(0).findViewById(R.id.nav_header_username)
         }
 
-        var url: String? = null
-        var title: String? = null
         intent?.let {
             if (it.action == Intent.ACTION_VIEW) {
                 val uri = it.data
-                url = uri.path.removePrefix("/")
+                mPageUrl = uri.path.removePrefix("/")
             } else {
                 it.extras?.let {
-                    url = it.getString(Constants.ARG_INTENT_URL)
-                    title = it.getString(Constants.ARG_INTENT_TITLE)
+                    mPageUrl = it.getString(Constants.ARG_INTENT_URL)
+                    mPageTitle = it.getString(Constants.ARG_INTENT_TITLE)
                 }
             }
         }
-        fragmentManager.beginTransaction().add(R.id.layout_fragment, HomeFragment.newInstance(url, title)).commit()
+        switchFragment(HomeFragment::class.java.simpleName)
     }
 
     override fun onBackPressed() {
-        if (mLayout.isDrawerOpen(GravityCompat.START)) {
-            mLayout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
+        when {
+            mLayout.isDrawerOpen(GravityCompat.START) ->
+                mLayout.closeDrawer(GravityCompat.START)
+            supportFragmentManager.findFragmentByTag(HomeFragment::class.java.simpleName)?.isVisible != true ->
+                switchFragment(HomeFragment::class.java.simpleName)
+            else ->
+                super.onBackPressed()
         }
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.nav_sector -> {
+                switchFragment(HomeFragment::class.java.simpleName)
+            }
             R.id.nav_home -> {
                 if (layoutResId == R.layout.activity_home) {
-
+                    switchFragment(HomeFragment::class.java.simpleName)
                 } else {
                     val intent = Intent(this, HomeActivity::class.java)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or
@@ -125,6 +134,7 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
             R.id.nav_message -> {
             }
             R.id.nav_history -> {
+                switchFragment(HistoryFragment::class.java.simpleName)
             }
             R.id.nav_favorite -> {
             }
@@ -155,7 +165,14 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
         if (isLoggedIn) {
             mNavView.menu.clear()
             mNavView.inflateMenu(R.menu.nav_drawer_logged)
-            mNavView.menu.getItem(0).isChecked = layoutResId == R.layout.activity_home
+            mNavView.menu.run {
+                if (layoutResId == R.layout.activity_home) {
+                    findItem(R.id.nav_sector).isVisible = false
+                    findItem(R.id.nav_home).isChecked = true
+                } else {
+                    findItem(R.id.nav_sector).isChecked = true
+                }
+            }
             Glide.with(this).load(avatarUrl).crossFade().into(mNavHeaderAvatar)
             mNavHeaderUsername.text = username ?: mNavHeaderUsername.text
             mNavHeaderAvatar.setOnClickListener {
@@ -168,7 +185,14 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
         } else {
             mNavView.menu.clear()
             mNavView.inflateMenu(R.menu.nav_drawer)
-            mNavView.menu.getItem(0).isChecked = layoutResId == R.layout.activity_home
+            mNavView.menu.run {
+                if (layoutResId == R.layout.activity_home) {
+                    findItem(R.id.nav_sector).isVisible = false
+                    findItem(R.id.nav_home).isChecked = true
+                } else {
+                    findItem(R.id.nav_sector).isChecked = true
+                }
+            }
             mNavHeaderAvatar.setImageResource(R.mipmap.ic_launcher_round)
             mNavHeaderUsername.setText(R.string.nav_header_username_hint)
             mNavHeaderAvatar.setOnClickListener {
@@ -176,5 +200,49 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
                 startActivity(intent)
             }
         }
+    }
+
+    private fun switchFragment(tag: String) {
+        var fragment = supportFragmentManager.findFragmentByTag(tag)
+        val transaction = supportFragmentManager.beginTransaction()
+        supportFragmentManager.fragments.forEach {
+            if (it is HomeFragment) {
+                transaction.hide(it)
+            } else {
+                transaction.remove(it)
+            }
+        }
+        if (fragment != null) {
+            transaction.show(fragment)
+        } else {
+            fragment = when (tag) {
+                HomeFragment::class.java.simpleName -> {
+                    HomeFragment.newInstance(mPageUrl, mPageTitle)
+                }
+                HistoryFragment::class.java.simpleName -> {
+                    HistoryFragment()
+                }
+                else -> {
+                    null
+                }
+            }
+            transaction.add(R.id.layout_fragment, fragment, fragment::class.java.simpleName)
+        }
+        mNavView.menu.run {
+            when (tag) {
+                HomeFragment::class.java.simpleName -> {
+                    if (layoutResId == R.layout.activity_home) {
+                        findItem(R.id.nav_home).isChecked = true
+                    } else {
+                        findItem(R.id.nav_sector).isChecked = true
+                    }
+                }
+                HistoryFragment::class.java.simpleName -> {
+                    findItem(R.id.nav_history).isChecked = true
+                }
+            }
+        }
+
+        transaction.commit()
     }
 }

@@ -3,7 +3,6 @@ package com.hydroh.yamibo.ui.adapter
 import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.text.Html
 import android.util.Log
 import com.chad.library.adapter.base.BaseViewHolder
 import com.chad.library.adapter.base.entity.MultiItemEntity
@@ -21,6 +20,7 @@ import com.hydroh.yamibo.ui.common.ItemType.TYPE_POST
 import com.hydroh.yamibo.ui.common.ItemType.TYPE_SECTOR
 import com.hydroh.yamibo.ui.common.ItemType.TYPE_TAG_LIST
 import com.hydroh.yamibo.ui.common.PageReloadListener
+import com.hydroh.yamibo.util.HtmlCompat
 
 class HomeAdapter(data: List<MultiItemEntity>) : AbsMultiAdapter(data) {
 
@@ -37,7 +37,6 @@ class HomeAdapter(data: List<MultiItemEntity>) : AbsMultiAdapter(data) {
         addItemType(TYPE_POST, R.layout.item_post)
     }
 
-    @Suppress("DEPRECATION")
     override fun convert(holder: BaseViewHolder, item: MultiItemEntity) {
         when (holder.itemViewType) {
             TYPE_TAG_LIST -> {
@@ -100,7 +99,7 @@ class HomeAdapter(data: List<MultiItemEntity>) : AbsMultiAdapter(data) {
 
             TYPE_POST -> {
                 val post = item as Post
-                val spanned = Html.fromHtml("<font color='#0099cc'>${post.tag}</font>${post.title}")
+                val spanned = HtmlCompat.fromHtml("<font color='#0099cc'>${post.tag}</font>${post.title}")
                 holder.setText(R.id.post_title, spanned)
                         .setText(R.id.post_author, post.author)
                         .setText(R.id.post_datetime, post.postTime)
