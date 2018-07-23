@@ -3,8 +3,10 @@ package com.hydroh.yamibo.ui.fragment
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
@@ -14,7 +16,7 @@ import android.view.ViewGroup
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.model.History
 import com.hydroh.yamibo.model.Post
-import com.hydroh.yamibo.ui.adapter.HomeAdapter
+import com.hydroh.yamibo.ui.adapter.HistoryAdapter
 import com.hydroh.yamibo.ui.fragment.listener.HomeInteractListener
 import com.hydroh.yamibo.util.PrefUtils
 import java.lang.RuntimeException
@@ -47,8 +49,17 @@ class HistoryFragment : Fragment() {
         val layoutManager = LinearLayoutManager(mContentRecyclerView.context)
         mContentRecyclerView.layoutManager = layoutManager
 
-        val adapter = HomeAdapter(mPostHistory.mDataList)
+        val adapter = HistoryAdapter(mPostHistory.mDataList)
         mContentRecyclerView.adapter = adapter
+
+        val dividerItemDecoration = DividerItemDecoration(
+                mContentRecyclerView.context,
+                layoutManager.orientation
+        )
+        dividerItemDecoration.setDrawable(ContextCompat.getDrawable(mContentRecyclerView.context, R.drawable.divider_horizontal_thin)!!)
+        if (mContentRecyclerView.itemDecorationCount == 0) {
+            mContentRecyclerView.addItemDecoration(dividerItemDecoration)
+        }
     }
 
     override fun onAttach(context: Context) {

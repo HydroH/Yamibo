@@ -135,7 +135,7 @@ class PostActivity : AppCompatActivity() {
                 val postParser = PostParser(document)
                 val postInfo = postParser.run {
                     (replyList.first() as Reply).run {
-                        Post(title ?: this@PostActivity.title.toString(), "", author, postDate, 0, mPageUrl, "", "")
+                        Post(title ?: this@PostActivity.title.toString(), "", author, postDate, 0, mPageUrl, sector ?: "", "")
                     }
                 }
                 PrefUtils.updatePostHistory(this@PostActivity, postInfo)

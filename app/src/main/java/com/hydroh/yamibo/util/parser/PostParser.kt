@@ -21,6 +21,8 @@ class PostParser {
         private set
     var replyUrl: String? = null
         private set
+    var sector: String? = null
+        private set
     var formhash: String? = null
         private set
     val replyList = ArrayList<MultiItemEntity>()
@@ -29,6 +31,10 @@ class PostParser {
         title = document.select("span#thread_subject").first()?.ownText()
         prevPageUrl = document.select("div.pg a.prev").first()?.attr("href")
         nextPageUrl = document.select("div.pg a.nxt").first()?.attr("href")
+        val elemNavs = document.select("div#pt div.z a")
+        if (elemNavs.size >= 2) {
+            sector = elemNavs[elemNavs.size - 2].ownText()
+        }
 
         document.select("form#fastpostform").first().run {
             replyUrl = attr("action")

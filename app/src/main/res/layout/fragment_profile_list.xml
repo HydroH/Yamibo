@@ -7,13 +7,6 @@
     android:orientation="vertical"
     tools:context=".ui.fragment.HomeFragment">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar_home"
-        android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-
     <include
         layout="@layout/list_common"
         android:layout_width="match_parent"
