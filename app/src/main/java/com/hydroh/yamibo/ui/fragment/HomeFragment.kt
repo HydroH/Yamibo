@@ -27,6 +27,9 @@ import com.hydroh.yamibo.ui.common.PageReloadListener
 import com.hydroh.yamibo.ui.fragment.listener.HomeInteractListener
 import com.hydroh.yamibo.util.parser.HomeParser
 import kotlinx.android.synthetic.main.list_common.*
+import org.jetbrains.anko.find
+import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.support.v4.ctx
 import org.jsoup.nodes.Document
 import java.lang.RuntimeException
 
@@ -39,11 +42,11 @@ class HomeFragment : Fragment() {
     private var mFormHash: String? = null
     private var mListener: HomeInteractListener? = null
 
-    private val mSwipeRefreshLayout by lazy { view!!.findViewById<SwipeRefreshLayout>(R.id.refresh_common) }
-    private val mToolbar by lazy { view!!.findViewById<Toolbar>(R.id.toolbar_home) }
-    private val mHintText by lazy { view!!.findViewById<TextView>(R.id.hint_text) }
-    private val mLoadProgressBar by lazy { view!!.findViewById<ProgressBar>(R.id.hint_progressbar) }
-    private val mContentRecyclerView by lazy { view!!.findViewById<RecyclerView>(R.id.list_common) }
+    private val mSwipeRefreshLayout by lazy { view!!.find<SwipeRefreshLayout>(R.id.refresh_common) }
+    private val mToolbar by lazy { view!!.find<Toolbar>(R.id.toolbar_home) }
+    private val mHintText by lazy { view!!.find<TextView>(R.id.hint_text) }
+    private val mLoadProgressBar by lazy { view!!.find<ProgressBar>(R.id.hint_progressbar) }
+    private val mContentRecyclerView by lazy { view!!.find<RecyclerView>(R.id.list_common) }
 
     private val mRefreshBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -51,6 +54,7 @@ class HomeFragment : Fragment() {
             loadHome(mSwipeRefreshLayout)
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.run {
@@ -60,8 +64,7 @@ class HomeFragment : Fragment() {
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
-            = inflater.inflate(R.layout.fragment_home, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? = inflater.inflate(R.layout.fragment_home, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -94,9 +97,10 @@ class HomeFragment : Fragment() {
         }
         context.registerReceiver(mRefreshBroadcastReceiver, IntentFilter("com.hydroh.yamibo.REFRESH"))
     }
+
     override fun onDetach() {
         mListener = null
-        activity!!.unregisterReceiver(mRefreshBroadcastReceiver)
+        ctx.unregisterReceiver(mRefreshBroadcastReceiver)
         super.onDetach()
     }
 
@@ -132,13 +136,13 @@ class HomeFragment : Fragment() {
             mSwipeRefreshLayout.isRefreshing = true
         }
 
-        WebRequest.getHtmlDocument(mPageUrl, false, activity!!, object : DocumentCallbackListener {
+        WebRequest.getHtmlDocument(mPageUrl, false, ctx, object : DocumentCallbackListener {
             override fun onFinish(document: Document) {
                 val homeParser = HomeParser(document)
                 mHomeItemList = homeParser.groupList
                 mNextPageUrl = homeParser.nextPageUrl
                 mFormHash = homeParser.formhash
-                activity!!.runOnUiThread {
+                ctx.runOnUiThread {
                     mHintText.visibility = View.GONE
                     mLoadProgressBar.visibility = View.GONE
                     mSwipeRefreshLayout.isRefreshing = false
@@ -146,56 +150,56 @@ class HomeFragment : Fragment() {
                         mListener?.onUserStatReady(isLoggedIn, avatarUrl, username, uid)
                     }
 
-                    val layoutManager = LinearLayoutManager(mContentRecyclerView.context)
+                    val layoutManager = LinearLayoutManager(ctx)
                     mContentRecyclerView.layoutManager = layoutManager
 
-                    val adapter = HomeAdapter(mHomeItemList)
-                    adapter.pageReloadListener = object : PageReloadListener {
-                        override fun onPageReload(url: String) {
-                            mPageUrl = url
-                            loadHome(refresh_common)
-                        }
-                    }
-
-                    mContentRecyclerView.adapter = adapter
-                    if (activity!! is SectorActivity) {
-                        adapter.setOnLoadMoreListener({
-                            if (mNextPageUrl != null) {
-                                WebRequest.getHtmlDocument(mNextPageUrl!!, false, mContentRecyclerView.context, object : DocumentCallbackListener {
-                                    override fun onFinish(document: Document) {
-                                        val homeMoreParser = HomeParser(document, true)
-                                        activity!!.runOnUiThread {
-                                            Log.d(ContentValues.TAG, "post: LoadMore Complete.")
-                                            mNextPageUrl = homeMoreParser.nextPageUrl
-                                            mFormHash = homeMoreParser.formhash
-                                            adapter.addData(homeMoreParser.groupList)
-                                            adapter.loadMoreComplete()
-                                        }
-                                    }
-
-                                    override fun onError(e: Exception) {
-                                        activity!!.runOnUiThread {
-                                            Log.d(ContentValues.TAG, "post: LoadMore failed.")
-                                            adapter.loadMoreFail()
-                                        }
-                                    }
-                                })
-                            } else {
-                                activity!!.runOnUiThread {
-                                    Log.d(ContentValues.TAG, "post: LoadMore End.")
-                                    adapter.loadMoreEnd()
-                                }
+                    mContentRecyclerView.adapter = HomeAdapter(mHomeItemList).apply {
+                        pageReloadListener = object : PageReloadListener {
+                            override fun onPageReload(url: String) {
+                                mPageUrl = url
+                                loadHome(refresh_common)
                             }
-                        }, mContentRecyclerView)
-                    }
-                    adapter.expandAll()
-                    adapter.collapseSticky()
+                        }
 
-                    val dividerItemDecoration = DividerItemDecoration(
-                            mContentRecyclerView.context,
-                            layoutManager.orientation
-                    )
-                    dividerItemDecoration.setDrawable(ContextCompat.getDrawable(mContentRecyclerView.context, R.drawable.divider_horizontal_thin)!!)
+                        if (activity!! is SectorActivity) {
+                            setOnLoadMoreListener({
+                                if (mNextPageUrl != null) {
+                                    WebRequest.getHtmlDocument(mNextPageUrl!!, false, ctx, object : DocumentCallbackListener {
+                                        override fun onFinish(document: Document) {
+                                            val homeMoreParser = HomeParser(document, true)
+                                            ctx.runOnUiThread {
+                                                Log.d(ContentValues.TAG, "post: LoadMore Complete.")
+                                                mNextPageUrl = homeMoreParser.nextPageUrl
+                                                mFormHash = homeMoreParser.formhash
+                                                addData(homeMoreParser.groupList)
+                                                loadMoreComplete()
+                                            }
+                                        }
+
+                                        override fun onError(e: Exception) {
+                                            ctx.runOnUiThread {
+                                                Log.d(ContentValues.TAG, "post: LoadMore failed.")
+                                                loadMoreFail()
+                                            }
+                                        }
+                                    })
+                                } else {
+                                    ctx.runOnUiThread {
+                                        Log.d(ContentValues.TAG, "post: LoadMore End.")
+                                        loadMoreEnd()
+                                    }
+                                }
+                            }, mContentRecyclerView)
+                        }
+                        expandAll()
+                        collapseSticky()
+                    }
+
+
+                    val dividerItemDecoration =
+                            DividerItemDecoration(ctx, layoutManager.orientation).apply {
+                                setDrawable(ContextCompat.getDrawable(ctx, R.drawable.divider_horizontal_thin)!!)
+                            }
                     if (mContentRecyclerView.itemDecorationCount == 0) {
                         mContentRecyclerView.addItemDecoration(dividerItemDecoration)
                     }
@@ -204,7 +208,7 @@ class HomeFragment : Fragment() {
 
             override fun onError(e: Exception) {
                 e.printStackTrace()
-                activity!!.runOnUiThread {
+                ctx.runOnUiThread {
                     val adapter = mContentRecyclerView.adapter as HomeAdapter?
                     adapter?.clear()
                     mHintText.visibility = View.VISIBLE

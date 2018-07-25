@@ -15,11 +15,13 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import kotlinx.android.synthetic.main.activity_login.*
+import org.jetbrains.anko.ctx
+import org.jetbrains.anko.find
+import org.jetbrains.anko.toast
 import org.jsoup.nodes.Document
 
 class LoginActivity : AppCompatActivity() {
@@ -37,7 +39,7 @@ class LoginActivity : AppCompatActivity() {
             false
         })
 
-        val mUsernameSignInButton = findViewById<View>(R.id.sign_in_button) as Button
+        val mUsernameSignInButton = find<Button>(R.id.sign_in_button)
         mUsernameSignInButton.setOnClickListener { attemptLogin() }
     }
 
@@ -91,11 +93,11 @@ class LoginActivity : AppCompatActivity() {
             // perform the user login attempt.
             showProgress(true)
             error_hint_text.visibility = View.GONE
-            WebRequest.getLogonCookies(username, password, this, object : DocumentCallbackListener {
+            WebRequest.getLogonCookies(username, password, ctx, object : DocumentCallbackListener {
                 override fun onFinish(document: Document) {
                     runOnUiThread {
                         showProgress(false)
-                        Toast.makeText(this@LoginActivity, R.string.login_success, Toast.LENGTH_SHORT).show()
+                        toast(R.string.login_success)
                     }
                     Log.d(TAG, "onFinish: Login Success!")
                     val intent = Intent("com.hydroh.yamibo.REFRESH")

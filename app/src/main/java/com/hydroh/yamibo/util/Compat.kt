@@ -12,7 +12,7 @@ class HtmlCompat {
                     Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY)
                 } else {
                     Html.fromHtml(html)
-                }
+                }!!
     }
 }
 

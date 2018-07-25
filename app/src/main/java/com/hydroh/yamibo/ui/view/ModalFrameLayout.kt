@@ -18,11 +18,11 @@ class ModalFrameLayout : FrameLayout {
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
-    var isInterCeptTouchEvent: Boolean = false
+    var isInterceptTouchEvent: Boolean = false
 
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         Log.d(TAG, "onInterceptTouchEvent: Intercepted touch event.")
         onTouchEvent(ev)
-        return isInterCeptTouchEvent
+        return isInterceptTouchEvent
     }
 }

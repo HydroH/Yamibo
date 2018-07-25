@@ -194,9 +194,7 @@ abstract class ImageTarget<T> extends BaseTarget<T> implements Recyclable {
             if (((Activity) context).isFinishing()) {
                 return false;
             } else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && ((Activity) context).isDestroyed()) {
-                    return false;
-                }
+                return Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1 || !((Activity) context).isDestroyed();
             }
         }
         return true;

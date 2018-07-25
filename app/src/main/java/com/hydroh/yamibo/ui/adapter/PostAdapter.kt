@@ -1,6 +1,5 @@
 package com.hydroh.yamibo.ui.adapter
 
-import android.content.Intent
 import android.graphics.Color
 import android.util.Log
 import android.widget.ImageView
@@ -20,6 +19,7 @@ import com.zzhoujay.richtext.ImageHolder
 import com.zzhoujay.richtext.RichText
 import com.zzhoujay.richtext.callback.ImageFixCallback
 import com.zzhoujay.richtext.ig.GlideImageGetter
+import org.jetbrains.anko.startActivity
 import java.util.*
 
 class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList<String>) : AbsMultiAdapter(data) {
@@ -42,12 +42,13 @@ class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList
 
                 Glide.with(mContext).load(reply.avatarUrl).crossFade()
                         .into(holder.getView(R.id.reply_avatar))
+
                 holder.getView<ImageView>(R.id.reply_avatar).setOnClickListener {
-                    val intent = Intent(mContext, ProfileActivity::class.java)
-                            .putExtra(Constants.ARG_INTENT_UID, reply.authorUid)
-                            .putExtra(Constants.ARG_INTENT_USERNAME, reply.author)
-                            .putExtra(Constants.ARG_INTENT_AVATAR_URL, reply.avatarUrl)
-                    mContext.startActivity(intent)
+                    mContext.startActivity<ProfileActivity>(
+                            Constants.ARG_INTENT_UID to reply.authorUid,
+                            Constants.ARG_INTENT_USERNAME to reply.author,
+                            Constants.ARG_INTENT_AVATAR_URL to reply.avatarUrl
+                    )
                 }
                 Log.d(TAG, "convert: Loading avatar: ${reply.avatarUrl}")
 
@@ -115,12 +116,10 @@ class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList
                             val imgUrl = imageUrls[position]
                             val imgPosition = imgUrlList.indexOf(imgUrl)
                             if (imgPosition >= 0) {
-                                Log.d(TAG, "openImage: $imgUrl")
-                                val intent = Intent()
-                                intent.putExtra(Constants.ARG_INTENT_IMG_POS, imgPosition)
-                                intent.putStringArrayListExtra(Constants.ARG_INTENT_IMG_URL_LIST, imgUrlList)
-                                intent.setClass(mContext, ImageGalleryActivity::class.java)
-                                mContext.startActivity(intent)
+                                mContext.startActivity<ImageGalleryActivity>(
+                                        Constants.ARG_INTENT_IMG_POS to imgPosition,
+                                        Constants.ARG_INTENT_IMG_URL_LIST to imgUrlList
+                                )
                             }
                         }
                         .into(holder.getView(R.id.reply_content))

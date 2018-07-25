@@ -44,15 +44,15 @@ class PostParser {
         document.select("dl.tattl.attm dd p.mbn").remove()
 
         val elements = document.select("div#postlist > div[id^='post_']")
-        for (element in elements) {
-            val elemAuthor = element.select("div.pls.favatar div.authi a.xw1").first()
+        elements.forEach {
+            val elemAuthor = it.select("div.pls.favatar div.authi a.xw1").first()
             val author = elemAuthor.ownText()
             val authorUid = elemAuthor.attr("href").replace("[^\\d]+".toRegex(), "")
-            val avatarUrl = element.select("div.avatar a.avtm img").first()?.attr("abs:src") ?: "https://bbs.yamibo.com/uc_server/images/noavatar_middle.gif"
-            val floorNum = element.select("div.pi strong a em").first().ownText().toIntOrNull() ?: 0
+            val avatarUrl = it.select("div.avatar a.avtm img").first()?.attr("abs:src") ?: "https://bbs.yamibo.com/uc_server/images/noavatar_middle.gif"
+            val floorNum = it.select("div.pi strong a em").first().ownText().toIntOrNull() ?: 0
 
-            val content = element.select("td[id^='postmessage']").first()
-            val appendix = element.select("div.pattl").first()
+            val content = it.select("td[id^='postmessage']").first()
+            val appendix = it.select("div.pattl").first()
             appendix?.let { content.appendChild(appendix) }
 
             for (image in content.select("img")) {
@@ -69,7 +69,7 @@ class PostParser {
                 }
             }
             val contentHTML = "<p style=\"word-break:break-all;\">" + content.html() + "</p>"
-            val postDate = element.select("em[id^='authorposton']").text()
+            val postDate = it.select("em[id^='authorposton']").text()
             replyList.add(Reply(author, avatarUrl, authorUid, contentHTML, postDate, floorNum))
             Log.d(ContentValues.TAG, "parsePost: $author / $avatarUrl / $postDate")
         }

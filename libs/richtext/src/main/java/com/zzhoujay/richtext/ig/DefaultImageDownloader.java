@@ -31,7 +31,7 @@ public class DefaultImageDownloader implements ImageDownloader {
     public static final String GLOBAL_ID = DefaultImageDownloader.class.getName();
 
     @Override
-    public BitmapStream download(String source) throws IOException {
+    public BitmapStream download(String source) {
         return new BitmapStreamImpl(source);
     }
 

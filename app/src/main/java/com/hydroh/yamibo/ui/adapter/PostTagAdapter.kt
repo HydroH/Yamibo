@@ -25,23 +25,19 @@ class PostTagAdapter(data: List<MultiItemEntity>) : AbsMultiAdapter(data) {
     override fun convert(holder: BaseViewHolder, item: MultiItemEntity) {
         when (holder.itemViewType) {
             ItemType.TYPE_TAG -> {
-                val postTag = item as PostTag
-                var postFix = ""
-                if (postTag.postNum > 0) postFix = " " + postTag.postNum.toString()
-                val spanned = HtmlCompat.fromHtml("${postTag.title}<b>$postFix</b>")
-                holder.setText(R.id.button_tag, spanned)
-                if (postTag.selected) {
-                    holder.itemView.isEnabled = false
-                    holder.itemView.alpha = .5f
-                    holder.setTextColor(R.id.button_tag, Color.WHITE)
-                } else {
-                    holder.itemView.isEnabled = true
-                    holder.itemView.alpha = 1f
+                (item as PostTag).run {
+                    val postFix = if (postNum > 0) " " + postNum.toString() else ""
+                    val spanned = HtmlCompat.fromHtml("$title<b>$postFix</b>")
+                    holder.setText(R.id.button_tag, spanned)
+                            .setTextColor(R.id.button_tag, Color.WHITE)
+                    holder.itemView.isEnabled = !selected
+                    holder.itemView.alpha = if (selected) .5f else 1f
                 }
 
                 holder.itemView.setOnClickListener {
-                    val clickedTag = mData[holder.adapterPosition] as PostTag
-                    pageReloadListener?.onPageReload(clickedTag.url)
+                    (mData[holder.adapterPosition] as PostTag).run {
+                        pageReloadListener?.onPageReload(url)
+                    }
                 }
             }
         }

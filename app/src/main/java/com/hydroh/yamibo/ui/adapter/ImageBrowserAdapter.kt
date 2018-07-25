@@ -13,7 +13,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import com.anthonycr.grant.PermissionsManager
 import com.anthonycr.grant.PermissionsResultAction
 import com.bumptech.glide.Glide
@@ -25,6 +24,8 @@ import com.github.chrisbanes.photoview.PhotoViewAttacher
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.io.SaveImageTask
 import com.hydroh.yamibo.ui.ImageGalleryActivity
+import org.jetbrains.anko.find
+import org.jetbrains.anko.toast
 import java.io.File
 
 class ImageBrowserAdapter(private val context: Activity, private var imgUrlList: List<String>) : PagerAdapter() {
@@ -38,18 +39,19 @@ class ImageBrowserAdapter(private val context: Activity, private var imgUrlList:
 
     override fun instantiateItem(container: ViewGroup, position: Int): View {
         val view = View.inflate(context, R.layout.item_img_browser, null)
-        val imageBrowserView = view.findViewById<PhotoView>(R.id.image_browser_view)
-        val progressBarLoading = view.findViewById<ProgressBar>(R.id.progressbar_image_loading)
-        val textHintError = view.findViewById<TextView>(R.id.text_image_error)
+        val imageBrowserView = view.find<PhotoView>(R.id.image_browser_view)
+        val progressBarLoading = view.find<ProgressBar>(R.id.progressbar_image_loading)
+        val textHintError = view.find<TextView>(R.id.text_image_error)
         val imgUrl = imgUrlList[position]
         val photoViewAttacher = PhotoViewAttacher(imageBrowserView)
 
         photoViewAttacher.setOnClickListener {
-            if (it.context is ImageGalleryActivity) {
-                val activity = it.context as ImageGalleryActivity
-                activity.toggleToolbar()
-            } else {
-                Log.d(TAG, "instantiateItem: Failed to toggle toolbar.")
+            it.context.let {
+                if (it is ImageGalleryActivity) {
+                    it.toggleToolbar()
+                } else {
+                    Log.d(TAG, "instantiateItem: Failed to toggle toolbar.")
+                }
             }
         }
 
@@ -91,22 +93,24 @@ class ImageBrowserAdapter(private val context: Activity, private var imgUrlList:
                                                                             override fun onMediaScannerConnected() {}
                                                                             override fun onScanCompleted(p0: String?, p1: Uri?) {}
                                                                         })
-                                                                Toast.makeText(context, "图片已保存", Toast.LENGTH_SHORT).show()
+                                                                context.toast("图片已保存")
                                                             }
 
                                                             override fun onError(e: Exception) {
-                                                                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                                                                context.toast(e.message ?: "未知错误")
                                                             }
                                                         })
                                                         saveImageTask.execute(drawable)
                                                     }
 
                                                     override fun onDenied(permission: String?) {
-                                                        Toast.makeText(context, "图片保存失败，请开启存储空间权限", Toast.LENGTH_SHORT).show()
+                                                        context.toast("图片保存失败，请开启存储空间权限")
                                                     }
                                                 })
                                     }
-                                    1 -> TODO("Image share function")
+                                    1 -> {
+                                        //TODO: Image share funtion.
+                                    }
                                 }
                             }
                             it.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)

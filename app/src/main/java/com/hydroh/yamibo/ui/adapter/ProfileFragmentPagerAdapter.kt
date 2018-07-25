@@ -18,15 +18,11 @@ class ProfileFragmentPagerAdapter(fragmentManager: android.support.v4.app.Fragme
     override fun getItem(position: Int) = createFragment(position)
 
     override fun getPageTitle(position: Int): CharSequence? {
-        return when (position) {
-            0 -> {
-                mContext.resources.getString(R.string.profile_tab_post)
-            }
-            1 -> {
-                mContext.resources.getString(R.string.profile_tab_reply)
-            }
-            else -> {
-                throw NotImplementedError("Unimplemented tab type.")
+        return mContext.resources.run {
+            when (position) {
+                0 -> getString(R.string.profile_tab_post)
+                1 -> getString(R.string.profile_tab_reply)
+                else -> throw NotImplementedError("Unimplemented tab type.")
             }
         }
     }
@@ -39,15 +35,9 @@ class ProfileFragmentPagerAdapter(fragmentManager: android.support.v4.app.Fragme
         }
 
         return when (position) {
-            0 -> {
-                ProfileListFragment.newInstance(URL_TEMPLATE.format("thread", mUid))
-            }
-            1 -> {
-                ProfileListFragment.newInstance(URL_TEMPLATE.format("reply", mUid))
-            }
-            else -> {
-                throw NotImplementedError("Unimplemented tab type.")
-            }
+            0 -> ProfileListFragment.newInstance(URL_TEMPLATE.format("thread", mUid))
+            1 -> ProfileListFragment.newInstance(URL_TEMPLATE.format("reply", mUid))
+            else -> throw NotImplementedError("Unimplemented tab type.")
         }.also {
             mFragmentHashMap.put(position, it)
         }

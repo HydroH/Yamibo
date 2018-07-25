@@ -19,17 +19,17 @@ class TextDrawable(res: Resources, private val mText: CharSequence, mTextColor: 
     private val mIntrinsicHeight: Int
 
     init {
-        mPaint.color = mTextColor
-        mPaint.textAlign = Paint.Align.CENTER
-        val textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
-                DEFAULT_TEXTSIZE.toFloat(), res.displayMetrics)
-        mPaint.textSize = textSize
+        mPaint.run {
+            color = mTextColor
+            textAlign = Paint.Align.CENTER
+            textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
+                    DEFAULT_TEXTSIZE.toFloat(), res.displayMetrics)
+        }
         mIntrinsicWidth = (mPaint.measureText(mText, 0, mText.length) + .5).toInt()
         mIntrinsicHeight = mPaint.getFontMetricsInt(null)
     }
 
     override fun draw(canvas: Canvas) {
-        val bounds = bounds
         canvas.drawColor(mBgColor)
         canvas.drawText(mText, 0, mText.length,
                 bounds.centerX().toFloat(), bounds.centerY().toFloat() - ((mPaint.descent() + mPaint.ascent()) / 2), mPaint)

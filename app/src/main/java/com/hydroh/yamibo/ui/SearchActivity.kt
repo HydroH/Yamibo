@@ -18,6 +18,8 @@ import com.hydroh.yamibo.ui.adapter.SearchResultAdapter
 import com.hydroh.yamibo.util.parser.SearchResultParser
 import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.list_common.*
+import org.jetbrains.anko.ctx
+import org.jetbrains.anko.find
 import org.jsoup.nodes.Document
 
 class SearchActivity : AppCompatActivity() {
@@ -49,7 +51,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         search_common.queryHint = "在${mSearchRange}中搜索…"
-        val searchIcon = search_common.findViewById<ImageView>(android.support.v7.appcompat.R.id.search_mag_icon)
+        val searchIcon = search_common.find<ImageView>(android.support.v7.appcompat.R.id.search_mag_icon)
         searchIcon.run {
             (parent as ViewGroup).removeView(this)
         }
@@ -81,7 +83,7 @@ class SearchActivity : AppCompatActivity() {
         hint_text.visibility = View.GONE
         hint_progressbar.visibility = View.VISIBLE
 
-        WebRequest.getSearchResult(query, mFid, mFormHash, this@SearchActivity, object : DocumentCallbackListener {
+        WebRequest.getSearchResult(query, mFid, mFormHash, ctx, object : DocumentCallbackListener {
             override fun onFinish(document: Document) {
                 val searchResultParser = SearchResultParser(document)
                 mSearchResultList = searchResultParser.postList
@@ -90,37 +92,36 @@ class SearchActivity : AppCompatActivity() {
                 runOnUiThread {
                     hint_progressbar.visibility = View.GONE
 
-                    val layoutManager = LinearLayoutManager(this@SearchActivity)
-                    list_common.layoutManager = layoutManager
+                    list_common.layoutManager = LinearLayoutManager(ctx)
 
-                    val adapter = SearchResultAdapter(mSearchResultList)
-                    list_common.adapter = adapter
-                    adapter.setOnLoadMoreListener({
-                        if (mNextPageUrl != null) {
-                            WebRequest.getHtmlDocument(mNextPageUrl!!, false, list_common.context, object : DocumentCallbackListener {
-                                override fun onFinish(document: Document) {
-                                    val searchMoreParser = SearchResultParser(document)
-                                    list_common.post {
-                                        Log.d(ContentValues.TAG, "post: LoadMore Complete.")
-                                        mNextPageUrl = searchMoreParser.nextPageUrl
-                                        adapter.addData(searchMoreParser.postList)
-                                        adapter.loadMoreComplete()
+                    list_common.adapter = SearchResultAdapter(mSearchResultList).apply {
+                        setOnLoadMoreListener({
+                            if (mNextPageUrl != null) {
+                                WebRequest.getHtmlDocument(mNextPageUrl!!, false, ctx, object : DocumentCallbackListener {
+                                    override fun onFinish(document: Document) {
+                                        val searchMoreParser = SearchResultParser(document)
+                                        list_common.post {
+                                            Log.d(ContentValues.TAG, "post: LoadMore Complete.")
+                                            mNextPageUrl = searchMoreParser.nextPageUrl
+                                            addData(searchMoreParser.postList)
+                                            loadMoreComplete()
+                                        }
                                     }
-                                }
-                                override fun onError(e: Exception) {
-                                    list_common.post {
-                                        Log.d(ContentValues.TAG, "post: LoadMore failed.")
-                                        adapter.loadMoreFail()
+                                    override fun onError(e: Exception) {
+                                        list_common.post {
+                                            Log.d(ContentValues.TAG, "post: LoadMore failed.")
+                                            loadMoreFail()
+                                        }
                                     }
+                                })
+                            } else {
+                                list_common.post {
+                                    Log.d(ContentValues.TAG, "post: LoadMore End.")
+                                    loadMoreEnd()
                                 }
-                            })
-                        } else {
-                            list_common.post {
-                                Log.d(ContentValues.TAG, "post: LoadMore End.")
-                                adapter.loadMoreEnd()
                             }
-                        }
-                    }, list_common)
+                        }, list_common)
+                    }
                 }
 
             }

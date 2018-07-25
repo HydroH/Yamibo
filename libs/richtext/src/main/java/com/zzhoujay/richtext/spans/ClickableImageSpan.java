@@ -51,9 +51,7 @@ public class ClickableImageSpan extends ImageSpan implements LongClickableSpan {
         Drawable drawable = getDrawable();
         if (drawable != null) {
             Rect rect = drawable.getBounds();
-            if (position <= rect.right + x && position >= rect.left + x) {
-                return true;
-            }
+            return position <= rect.right + x && position >= rect.left + x;
         }
         return false;
     }

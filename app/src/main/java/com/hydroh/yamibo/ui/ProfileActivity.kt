@@ -8,6 +8,7 @@ import com.hydroh.yamibo.R
 import com.hydroh.yamibo.common.Constants
 import com.hydroh.yamibo.ui.adapter.ProfileFragmentPagerAdapter
 import kotlinx.android.synthetic.main.activity_profile.*
+import org.jetbrains.anko.ctx
 
 class ProfileActivity : AppCompatActivity() {
 
@@ -30,7 +31,7 @@ class ProfileActivity : AppCompatActivity() {
         supportActionBar?.title = mUsername
 
         Glide.with(this).load(mAvatarUrl).crossFade().into(profile_avatar)
-        pager_tab_profile.adapter = ProfileFragmentPagerAdapter(supportFragmentManager, mUid, tab_profile.tabCount, this)
+        pager_tab_profile.adapter = ProfileFragmentPagerAdapter(supportFragmentManager, mUid, tab_profile.tabCount, ctx)
         tab_profile.setupWithViewPager(pager_tab_profile)
     }
 

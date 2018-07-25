@@ -25,7 +25,10 @@ object WebRequest {
     fun checkVersion(listener: JsonCallbackListener?) {
         Thread(Runnable {
             try {
-                val result = Jsoup.connect(UrlUtils.getAppUpdateUrl()).ignoreContentType(true).execute().body()
+                val result = Jsoup.connect(UrlUtils.getAppUpdateUrl())
+                        .ignoreContentType(true)
+                        .execute()
+                        .body()
                 listener?.onFinish(JSONTokener(result).nextValue() as JSONObject)
             } catch (e: Exception) {
                 listener?.onError(e)

@@ -14,7 +14,7 @@ import java.util.*
 class SaveImageTask(private val callback: Callback) :
         AsyncTask<Drawable, Unit, File>() {
 
-    private lateinit var e: Exception
+    private var e: Exception? = null
 
     override fun doInBackground(vararg drawables: Drawable): File? {
         if (Environment.MEDIA_MOUNTED != Environment.getExternalStorageState()) {
@@ -28,7 +28,7 @@ class SaveImageTask(private val callback: Callback) :
         }
         val drawable = drawables.first()
         try {
-            when (drawable) {
+            return when (drawable) {
                 is GlideBitmapDrawable -> {
                     val filename = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date()) + ".png"
                     val mediaFile = File(mediaStorageDir.path + File.separator + filename)
@@ -37,7 +37,7 @@ class SaveImageTask(private val callback: Callback) :
                     val image = drawable.bitmap
                     image.compress(Bitmap.CompressFormat.PNG, 100, fos)
                     fos.close()
-                    return mediaFile
+                    mediaFile
                 }
                 is GifDrawable -> {
                     val filename = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date()) + ".gif"
@@ -47,11 +47,11 @@ class SaveImageTask(private val callback: Callback) :
                     val byteBuffer = drawable.data
                     fos.write(byteBuffer, 0, byteBuffer.size)
                     fos.close()
-                    return mediaFile
+                    mediaFile
                 }
                 else -> {
                     e = Exception("未知图片格式")
-                    return null
+                    null
                 }
             }
         } catch (e: FileNotFoundException) {
@@ -68,7 +68,7 @@ class SaveImageTask(private val callback: Callback) :
         if (result != null) {
             callback.onSaveComplete(result)
         } else {
-            callback.onError(e)
+            callback.onError(e ?: Exception("未知错误"))
         }
     }
 

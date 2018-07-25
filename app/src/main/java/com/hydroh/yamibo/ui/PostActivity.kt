@@ -20,7 +20,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
-import android.widget.Toast
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.common.Constants
@@ -35,6 +34,8 @@ import com.hydroh.yamibo.util.parser.PostParser
 import com.zzhoujay.richtext.RichText
 import kotlinx.android.synthetic.main.activity_post.*
 import kotlinx.android.synthetic.main.list_common.*
+import org.jetbrains.anko.ctx
+import org.jetbrains.anko.toast
 import org.jsoup.nodes.Document
 
 class PostActivity : AppCompatActivity() {
@@ -65,16 +66,16 @@ class PostActivity : AppCompatActivity() {
             list_common.scrollToPosition(0)
         }
         edit_post_reply.setOnFocusChangeListener { view, b -> setFocusEditReply(b) }
-        list_post.foreground = ColorDrawable(ContextCompat.getColor(this, R.color.blackTransHalf))
+        list_post.foreground = ColorDrawable(ContextCompat.getColor(ctx, R.color.blackTransHalf))
         list_post.foreground.alpha = 0
         animatorDim.duration = 200
 
-        intent?.let {
-            if (intent.action == Intent.ACTION_VIEW) {
-                val uri = intent.data
+        intent?.run {
+            if (action == Intent.ACTION_VIEW) {
+                val uri = data
                 mPageUrl = uri.path
             } else {
-                intent.extras?.run {
+                extras?.run {
                     mPageUrl = getString(Constants.ARG_INTENT_URL, "")
                     title = getString(Constants.ARG_INTENT_TITLE, "百合会")
                 }
@@ -85,20 +86,20 @@ class PostActivity : AppCompatActivity() {
         try {
             val field = toolbar_post::class.java.getDeclaredField("mTitleTextView")
             field.isAccessible = true
-            mTitleTextView = field.get(toolbar_post) as TextView
-
-            mTitleTextView!!.ellipsize = TextUtils.TruncateAt.MARQUEE
-            mTitleTextView!!.isFocusable = true
-            mTitleTextView!!.isFocusableInTouchMode = true
-            mTitleTextView!!.requestFocus()
-            mTitleTextView!!.setSingleLine(true)
-            mTitleTextView!!.isSelected = true
-            mTitleTextView!!.marqueeRepeatLimit = -1
+            mTitleTextView = (field.get(toolbar_post) as TextView).apply {
+                ellipsize = TextUtils.TruncateAt.MARQUEE
+                isFocusable = true
+                isFocusableInTouchMode = true
+                requestFocus()
+                setSingleLine(true)
+                isSelected = true
+                marqueeRepeatLimit = -1
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
 
-        RichText.initCacheDir(this)
+        RichText.initCacheDir(ctx)
         loadPosts(hint_text)
     }
 
@@ -116,7 +117,7 @@ class PostActivity : AppCompatActivity() {
             R.id.menu_link -> {
                 val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 clipboard.primaryClip = ClipData.newPlainText("网页地址", UrlUtils.getFullUrl(mPageUrl))
-                Toast.makeText(this, "链接已复制", Toast.LENGTH_SHORT).show()
+                toast("链接已复制")
             }
         }
         return super.onOptionsItemSelected(item)
@@ -130,15 +131,15 @@ class PostActivity : AppCompatActivity() {
             hint_progressbar.visibility = View.VISIBLE
         }
 
-        WebRequest.getHtmlDocument(mPageUrl, false, this, object : DocumentCallbackListener {
+        WebRequest.getHtmlDocument(mPageUrl, false, ctx, object : DocumentCallbackListener {
             override fun onFinish(document: Document) {
                 val postParser = PostParser(document)
                 val postInfo = postParser.run {
                     (replyList.first() as Reply).run {
-                        Post(title ?: this@PostActivity.title.toString(), "", author, postDate, 0, mPageUrl, sector ?: "", "")
+                        Post(title ?: this@PostActivity.title.toString(), "", author, "", 0, mPageUrl, sector ?: "", "")
                     }
                 }
-                PrefUtils.updatePostHistory(this@PostActivity, postInfo)
+                PrefUtils.updatePostHistory(ctx, postInfo)
 
                 mReplyList = postParser.replyList
                 mImgUrlList = postParser.imgUrlList
@@ -151,17 +152,17 @@ class PostActivity : AppCompatActivity() {
                     button_post_reply.setOnClickListener {
                         if (edit_post_reply.text.isEmpty()) return@setOnClickListener
                         WebRequest.postReply(mReplyUrl!!, edit_post_reply.text.toString(), mFormHash!!,
-                                this@PostActivity, object : DocumentCallbackListener {
+                                ctx, object : DocumentCallbackListener {
                             override fun onFinish(document: Document) {
                                 runOnUiThread {
-                                    Toast.makeText(this@PostActivity, "回复成功", Toast.LENGTH_SHORT).show()
+                                    toast("回复成功")
                                     edit_post_reply.clearComposingText()
                                     setFocusEditReply(false)
                                 }
                             }
                             override fun onError(e: Exception) {
                                 runOnUiThread {
-                                    Toast.makeText(this@PostActivity, "回复失败", Toast.LENGTH_SHORT).show()
+                                    toast("回复失败")
                                 }
                             }
                         })
@@ -171,8 +172,7 @@ class PostActivity : AppCompatActivity() {
                 runOnUiThread {
                     hint_progressbar.visibility = View.GONE
                     refresh_common.isRefreshing = false
-                    val layoutManager = LinearLayoutManager(list_common.context)
-                    list_common.layoutManager = layoutManager
+                    list_common.layoutManager = LinearLayoutManager(ctx)
 
                     postParser.title?.let {
                         if (title != it) {
@@ -180,71 +180,71 @@ class PostActivity : AppCompatActivity() {
                         }
                     }
 
-                    val adapter = PostAdapter(mReplyList, mImgUrlList)
-                    list_common.adapter = adapter
-                    adapter.setOnLoadMoreListener({
-                        if (mNextPageUrl != null) {
-                            WebRequest.getHtmlDocument(mNextPageUrl!!, false, list_common.context, object : DocumentCallbackListener {
-                                override fun onFinish(document: Document) {
-                                    val postMoreParser = PostParser(document)
-                                    list_common.post {
-                                        Log.d(TAG, "post: LoadMore Complete.")
-                                        mNextPageUrl = postMoreParser.nextPageUrl
-                                        mFormHash = postMoreParser.formhash
-                                        adapter.addData(postMoreParser.replyList)
-                                        mImgUrlList.addAll(postMoreParser.imgUrlList)
-                                        adapter.loadMoreComplete()
-                                    }
-                                }
-                                override fun onError(e: Exception) {
-                                    list_common.post {
-                                        Log.d(TAG, "post: LoadMore failed.")
-                                        adapter.loadMoreFail()
-                                    }
-                                }
-                            })
-                        } else {
-                            list_common.post {
-                                Log.d(TAG, "post: LoadMore End.")
-                                adapter.loadMoreEnd()
-                            }
-                        }
-                    }, list_common)
-
-                    if (mPrevPageUrl != null) {
-                        refresh_common.isEnabled = false
-                        adapter.isUpFetchEnable = true
-                        adapter.setUpFetchListener {
-                            adapter.isUpFetching = true
-
-                            WebRequest.getHtmlDocument(mPrevPageUrl!!, false, list_common.context, object : DocumentCallbackListener {
-                                override fun onFinish(document: Document) {
-                                    val postMoreParser = PostParser(document)
-                                    list_common.post {
-                                        Log.d(TAG, "post: LoadMore Complete.")
-                                        mPrevPageUrl = postMoreParser.prevPageUrl
-                                        mFormHash = postMoreParser.formhash
-                                        adapter.addData(0, postMoreParser.replyList)
-                                        mImgUrlList.addAll(0, postMoreParser.imgUrlList)
-                                        adapter.isUpFetching = false
-                                        if (mPrevPageUrl == null) {
-                                            adapter.isUpFetchEnable = false
-                                            refresh_common.isEnabled = true
+                    list_common.adapter = PostAdapter(mReplyList, mImgUrlList).apply {
+                        setOnLoadMoreListener({
+                            if (mNextPageUrl != null) {
+                                WebRequest.getHtmlDocument(mNextPageUrl!!, false, ctx, object : DocumentCallbackListener {
+                                    override fun onFinish(document: Document) {
+                                        val postMoreParser = PostParser(document)
+                                        list_common.post {
+                                            Log.d(TAG, "post: LoadMore Complete.")
+                                            mNextPageUrl = postMoreParser.nextPageUrl
+                                            mFormHash = postMoreParser.formhash
+                                            addData(postMoreParser.replyList)
+                                            mImgUrlList.addAll(postMoreParser.imgUrlList)
+                                            loadMoreComplete()
                                         }
                                     }
-                                }
-
-                                override fun onError(e: Exception) {
-                                    list_common.post {
-                                        Log.d(TAG, "post: LoadMore failed.")
-                                        adapter.isUpFetching = false
+                                    override fun onError(e: Exception) {
+                                        list_common.post {
+                                            Log.d(TAG, "post: LoadMore failed.")
+                                            loadMoreFail()
+                                        }
                                     }
+                                })
+                            } else {
+                                list_common.post {
+                                    Log.d(TAG, "post: LoadMore End.")
+                                    loadMoreEnd()
                                 }
-                            })
+                            }
+                        }, list_common)
+
+                        if (mPrevPageUrl != null) {
+                            refresh_common.isEnabled = false
+                            isUpFetchEnable = true
+                            setUpFetchListener {
+                                isUpFetching = true
+
+                                WebRequest.getHtmlDocument(mPrevPageUrl!!, false, ctx, object : DocumentCallbackListener {
+                                    override fun onFinish(document: Document) {
+                                        val postMoreParser = PostParser(document)
+                                        list_common.post {
+                                            Log.d(TAG, "post: LoadMore Complete.")
+                                            mPrevPageUrl = postMoreParser.prevPageUrl
+                                            mFormHash = postMoreParser.formhash
+                                            addData(0, postMoreParser.replyList)
+                                            mImgUrlList.addAll(0, postMoreParser.imgUrlList)
+                                            isUpFetching = false
+                                            if (mPrevPageUrl == null) {
+                                                isUpFetchEnable = false
+                                                refresh_common.isEnabled = true
+                                            }
+                                        }
+                                    }
+
+                                    override fun onError(e: Exception) {
+                                        list_common.post {
+                                            Log.d(TAG, "post: LoadMore failed.")
+                                            isUpFetching = false
+                                        }
+                                    }
+                                })
+                            }
+                        } else {
+                            isUpFetchEnable = false
+                            refresh_common.isEnabled = true
                         }
-                    } else {
-                        adapter.isUpFetchEnable = false
-                        refresh_common.isEnabled = true
                     }
                 }
             }
@@ -252,8 +252,7 @@ class PostActivity : AppCompatActivity() {
             override fun onError(e: Exception) {
                 e.printStackTrace()
                 runOnUiThread {
-                    val adapter = list_common.adapter as PostAdapter
-                    adapter.clear()
+                    (list_common.adapter as PostAdapter).clear()
                     hint_text.visibility = View.VISIBLE
                     hint_progressbar.visibility = View.GONE
                     refresh_common.isRefreshing = false
@@ -267,7 +266,7 @@ class PostActivity : AppCompatActivity() {
         if (focused) {
             edit_post_reply.setLines(3)
             button_post_reply.visibility = View.VISIBLE
-            list_post.isInterCeptTouchEvent = true
+            list_post.isInterceptTouchEvent = true
             list_post.setOnTouchListener { view, motionEvent ->
                 val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(edit_post_reply.windowToken, 0)
@@ -281,7 +280,7 @@ class PostActivity : AppCompatActivity() {
             edit_post_reply.setLines(1)
             button_post_reply.visibility = View.GONE
             list_post.setOnTouchListener(null)
-            list_post.isInterCeptTouchEvent = false
+            list_post.isInterceptTouchEvent = false
             animatorDim.setIntValues(255, 0)
             animatorDim.start()
         }

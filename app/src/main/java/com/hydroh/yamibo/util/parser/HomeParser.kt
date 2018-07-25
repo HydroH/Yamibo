@@ -73,21 +73,21 @@ class HomeParser {
         elemPosts.first() ?: return
         val groupStick = SectorGroup("置顶主题")
         val groupNormal = SectorGroup("版块主题")
-        for (elemPost in elemPosts) {
-            val elemID = elemPost.id()
+        elemPosts.forEach {
+            val elemID = it.id()
             if (!elemID.contains("thread")) {
-                continue
+                return@forEach
             }
-            val elemTitle = elemPost.child(0).child(1).select("a.s.xst").first()
+            val elemTitle = it.child(0).child(1).select("a.s.xst").first()
             val title = elemTitle.ownText()
             val url = elemTitle.attr("href")
-            val elemTag = elemPost.child(0).child(1).select("em a").first()
+            val elemTag = it.child(0).child(1).select("em a").first()
             var tag = ""
             elemTag?.let { tag = "[${elemTag.ownText()}]" }
 
-            val author = elemPost.select("td.by cite a").first().ownText()
-            val postTime = elemPost.select("td.by em span").first().ownText()
-            val replyNum = elemPost.select("td.num a").first().ownText().toIntOrNull() ?: 0
+            val author = it.select("td.by cite a").first().ownText()
+            val postTime = it.select("td.by em span").first().ownText()
+            val replyNum = it.select("td.num a").first().ownText().toIntOrNull() ?: 0
 
             val post = Post(title, tag, author, postTime, replyNum, url, "", "")
 
