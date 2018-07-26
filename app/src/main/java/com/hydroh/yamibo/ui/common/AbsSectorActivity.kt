@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.NavigationView
+import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
@@ -23,6 +24,7 @@ import com.hydroh.yamibo.network.callback.JsonCallbackListener
 import com.hydroh.yamibo.ui.HomeActivity
 import com.hydroh.yamibo.ui.LoginActivity
 import com.hydroh.yamibo.ui.ProfileActivity
+import com.hydroh.yamibo.ui.fragment.FavoriteFragment
 import com.hydroh.yamibo.ui.fragment.HistoryFragment
 import com.hydroh.yamibo.ui.fragment.HomeFragment
 import com.hydroh.yamibo.ui.fragment.listener.HomeInteractListener
@@ -35,6 +37,7 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
 
     private var mPageUrl: String? = null
     private var mPageTitle: String? = null
+    private var mAvatarUrl: String? = null
 
     private val mLayout by lazy {
         find<DrawerLayout>(
@@ -101,7 +104,7 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
                 }
             }
         }
-        switchFragment(HomeFragment::class.java.simpleName)
+        switchFragment<HomeFragment>()
     }
 
     override fun onBackPressed() {
@@ -109,7 +112,7 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
             mLayout.isDrawerOpen(GravityCompat.START) ->
                 mLayout.closeDrawer(GravityCompat.START)
             supportFragmentManager.findFragmentByTag(HomeFragment::class.java.simpleName)?.isVisible != true ->
-                switchFragment(HomeFragment::class.java.simpleName)
+                switchFragment<HomeFragment>()
             else ->
                 super.onBackPressed()
         }
@@ -118,11 +121,11 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.nav_sector -> {
-                switchFragment(HomeFragment::class.java.simpleName)
+                switchFragment<HomeFragment>()
             }
             R.id.nav_home -> {
                 if (layoutResId == R.layout.activity_home) {
-                    switchFragment(HomeFragment::class.java.simpleName)
+                    switchFragment<HomeFragment>()
                 } else {
                     startActivity(intentFor<HomeActivity>().clearTop().newTask())
                 }
@@ -130,9 +133,10 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
             R.id.nav_message -> {
             }
             R.id.nav_history -> {
-                switchFragment(HistoryFragment::class.java.simpleName)
+                switchFragment<HistoryFragment>()
             }
             R.id.nav_favorite -> {
+                switchFragment<FavoriteFragment>()
             }
             R.id.nav_settings -> {
             }
@@ -146,11 +150,14 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
         return true
     }
 
-    override fun onToolbarReady(toolbar: Toolbar) {
+    override fun onSetupToolbar(toolbar: Toolbar, title: String?) {
+        setSupportActionBar(toolbar)
+        title?.let { supportActionBar?.title = it }
         val toggle = ActionBarDrawerToggle(
-                this, mLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+                this, mLayout, toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close)
         mLayout.addDrawerListener(toggle)
         toggle.syncState()
+        Glide.with(this).load(mAvatarUrl).crossFade().into(mNavHeaderAvatar) //TODO: Why??
     }
 
     override fun onHomeRefresh() {
@@ -159,6 +166,7 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
 
     override fun onUserStatReady(isLoggedIn: Boolean, avatarUrl: String?, username: String?, uid: String?) {
         if (isLoggedIn) {
+            mAvatarUrl = avatarUrl
             mNavView.menu.clear()
             mNavView.inflateMenu(R.menu.nav_drawer_logged)
             mNavView.menu.run {
@@ -169,7 +177,7 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
                     findItem(R.id.nav_sector).isChecked = true
                 }
             }
-            Glide.with(this).load(avatarUrl).crossFade().into(mNavHeaderAvatar)
+            Glide.with(this).load(mAvatarUrl).crossFade().into(mNavHeaderAvatar)
             mNavHeaderUsername.text = username ?: mNavHeaderUsername.text
             mNavHeaderAvatar.setOnClickListener {
                 startActivity<ProfileActivity>(
@@ -197,8 +205,8 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
         }
     }
 
-    private fun switchFragment(tag: String) {
-        var fragment = supportFragmentManager.findFragmentByTag(tag)
+    private inline fun <reified T : Fragment> switchFragment() {
+        var fragment = supportFragmentManager.findFragmentByTag(T::class.java.simpleName)
         val transaction = supportFragmentManager.beginTransaction()
         supportFragmentManager.fragments.forEach {
             if (it is HomeFragment) {
@@ -210,30 +218,36 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
         if (fragment != null) {
             transaction.show(fragment)
         } else {
-            fragment = when (tag) {
-                HomeFragment::class.java.simpleName -> {
+            fragment = when (T::class) {
+                HomeFragment::class -> {
                     HomeFragment.newInstance(mPageUrl, mPageTitle)
                 }
-                HistoryFragment::class.java.simpleName -> {
+                HistoryFragment::class -> {
                     HistoryFragment()
+                }
+                FavoriteFragment::class -> {
+                    FavoriteFragment()
                 }
                 else -> {
                     null
                 }
             }
-            transaction.add(R.id.layout_fragment, fragment, fragment::class.java.simpleName)
+            transaction.add(R.id.layout_fragment, fragment, T::class.java.simpleName)
         }
         mNavView.menu.run {
-            when (tag) {
-                HomeFragment::class.java.simpleName -> {
+            when (T::class) {
+                HomeFragment::class -> {
                     if (layoutResId == R.layout.activity_home) {
                         findItem(R.id.nav_home).isChecked = true
                     } else {
                         findItem(R.id.nav_sector).isChecked = true
                     }
                 }
-                HistoryFragment::class.java.simpleName -> {
+                HistoryFragment::class -> {
                     findItem(R.id.nav_history).isChecked = true
+                }
+                FavoriteFragment::class -> {
+                    findItem(R.id.nav_favorite).isChecked = true
                 }
             }
         }

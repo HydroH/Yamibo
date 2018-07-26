@@ -7,6 +7,7 @@ object UrlUtils {
     private const val DEFAULT_URL = "${BASE_URL}forum.php"
 
     private const val SEARCH_FORUM_URL = "${BASE_URL}search.php?mod=forum"
+    private const val FAVORITE_PAGE_URL = "${BASE_URL}home.php?mod=space&do=favorite&view=me"
     private const val LOGIN_FORM_URL = "${BASE_URL}member.php"
     private const val LOGIN_REQUEST_URL = "$LOGIN_FORM_URL?mod=logging&action=login&loginsubmit=yes&handlekey=login&loginhash=%s&inajax=1"
 
@@ -26,6 +27,9 @@ object UrlUtils {
 
     @JvmStatic
     fun getSearchForumUrl() = SEARCH_FORUM_URL
+
+    @JvmStatic
+    fun getFavoritePageUrl() = FAVORITE_PAGE_URL
 
     @JvmStatic
     fun getLoginFormUrl() = LOGIN_FORM_URL

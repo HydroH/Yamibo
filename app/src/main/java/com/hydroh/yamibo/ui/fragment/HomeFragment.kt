@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -68,14 +67,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        activity.run {
-            if (this is AppCompatActivity) {
-                setSupportActionBar(mToolbar)
-                mPageTitle?.let { supportActionBar?.title = it }
-            }
-        }
-        mListener?.onToolbarReady(mToolbar)
-
+        mListener?.onSetupToolbar(mToolbar, mPageTitle)
         mSwipeRefreshLayout.setOnRefreshListener {
             loadHome(mSwipeRefreshLayout)
         }
@@ -126,9 +118,14 @@ class HomeFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun loadHome(view: View) {
-        Log.d(ContentValues.TAG, "refreshNetwork: URL: $mPageUrl")
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            mListener?.onSetupToolbar(mToolbar, null) //TODO: But why???
+        }
+    }
 
+    private fun loadHome(view: View) {
         if (view.id == R.id.hint_text) {
             mHintText.visibility = View.GONE
             mLoadProgressBar.visibility = View.VISIBLE
@@ -194,7 +191,6 @@ class HomeFragment : Fragment() {
                         expandAll()
                         collapseSticky()
                     }
-
 
                     val dividerItemDecoration =
                             DividerItemDecoration(ctx, layoutManager.orientation).apply {

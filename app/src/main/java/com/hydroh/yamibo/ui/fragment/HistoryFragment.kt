@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -32,17 +31,12 @@ class HistoryFragment : Fragment() {
     private val mSwipeRefreshLayout by lazy { view!!.find<SwipeRefreshLayout>(R.id.refresh_common) }
     private val mContentRecyclerView by lazy { view!!.find<RecyclerView>(R.id.list_common) }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? = inflater.inflate(R.layout.fragment_history, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+            inflater.inflate(R.layout.fragment_history, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        activity.run {
-            if (this is AppCompatActivity) {
-                setSupportActionBar(mToolbar)
-                supportActionBar?.title = "浏览历史"
-            }
-        }
-        mListener?.onToolbarReady(mToolbar)
+        mListener?.onSetupToolbar(mToolbar, "浏览历史")
 
         mSwipeRefreshLayout.isEnabled = false
         mPostHistory = PrefUtils.getPostHistory(ctx)
