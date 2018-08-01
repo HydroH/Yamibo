@@ -119,6 +119,10 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        if (item.isChecked) {
+            mLayout.closeDrawers()
+            return true
+        }
         when (item.itemId) {
             R.id.nav_sector -> {
                 switchFragment<HomeFragment>()

@@ -48,6 +48,7 @@ class PostActivity : AppCompatActivity() {
     private var mNextPageUrl: String? = null
     private var mPageJumpUrl: String? = null
     private var mPageCount: Int = 1
+    private var mCurrentPage: Int = 1
     private var mReplyUrl: String? = null
     private var mFormHash: String? = null
 
@@ -133,6 +134,7 @@ class PostActivity : AppCompatActivity() {
                                 inputWidget = numberPicker {
                                     minValue = 1
                                     maxValue = mPageCount
+                                    value = mCurrentPage
                                     layoutParams = RelativeLayout.LayoutParams(
                                             RelativeLayout.LayoutParams.WRAP_CONTENT,
                                             RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
@@ -143,8 +145,9 @@ class PostActivity : AppCompatActivity() {
                         }
                         positiveButton("确定") {
                             it.dismiss()
+                            inputWidget.clearFocus()
                             mPageUrl = mPageJumpUrl + inputWidget.value
-                            loadPosts(hint_text)
+                            loadPosts(hint_text, updateHistory = false)
                         }
                         negativeButton("取消") {
                             it.dismiss()
@@ -156,7 +159,7 @@ class PostActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun loadPosts(view: View) {
+    private fun loadPosts(view: View, updateHistory: Boolean = false) {
         Log.d(TAG, "refreshNetwork: URL: $mPageUrl")
 
         if (view.id == R.id.hint_text) {
@@ -172,7 +175,7 @@ class PostActivity : AppCompatActivity() {
                         Post(title ?: this@PostActivity.title.toString(), "", author, "", 0, mPageUrl, sector ?: "", "")
                     }
                 }
-                PrefUtils.updatePostHistory(ctx, postInfo)
+                if (updateHistory) PrefUtils.updatePostHistory(ctx, postInfo)
 
                 mReplyList = postParser.replyList
                 mImgUrlList = postParser.imgUrlList
@@ -180,6 +183,7 @@ class PostActivity : AppCompatActivity() {
                 mNextPageUrl = postParser.nextPageUrl
                 mPageJumpUrl = postParser.pageJumpUrl
                 mPageCount = postParser.pageCount
+                mCurrentPage = postParser.currentPage
 
                 mReplyUrl = postParser.replyUrl
                 mFormHash = postParser.formhash
@@ -225,6 +229,7 @@ class PostActivity : AppCompatActivity() {
                                             Log.d(TAG, "post: LoadMore Complete.")
                                             mNextPageUrl = postMoreParser.nextPageUrl
                                             mPageCount = postMoreParser.pageCount
+                                            mCurrentPage = postMoreParser.currentPage
                                             mFormHash = postMoreParser.formhash
                                             addData(postMoreParser.replyList)
                                             mImgUrlList.addAll(postMoreParser.imgUrlList)
@@ -259,6 +264,7 @@ class PostActivity : AppCompatActivity() {
                                             Log.d(TAG, "post: LoadMore Complete.")
                                             mPrevPageUrl = postMoreParser.prevPageUrl
                                             mPageCount = postMoreParser.pageCount
+                                            mCurrentPage = postMoreParser.currentPage
                                             mFormHash = postMoreParser.formhash
                                             addData(0, postMoreParser.replyList)
                                             mImgUrlList.addAll(0, postMoreParser.imgUrlList)

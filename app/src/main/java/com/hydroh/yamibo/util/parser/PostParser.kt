@@ -23,6 +23,8 @@ class PostParser {
         private set
     var pageCount: Int = 1
         private set
+    var currentPage: Int = 1
+        private set
     var replyUrl: String? = null
         private set
     var sector: String? = null
@@ -38,8 +40,11 @@ class PostParser {
         document.select("input[name=custompage]").first()?.attr("onkeydown")?.let {
             pageJumpUrl = "'(.*)'".toRegex().find(it)?.groupValues?.get(1)
         }
+
         val pageCountStr = document.select("div.pg a.last").first()?.ownText() ?: ""
-        pageCount = "\\d+".toRegex().find(pageCountStr)?.value?.toIntOrNull() ?: 1
+        pageCount = "\\d+".toRegex().find(pageCountStr)?.value?.toIntOrNull() ?:
+                document.select("div.pg label").first()?.previousElementSibling()?.ownText()?.toIntOrNull() ?: 1
+        currentPage = document.select("div.pg strong").first()?.ownText()?.toIntOrNull() ?: 1
 
         val elemNavs = document.select("div#pt div.z a")
         if (elemNavs.size >= 2) {
