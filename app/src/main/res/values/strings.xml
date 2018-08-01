@@ -45,4 +45,5 @@
 
     <string name="title_menu_search">搜索</string>
     <string name="title_menu_link">复制链接</string>
+    <string name="title_menu_page">跳转到页面</string>
 </resources>

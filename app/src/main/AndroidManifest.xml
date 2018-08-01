@@ -92,6 +92,14 @@
                     android:host="bbs.yamibo.com"
                     android:pathPattern="/forum.php?.*mod=viewthread.*"
                     android:scheme="https" />
+                <data
+                    android:host="bbs.yamibo.com"
+                    android:pathPattern="/forum.php?.*mod=redirect.*goto=findpost.*"
+                    android:scheme="http" />
+                <data
+                    android:host="bbs.yamibo.com"
+                    android:pathPattern="/forum.php?.*goto=findpost.*mod=redirect.*"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
         <activity
@@ -109,9 +117,6 @@
             android:label="@string/title_activity_profile"
             android:parentActivityName=".ui.HomeActivity"
             android:theme="@style/YamiboTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.hydroh.yamibo.ui.HomeActivity" />
         </activity>
         <activity
             android:name=".ui.SearchActivity"

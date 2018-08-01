@@ -19,6 +19,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.NumberPicker
+import android.widget.RelativeLayout
 import android.widget.TextView
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
@@ -34,8 +36,7 @@ import com.hydroh.yamibo.util.parser.PostParser
 import com.zzhoujay.richtext.RichText
 import kotlinx.android.synthetic.main.activity_post.*
 import kotlinx.android.synthetic.main.list_common.*
-import org.jetbrains.anko.ctx
-import org.jetbrains.anko.toast
+import org.jetbrains.anko.*
 import org.jsoup.nodes.Document
 
 class PostActivity : AppCompatActivity() {
@@ -45,6 +46,8 @@ class PostActivity : AppCompatActivity() {
     private var mPageUrl: String = ""
     private var mPrevPageUrl: String? = null
     private var mNextPageUrl: String? = null
+    private var mPageJumpUrl: String? = null
+    private var mPageCount: Int = 1
     private var mReplyUrl: String? = null
     private var mFormHash: String? = null
 
@@ -119,6 +122,36 @@ class PostActivity : AppCompatActivity() {
                 clipboard.primaryClip = ClipData.newPlainText("网页地址", UrlUtils.getFullUrl(mPageUrl))
                 toast("链接已复制")
             }
+            R.id.menu_page -> {
+                mPageJumpUrl?.let {
+                    alert("请输入要跳转到的页面：") {
+                        lateinit var inputWidget: NumberPicker
+                        title = "跳转至页面"
+                        isCancelable = true
+                        customView {
+                            relativeLayout {
+                                inputWidget = numberPicker {
+                                    minValue = 1
+                                    maxValue = mPageCount
+                                    layoutParams = RelativeLayout.LayoutParams(
+                                            RelativeLayout.LayoutParams.WRAP_CONTENT,
+                                            RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
+                                        addRule(RelativeLayout.CENTER_HORIZONTAL)
+                                    }
+                                }
+                            }
+                        }
+                        positiveButton("确定") {
+                            it.dismiss()
+                            mPageUrl = mPageJumpUrl + inputWidget.value
+                            loadPosts(hint_text)
+                        }
+                        negativeButton("取消") {
+                            it.dismiss()
+                        }
+                    }.show()
+                }
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -145,6 +178,8 @@ class PostActivity : AppCompatActivity() {
                 mImgUrlList = postParser.imgUrlList
                 mPrevPageUrl = postParser.prevPageUrl
                 mNextPageUrl = postParser.nextPageUrl
+                mPageJumpUrl = postParser.pageJumpUrl
+                mPageCount = postParser.pageCount
 
                 mReplyUrl = postParser.replyUrl
                 mFormHash = postParser.formhash
@@ -189,6 +224,7 @@ class PostActivity : AppCompatActivity() {
                                         list_common.post {
                                             Log.d(TAG, "post: LoadMore Complete.")
                                             mNextPageUrl = postMoreParser.nextPageUrl
+                                            mPageCount = postMoreParser.pageCount
                                             mFormHash = postMoreParser.formhash
                                             addData(postMoreParser.replyList)
                                             mImgUrlList.addAll(postMoreParser.imgUrlList)
@@ -222,6 +258,7 @@ class PostActivity : AppCompatActivity() {
                                         list_common.post {
                                             Log.d(TAG, "post: LoadMore Complete.")
                                             mPrevPageUrl = postMoreParser.prevPageUrl
+                                            mPageCount = postMoreParser.pageCount
                                             mFormHash = postMoreParser.formhash
                                             addData(0, postMoreParser.replyList)
                                             mImgUrlList.addAll(0, postMoreParser.imgUrlList)

@@ -8,4 +8,9 @@
         android:icon="@drawable/ic_menu_link"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/menu_page"
+        android:title="@string/title_menu_page"
+        app:showAsAction="never" />
+
 </menu>

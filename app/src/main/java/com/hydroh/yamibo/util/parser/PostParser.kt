@@ -19,6 +19,10 @@ class PostParser {
         private set
     var nextPageUrl: String? = null
         private set
+    var pageJumpUrl: String? = null
+        private set
+    var pageCount: Int = 1
+        private set
     var replyUrl: String? = null
         private set
     var sector: String? = null
@@ -31,6 +35,12 @@ class PostParser {
         title = document.select("span#thread_subject").first()?.ownText()
         prevPageUrl = document.select("div.pg a.prev").first()?.attr("href")
         nextPageUrl = document.select("div.pg a.nxt").first()?.attr("href")
+        document.select("input[name=custompage]").first()?.attr("onkeydown")?.let {
+            pageJumpUrl = "'(.*)'".toRegex().find(it)?.groupValues?.get(1)
+        }
+        val pageCountStr = document.select("div.pg a.last").first()?.ownText() ?: ""
+        pageCount = "\\d+".toRegex().find(pageCountStr)?.value?.toIntOrNull() ?: 1
+
         val elemNavs = document.select("div#pt div.z a")
         if (elemNavs.size >= 2) {
             sector = elemNavs[elemNavs.size - 2].ownText()
