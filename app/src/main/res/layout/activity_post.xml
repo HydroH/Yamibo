@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/layout_post_reply"
-        android:layout_below="@id/toolbar_post" >
+        android:layout_below="@id/toolbar_post">
 
         <include
             layout="@layout/list_common"
@@ -57,10 +57,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_below="@id/edit_post_reply"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:layout_marginBottom="10dp"
             android:layout_marginEnd="16dp"
             android:layout_marginTop="4dp"
-            android:layout_marginBottom="10dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:src="@drawable/ic_send"

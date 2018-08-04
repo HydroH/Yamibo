@@ -4,31 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:layout_marginStart="8dp"
     android:layout_marginEnd="8dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="8dp"
     app:cardElevation="2dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?android:attr/selectableItemBackground"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="12dp"
+        android:paddingEnd="20dp"
+        android:paddingStart="20dp"
+        android:paddingTop="8dp">
 
         <TextView
             android:id="@+id/post_sector"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="2dp"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:paddingStart="4dp"
-            android:paddingEnd="4dp"
-            android:textColor="?android:attr/colorBackground"
             android:background="@drawable/notification_round_rect"
             android:backgroundTint="?android:attr/textColorHighlight"
+            android:paddingBottom="2dp"
+            android:paddingEnd="4dp"
+            android:paddingStart="4dp"
+            android:paddingTop="2dp"
+            android:textColor="?android:attr/colorBackground"
             android:textSize="12sp"
             tools:text="海域区" />
 
@@ -38,9 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/post_sector"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="6dp"
+            android:layout_marginTop="2dp"
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="16sp"
             tools:text="你好世界你好世界你好世界你好世界你好世界你好世界" />
@@ -49,25 +48,22 @@
             android:id="@+id/post_abstract"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
             android:layout_below="@id/post_title"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            tools:text="你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界"/>
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="6dp"
+            android:layout_marginTop="6dp"
+            tools:text="你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界" />
 
         <TextView
             android:id="@+id/post_author"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/post_abstract"
-            android:layout_marginBottom="12dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="6dp"
             android:drawablePadding="2dp"
-            android:gravity="center_vertical"
-            android:textSize="14sp"
-            android:minEms="5"
             android:drawableStart="@drawable/ic_account_circle"
+            android:gravity="center_vertical"
+            android:minEms="5"
+            android:textSize="14sp"
             tools:text="氢氧化氢" />
 
         <TextView
@@ -75,14 +71,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/post_abstract"
-            android:layout_toEndOf="@id/post_author"
-            android:layout_marginBottom="12dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="6dp"
+            android:layout_toEndOf="@id/post_author"
             android:drawablePadding="2dp"
+            android:drawableStart="@drawable/ic_date"
             android:gravity="center_vertical"
             android:textSize="14sp"
-            android:drawableStart="@drawable/ic_date"
             tools:text="2018-7-1 17:00" />
 
         <TextView
@@ -91,13 +85,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_below="@id/post_abstract"
-            android:layout_marginBottom="12dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginTop="6dp"
             android:drawablePadding="2dp"
+            android:drawableStart="@drawable/ic_message"
             android:gravity="end"
             android:textSize="14sp"
-            android:drawableStart="@drawable/ic_message"
             tools:text="123" />
     </RelativeLayout>
 

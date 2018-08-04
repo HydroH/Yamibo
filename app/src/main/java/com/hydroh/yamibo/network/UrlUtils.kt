@@ -8,8 +8,12 @@ object UrlUtils {
 
     private const val SEARCH_FORUM_URL = "${BASE_URL}search.php?mod=forum"
     private const val FAVORITE_PAGE_URL = "${BASE_URL}home.php?mod=space&do=favorite&view=me"
+    private const val MESSAGE_MAIL_PAGE_URL = "${BASE_URL}home.php?mod=space&do=pm"
+    private const val MESSAGE_REPLY_PAGE_URL = "${BASE_URL}home.php?mod=space&do=notice&view=mypost"
     private const val LOGIN_FORM_URL = "${BASE_URL}member.php"
     private const val LOGIN_REQUEST_URL = "$LOGIN_FORM_URL?mod=logging&action=login&loginsubmit=yes&handlekey=login&loginhash=%s&inajax=1"
+
+    private const val AVATAR_DEFAULT_URL = "${BASE_URL}uc_server/images/noavatar_%s.gif"
 
     @JvmStatic
     fun getFullUrl(url: String) =
@@ -32,8 +36,25 @@ object UrlUtils {
     fun getFavoritePageUrl() = FAVORITE_PAGE_URL
 
     @JvmStatic
+    fun getMessageMailPageUrl() = MESSAGE_MAIL_PAGE_URL
+
+    @JvmStatic
+    fun getMessageReplyPageUrl() = MESSAGE_REPLY_PAGE_URL
+
+    @JvmStatic
     fun getLoginFormUrl() = LOGIN_FORM_URL
 
     @JvmStatic
     fun getLoginRequestUrl(loginHash: String) = LOGIN_REQUEST_URL.format(loginHash)
+
+    @JvmStatic
+    fun getAvatarDefaultUrl(size: String) = AVATAR_DEFAULT_URL.format(size)
+
+    class AvatarSize {
+        companion object {
+            const val SMALL = "small"
+            const val MIDDLE = "middle"
+            const val BIG = "big"
+        }
+    }
 }

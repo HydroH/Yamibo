@@ -2,17 +2,11 @@ package com.hydroh.yamibo.ui.fragment
 
 import android.content.*
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
-import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.*
-import android.widget.ProgressBar
-import android.widget.TextView
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
 import com.hydroh.yamibo.common.Constants
@@ -22,17 +16,19 @@ import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.SearchActivity
 import com.hydroh.yamibo.ui.SectorActivity
 import com.hydroh.yamibo.ui.adapter.HomeAdapter
+import com.hydroh.yamibo.ui.common.AbsRefreshListFragment
 import com.hydroh.yamibo.ui.common.PageReloadListener
+import com.hydroh.yamibo.ui.common.RefreshState
 import com.hydroh.yamibo.ui.fragment.listener.HomeInteractListener
 import com.hydroh.yamibo.util.parser.HomeParser
+import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.list_common.*
-import org.jetbrains.anko.find
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.support.v4.ctx
 import org.jsoup.nodes.Document
 import java.lang.RuntimeException
 
-class HomeFragment : Fragment() {
+class HomeFragment : AbsRefreshListFragment() {
 
     private lateinit var mHomeItemList: List<MultiItemEntity>
     private var mPageTitle: String? = null
@@ -41,16 +37,10 @@ class HomeFragment : Fragment() {
     private var mFormHash: String? = null
     private var mListener: HomeInteractListener? = null
 
-    private val mSwipeRefreshLayout by lazy { view!!.find<SwipeRefreshLayout>(R.id.refresh_common) }
-    private val mToolbar by lazy { view!!.find<Toolbar>(R.id.toolbar_home) }
-    private val mHintText by lazy { view!!.find<TextView>(R.id.hint_text) }
-    private val mLoadProgressBar by lazy { view!!.find<ProgressBar>(R.id.hint_progressbar) }
-    private val mContentRecyclerView by lazy { view!!.find<RecyclerView>(R.id.list_common) }
-
     private val mRefreshBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             mListener?.onHomeRefresh()
-            loadHome(mSwipeRefreshLayout)
+            refreshList(refresh_common)
         }
     }
 
@@ -67,17 +57,10 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mListener?.onSetupToolbar(mToolbar, mPageTitle)
-        mSwipeRefreshLayout.setOnRefreshListener {
-            loadHome(mSwipeRefreshLayout)
+        mListener?.onSetupToolbar(toolbar_home, mPageTitle)
+        toolbar_home.setOnClickListener {
+            list_common.scrollToPosition(0)
         }
-        mHintText.setOnClickListener {
-            loadHome(it)
-        }
-        mToolbar.setOnClickListener {
-            mContentRecyclerView.scrollToPosition(0)
-        }
-        loadHome(mHintText)
     }
 
     override fun onAttach(context: Context) {
@@ -121,18 +104,11 @@ class HomeFragment : Fragment() {
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
         if (!hidden) {
-            mListener?.onSetupToolbar(mToolbar, null) //TODO: But why???
+            mListener?.onSetupToolbar(toolbar_home, null) //TODO: But why???
         }
     }
 
-    private fun loadHome(view: View) {
-        if (view.id == R.id.hint_text) {
-            mHintText.visibility = View.GONE
-            mLoadProgressBar.visibility = View.VISIBLE
-        } else if (view.id == R.id.refresh_common) {
-            mSwipeRefreshLayout.isRefreshing = true
-        }
-
+    override fun loadContent() {
         WebRequest.getHtmlDocument(mPageUrl, false, ctx, object : DocumentCallbackListener {
             override fun onFinish(document: Document) {
                 val homeParser = HomeParser(document)
@@ -140,21 +116,19 @@ class HomeFragment : Fragment() {
                 mNextPageUrl = homeParser.nextPageUrl
                 mFormHash = homeParser.formhash
                 ctx.runOnUiThread {
-                    mHintText.visibility = View.GONE
-                    mLoadProgressBar.visibility = View.GONE
-                    mSwipeRefreshLayout.isRefreshing = false
+                    setRefreshState(RefreshState.FINISH)
                     homeParser.run {
                         mListener?.onUserStatReady(isLoggedIn, avatarUrl, username, uid)
                     }
 
                     val layoutManager = LinearLayoutManager(ctx)
-                    mContentRecyclerView.layoutManager = layoutManager
+                    list_common.layoutManager = layoutManager
 
-                    mContentRecyclerView.adapter = HomeAdapter(mHomeItemList).apply {
+                    list_common.adapter = HomeAdapter(mHomeItemList).apply {
                         pageReloadListener = object : PageReloadListener {
                             override fun onPageReload(url: String) {
                                 mPageUrl = url
-                                loadHome(refresh_common)
+                                refreshList(list_common)
                             }
                         }
 
@@ -186,7 +160,7 @@ class HomeFragment : Fragment() {
                                         loadMoreEnd()
                                     }
                                 }
-                            }, mContentRecyclerView)
+                            }, list_common)
                         }
                         expandAll()
                         collapseSticky()
@@ -196,8 +170,8 @@ class HomeFragment : Fragment() {
                             DividerItemDecoration(ctx, layoutManager.orientation).apply {
                                 setDrawable(ContextCompat.getDrawable(ctx, R.drawable.divider_horizontal_thin)!!)
                             }
-                    if (mContentRecyclerView.itemDecorationCount == 0) {
-                        mContentRecyclerView.addItemDecoration(dividerItemDecoration)
+                    if (list_common.itemDecorationCount == 0) {
+                        list_common.addItemDecoration(dividerItemDecoration)
                     }
                 }
             }
@@ -205,11 +179,9 @@ class HomeFragment : Fragment() {
             override fun onError(e: Exception) {
                 e.printStackTrace()
                 ctx.runOnUiThread {
-                    val adapter = mContentRecyclerView.adapter as HomeAdapter?
+                    val adapter = list_common.adapter as HomeAdapter?
                     adapter?.clear()
-                    mHintText.visibility = View.VISIBLE
-                    mLoadProgressBar.visibility = View.GONE
-                    mSwipeRefreshLayout.isRefreshing = false
+                    setRefreshState(RefreshState.ERROR)
                 }
             }
         })

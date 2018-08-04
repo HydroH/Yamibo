@@ -2,11 +2,9 @@ package com.hydroh.yamibo.ui
 
 import android.content.ContentValues
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.MenuItem
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.chad.library.adapter.base.entity.MultiItemEntity
@@ -15,6 +13,8 @@ import com.hydroh.yamibo.common.Constants
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.adapter.SearchResultAdapter
+import com.hydroh.yamibo.ui.common.AbsRefreshActivity
+import com.hydroh.yamibo.ui.common.RefreshState
 import com.hydroh.yamibo.util.parser.SearchResultParser
 import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.list_common.*
@@ -22,7 +22,7 @@ import org.jetbrains.anko.ctx
 import org.jetbrains.anko.find
 import org.jsoup.nodes.Document
 
-class SearchActivity : AppCompatActivity() {
+class SearchActivity : AbsRefreshActivity() {
 
     private lateinit var mSearchResultList: List<MultiItemEntity>
     private lateinit var mSearchRange: String
@@ -80,8 +80,7 @@ class SearchActivity : AppCompatActivity() {
 
         val searchResultAdapter = list_common.adapter as SearchResultAdapter?
         searchResultAdapter?.clear()
-        hint_text.visibility = View.GONE
-        hint_progressbar.visibility = View.VISIBLE
+        setRefreshState(RefreshState.START_MAIN)
 
         WebRequest.getSearchResult(query, mFid, mFormHash, ctx, object : DocumentCallbackListener {
             override fun onFinish(document: Document) {
@@ -90,8 +89,7 @@ class SearchActivity : AppCompatActivity() {
                 mNextPageUrl = searchResultParser.nextPageUrl
 
                 runOnUiThread {
-                    hint_progressbar.visibility = View.GONE
-
+                    setRefreshState(RefreshState.FINISH)
                     list_common.layoutManager = LinearLayoutManager(ctx)
 
                     list_common.adapter = SearchResultAdapter(mSearchResultList).apply {
@@ -127,8 +125,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onError(e: Exception) {
-                hint_text.visibility = View.VISIBLE
-                hint_progressbar.visibility = View.GONE
+                setRefreshState(RefreshState.ERROR)
             }
         })
         return true

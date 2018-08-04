@@ -27,13 +27,14 @@ import com.hydroh.yamibo.ui.ProfileActivity
 import com.hydroh.yamibo.ui.fragment.FavoriteFragment
 import com.hydroh.yamibo.ui.fragment.HistoryFragment
 import com.hydroh.yamibo.ui.fragment.HomeFragment
+import com.hydroh.yamibo.ui.fragment.MessageFragment
 import com.hydroh.yamibo.ui.fragment.listener.HomeInteractListener
 import com.hydroh.yamibo.util.PrefUtils
 import de.hdodenhof.circleimageview.CircleImageView
 import org.jetbrains.anko.*
 import org.json.JSONObject
 
-abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, HomeInteractListener {
+abstract class AbsHomeActivity(private val layoutResId: Int) : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, HomeInteractListener {
 
     private var mPageUrl: String? = null
     private var mPageTitle: String? = null
@@ -88,7 +89,7 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
 
         mNavView.run {
             menu.getItem(0).isChecked = layoutResId == R.layout.activity_home
-            setNavigationItemSelectedListener(this@AbsSectorActivity)
+            setNavigationItemSelectedListener(this@AbsHomeActivity)
             mNavHeaderAvatar = getHeaderView(0).find(R.id.nav_header_avatar)
             mNavHeaderUsername = getHeaderView(0).find(R.id.nav_header_username)
         }
@@ -135,6 +136,7 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
                 }
             }
             R.id.nav_message -> {
+                switchFragment<MessageFragment>()
             }
             R.id.nav_history -> {
                 switchFragment<HistoryFragment>()
@@ -226,6 +228,9 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
                 HomeFragment::class -> {
                     HomeFragment.newInstance(mPageUrl, mPageTitle)
                 }
+                MessageFragment::class -> {
+                    MessageFragment()
+                }
                 HistoryFragment::class -> {
                     HistoryFragment()
                 }
@@ -246,6 +251,9 @@ abstract class AbsSectorActivity(private val layoutResId: Int) : AppCompatActivi
                     } else {
                         findItem(R.id.nav_sector).isChecked = true
                     }
+                }
+                MessageFragment::class -> {
+                    findItem(R.id.nav_message).isChecked = true
                 }
                 HistoryFragment::class -> {
                     findItem(R.id.nav_history).isChecked = true

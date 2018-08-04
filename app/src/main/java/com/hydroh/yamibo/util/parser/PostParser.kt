@@ -1,10 +1,9 @@
 package com.hydroh.yamibo.util.parser
 
-import android.content.ContentValues
-import android.util.Log
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.model.Reply
 import com.hydroh.yamibo.network.UrlUtils
+import com.hydroh.yamibo.util.getUid
 import org.jsoup.nodes.Document
 
 class PostParser {
@@ -62,8 +61,9 @@ class PostParser {
         elements.forEach {
             val elemAuthor = it.select("div.pls.favatar div.authi a.xw1").first()
             val author = elemAuthor.ownText()
-            val authorUid = elemAuthor.attr("href").replace("[^\\d]+".toRegex(), "")
-            val avatarUrl = it.select("div.avatar a.avtm img").first()?.attr("abs:src") ?: "https://bbs.yamibo.com/uc_server/images/noavatar_middle.gif"
+            val authorUid = elemAuthor.attr("href").getUid()
+            val avatarUrl = it.select("div.avatar a.avtm img").first()?.attr("abs:src")
+                    ?: UrlUtils.getAvatarDefaultUrl(UrlUtils.AvatarSize.MIDDLE)
             val floorNum = it.select("div.pi strong a em").first().ownText().toIntOrNull() ?: 0
 
             val content = it.select("td[id^='postmessage']").first()
@@ -86,7 +86,6 @@ class PostParser {
             val contentHTML = "<p style=\"word-break:break-all;\">" + content.html() + "</p>"
             val postDate = it.select("em[id^='authorposton']").text()
             replyList.add(Reply(author, avatarUrl, authorUid, contentHTML, postDate, floorNum))
-            Log.d(ContentValues.TAG, "parsePost: $author / $avatarUrl / $postDate")
         }
     }
 }

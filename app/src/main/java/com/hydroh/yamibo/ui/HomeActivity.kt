@@ -1,6 +1,6 @@
 package com.hydroh.yamibo.ui
 
 import com.hydroh.yamibo.R
-import com.hydroh.yamibo.ui.common.AbsSectorActivity
+import com.hydroh.yamibo.ui.common.AbsHomeActivity
 
-class HomeActivity : AbsSectorActivity(R.layout.activity_home)
+class HomeActivity : AbsHomeActivity(R.layout.activity_home)

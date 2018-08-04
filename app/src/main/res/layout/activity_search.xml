@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.SearchActivity" >
+    tools:context=".ui.SearchActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
             android:id="@+id/toolbar_search"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/actionBarSize"
-            app:contentInsetStartWithNavigation="0dp" >
+            app:contentInsetStartWithNavigation="0dp">
 
             <android.support.v7.widget.SearchView
                 android:id="@+id/search_common"

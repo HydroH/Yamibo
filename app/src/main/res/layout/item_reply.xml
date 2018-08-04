@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:layout_marginStart="8dp"
     android:layout_marginEnd="8dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="8dp"
     app:cardElevation="2dp">
 
     <RelativeLayout
@@ -13,53 +13,59 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/reply_avatar"
-            android:layout_width="@dimen/dp_40"
-            android:layout_height="@dimen/dp_40"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="12dp" />
-
-        <TextView
-            android:id="@+id/reply_author"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:id="@+id/reply_header"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="12dp"
-            android:layout_toEndOf="@id/reply_avatar"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textSize="14sp"
-            tools:text="氢氧化氢" />
+            android:paddingBottom="12dp"
+            android:paddingEnd="12dp"
+            android:paddingStart="12dp"
+            android:paddingTop="12dp">
 
-        <TextView
-            android:id="@+id/reply_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/reply_author"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="9dp"
-            android:layout_marginTop="4dp"
-            android:layout_toEndOf="@id/reply_avatar"
-            android:textSize="12sp"
-            tools:text="2018/01/01 00:00:00" />
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/reply_avatar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                tools:src="@mipmap/ic_launcher_round" />
 
-        <TextView
-            android:id="@+id/reply_no"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="12dp"
-            android:layout_marginTop="12dp"
-            android:textSize="12sp"
-            tools:text="#12" />
+            <TextView
+                android:id="@+id/reply_author"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@id/reply_avatar"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="14sp"
+                tools:text="氢氧化氢" />
+
+            <TextView
+                android:id="@+id/reply_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reply_author"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="9dp"
+                android:layout_marginTop="4dp"
+                android:layout_toEndOf="@id/reply_avatar"
+                android:textSize="12sp"
+                tools:text="2018/01/01 00:00:00" />
+
+            <TextView
+                android:id="@+id/reply_no"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:textSize="12sp"
+                tools:text="#12" />
+        </RelativeLayout>
+
 
         <ImageView
             android:id="@+id/reply_divider"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/reply_avatar"
-            android:layout_marginTop="12dp"
+            android:layout_below="@id/reply_header"
             android:src="@drawable/divider_horizontal_thin" />
 
         <TextView

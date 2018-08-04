@@ -11,7 +11,6 @@ import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
 import android.util.Log
@@ -31,6 +30,8 @@ import com.hydroh.yamibo.network.UrlUtils
 import com.hydroh.yamibo.network.WebRequest
 import com.hydroh.yamibo.network.callback.DocumentCallbackListener
 import com.hydroh.yamibo.ui.adapter.PostAdapter
+import com.hydroh.yamibo.ui.common.AbsRefreshActivity
+import com.hydroh.yamibo.ui.common.RefreshState
 import com.hydroh.yamibo.util.PrefUtils
 import com.hydroh.yamibo.util.parser.PostParser
 import com.zzhoujay.richtext.RichText
@@ -39,7 +40,7 @@ import kotlinx.android.synthetic.main.list_common.*
 import org.jetbrains.anko.*
 import org.jsoup.nodes.Document
 
-class PostActivity : AppCompatActivity() {
+class PostActivity : AbsRefreshActivity() {
 
     private lateinit var mReplyList: List<MultiItemEntity>
     private lateinit var mImgUrlList: ArrayList<String>
@@ -163,8 +164,9 @@ class PostActivity : AppCompatActivity() {
         Log.d(TAG, "refreshNetwork: URL: $mPageUrl")
 
         if (view.id == R.id.hint_text) {
-            hint_text.visibility = View.GONE
-            hint_progressbar.visibility = View.VISIBLE
+            setRefreshState(RefreshState.START_MAIN)
+        } else if (view.id == R.id.refresh_common) {
+            setRefreshState(RefreshState.START_SWIPE)
         }
 
         WebRequest.getHtmlDocument(mPageUrl, false, ctx, object : DocumentCallbackListener {
@@ -209,8 +211,7 @@ class PostActivity : AppCompatActivity() {
                 }
 
                 runOnUiThread {
-                    hint_progressbar.visibility = View.GONE
-                    refresh_common.isRefreshing = false
+                    setRefreshState(RefreshState.FINISH)
                     list_common.layoutManager = LinearLayoutManager(ctx)
 
                     postParser.title?.let {
@@ -296,9 +297,7 @@ class PostActivity : AppCompatActivity() {
                 e.printStackTrace()
                 runOnUiThread {
                     (list_common.adapter as PostAdapter).clear()
-                    hint_text.visibility = View.VISIBLE
-                    hint_progressbar.visibility = View.GONE
-                    refresh_common.isRefreshing = false
+                    setRefreshState(RefreshState.ERROR)
                 }
             }
         })

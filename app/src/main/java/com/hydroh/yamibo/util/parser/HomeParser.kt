@@ -2,6 +2,8 @@ package com.hydroh.yamibo.util.parser
 
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.model.*
+import com.hydroh.yamibo.util.getUid
+import com.hydroh.yamibo.util.toIntOrNullIgnore
 import org.jsoup.nodes.Document
 
 class HomeParser {
@@ -30,7 +32,7 @@ class HomeParser {
             isLoggedIn = true
             document.select("ul#mycp1_menu").first()?.child(0)?.run {
                 username = ownText()
-                uid = attr("href").replace("[^\\d]+".toRegex(), "")
+                uid = attr("href").getUid()
             }
         }
         formhash = document.select("form#scbar_form input[name=\"formhash\"]").first()?.attr("value")
@@ -59,8 +61,7 @@ class HomeParser {
                         val elemSectorMain = elemSector.child(1)
                         val sectorTitle = elemSectorMain.select("h2 a").first().ownText()
                         val sectorUrl = elemSectorMain.select("h2 a").first().attr("href")
-                        val sectorUnreadNum = elemSectorMain.select("h2 em").first()?.ownText()
-                                ?.replace("[^\\d]".toRegex(), "")?.toIntOrNull() ?: 0
+                        val sectorUnreadNum = elemSectorMain.select("h2 em").first()?.ownText()?.toIntOrNullIgnore() ?: 0
                         val sectorDescription = elemSectorMain.select("p.xg2").first()?.ownText()
                                 ?: sectorTitle
                         group.addSubItem(Sector(sectorTitle, sectorUnreadNum, sectorDescription, sectorUrl))
