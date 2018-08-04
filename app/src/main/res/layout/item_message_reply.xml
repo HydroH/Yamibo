@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="0dp"
+    app:cardElevation="2dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/message_reply_avatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="12dp"
+            tools:src="@mipmap/ic_launcher_round" />
+
+        <TextView
+            android:id="@+id/message_reply_author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/message_reply_avatar"
+            android:lines="1"
+            tools:text="氢氧化氢 回复了你的帖子" />
+
+        <TextView
+            android:id="@+id/message_reply_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/message_reply_author"
+            android:layout_marginTop="4dp"
+            android:layout_toEndOf="@id/message_reply_avatar"
+            android:ellipsize="end"
+            android:textColor="?android:attr/textColorPrimary"
+            tools:text="测试文字测试文字测试文字测试文字测试文字测试文字测试文字测试文字测试文字测试文字测试文字测试文字" />
+
+        <TextView
+            android:id="@+id/message_reply_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/message_reply_title"
+            android:layout_marginTop="4dp"
+            android:layout_toEndOf="@id/message_reply_avatar"
+            tools:text="2018.13.32 25:84" />
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

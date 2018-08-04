@@ -4,7 +4,7 @@
     <string name="action_settings">设置</string>
     <string name="network_error_hint">网络连接失败，点击以重试</string>
 
-    <string name="title_activity_thread">贴子详情</string>
+    <string name="title_activity_thread">帖子详情</string>
     <string name="title_activity_sector">版块</string>
     <string name="title_activity_image_browser">图片浏览</string>
     <string name="title_activity_login">登录</string>
@@ -21,7 +21,7 @@
     <string name="nav_drawer_close">关闭侧边栏</string>
     <string name="nav_header_username_hint">点击头像以登录</string>
     <string name="nav_menu_home">首页</string>
-    <string name="nav_menu_sector">贴子</string>
+    <string name="nav_menu_sector">帖子</string>
     <string name="nav_menu_message">消息</string>
     <string name="nav_menu_favorite">收藏</string>>
     <string name="nav_menu_history">历史</string>
@@ -50,5 +50,5 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="message_tab_mail">消息</string>
-    <string name="message_tab_reply">我的贴子</string>
+    <string name="message_tab_reply">我的帖子</string>
 </resources>

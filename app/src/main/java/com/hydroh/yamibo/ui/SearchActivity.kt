@@ -45,7 +45,7 @@ class SearchActivity : AbsRefreshActivity() {
         }
 
         intent!!.extras!!.run {
-            mSearchRange = getString(Constants.ARG_INTENT_NAME, "全部贴子")
+            mSearchRange = getString(Constants.ARG_INTENT_NAME, "全部帖子")
             mFid = getString(Constants.ARG_INTENT_FID, "all")
             mFormHash = getString(Constants.ARG_INTENT_FORMHASH)
         }

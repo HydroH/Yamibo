@@ -15,4 +15,4 @@ fun String.toAvatarSize(size: String): String = replace(UrlUtils.AvatarSize.SMAL
             .replace(UrlUtils.AvatarSize.MIDDLE, size)
             .replace(UrlUtils.AvatarSize.BIG, size)
 
-fun String.getUid(): String = "space-uid-\\d+\\.html".toRegex().find(this)?.value ?: ""
+fun String.getUid(): String = "space-uid-(\\d+)\\.html".toRegex().find(this)?.groupValues?.get(1) ?: ""
