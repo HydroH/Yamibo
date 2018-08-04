@@ -17,11 +17,11 @@ class MessageMailParser {
             val avatarUrl = it.select("a img").first()?.attr("src")
                     ?.toAvatarSize(UrlUtils.AvatarSize.MIDDLE)
                     ?: UrlUtils.getAvatarDefaultUrl(UrlUtils.AvatarSize.MIDDLE)
-            it.select("dd.ptm.pc_c").first().run {
+            it.select("dd.ptm.pm_c").first().run {
                 val elemAuthor = select("a.xw1").first()
                 val author = elemAuthor.ownText()
                 val authorUid = elemAuthor.attr("href").getUid()
-                val abstract = ownText()
+                val abstract = ownText().split(":".toRegex(), 2).getOrNull(1)?.trim() ?: ""
                 val replyTime = select("span.xg1").first().ownText()
                 val messageCount = select("span.pm_o.y span.xg1.z").first().ownText().toIntOrNullIgnore() ?: 0
 
