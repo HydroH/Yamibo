@@ -49,7 +49,7 @@
 -printusage unused.txt
 
 #混淆前后的映射
--printmapping mapping.txt
+#-printmapping mapping.txt
 
 # 指定不去忽略非公共库的类成员
 -dontskipnonpubliclibraryclassmembers
@@ -195,6 +195,10 @@
 
 
 #-----------处理第三方依赖库---------
+# Crashlytics
+-keep class com.crashlytics.** { *; }
+-dontwarn com.crashlytics.**
+
 # BRVAH
 -keep class com.chad.library.adapter.** { *; }
 -keep public class * extends com.chad.library.adapter.base.BaseQuickAdapter

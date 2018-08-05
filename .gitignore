@@ -1,4 +1,5 @@
 *.iml
+*.apk
 .gradle
 /local.properties
 /.idea/workspace.xml
@@ -11,3 +12,5 @@
 /app/build
 /app/debug
 /app/release
+**/node_modules/*
+**/.firebaserc

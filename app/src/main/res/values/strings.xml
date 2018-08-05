@@ -51,4 +51,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="message_tab_mail">消息</string>
     <string name="message_tab_reply">我的帖子</string>
+    <string name="title_activity_search">搜索</string>
+    <string name="title_activity_private_message">私信</string>
 </resources>
