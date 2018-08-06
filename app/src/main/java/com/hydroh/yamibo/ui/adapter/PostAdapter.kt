@@ -63,8 +63,8 @@ class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList
                         .showBorder(false)
                         .borderColor(Color.argb(1, 1, 1, 1))
                         .borderSize(0f)
-                        .placeHolder{ imageHolder, config, textView ->
-                            var hintText =  ""
+                        .placeHolder { imageHolder, config, textView ->
+                            var hintText = ""
                             var width = 50
                             var height = 50
                             if (imgUrlList.contains(imageHolder.source)) {
@@ -78,8 +78,8 @@ class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList
                             textDrawable.setBounds(0, 0, width, height)
                             textDrawable
                         }
-                        .errorImage{ imageHolder, config, textView ->
-                            var hintText =  ""
+                        .errorImage { imageHolder, config, textView ->
+                            var hintText = ""
                             var width = 50
                             var height = 50
                             if (imgUrlList.contains(imageHolder.source)) {
@@ -107,6 +107,7 @@ class PostAdapter(data: List<MultiItemEntity>, private var imgUrlList: ArrayList
                                     holder.width = width * 2
                                 }
                             }
+
                             override fun onFailure(holder: ImageHolder, e: Exception?) {
                                 Log.d(TAG, "onFailure: ${holder.source}")
                                 GlideImageGetter.removeCache(holder.source)

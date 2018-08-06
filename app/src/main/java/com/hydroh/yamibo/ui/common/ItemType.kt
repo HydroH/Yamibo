@@ -10,4 +10,6 @@ object ItemType {
     const val TYPE_TAG_LIST = 6
     const val TYPE_MESSAGE_MAIL = 7
     const val TYPE_MESSAGE_REPLY = 8
+    const val TYPE_PM_ME = 9
+    const val TYPE_PM_OTHER = 10
 }

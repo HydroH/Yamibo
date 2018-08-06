@@ -7,4 +7,6 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="speech_bubble_round_corner">6dp</dimen>
+    <dimen name="speech_bubble_margin">6dp</dimen>
 </resources>

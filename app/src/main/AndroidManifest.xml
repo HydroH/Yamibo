@@ -123,7 +123,7 @@
             android:parentActivityName=".ui.HomeActivity"
             android:theme="@style/YamiboTheme.NoActionBar" />
         <activity
-            android:name=".ui.PrivateMessage"
+            android:name=".ui.PrivateMessageActivity"
             android:label="@string/title_activity_private_message"
             android:parentActivityName=".ui.HomeActivity"
             android:theme="@style/YamiboTheme.NoActionBar"/>

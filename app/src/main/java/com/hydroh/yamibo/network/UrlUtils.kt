@@ -1,7 +1,7 @@
 package com.hydroh.yamibo.network
 
 object UrlUtils {
-    private const val APP_UPDATE_URL = "http://hydroh.me/yamibo/version.json"
+    private const val APP_UPDATE_URL = "https://yamibo-android.firebaseapp.com/version.json"
 
     private const val BASE_URL = "https://bbs.yamibo.com/"
     private const val DEFAULT_URL = "${BASE_URL}forum.php"
@@ -9,6 +9,7 @@ object UrlUtils {
     private const val SEARCH_FORUM_URL = "${BASE_URL}search.php?mod=forum"
     private const val FAVORITE_PAGE_URL = "${BASE_URL}home.php?mod=space&do=favorite&view=me"
     private const val MESSAGE_MAIL_PAGE_URL = "${BASE_URL}home.php?mod=space&do=pm"
+    private const val MESSAGE_MAIL_PRIVATE_PAGE_URL = "${BASE_URL}home.php?mod=space&do=pm&subop=view&touid=%s#last"
     private const val MESSAGE_REPLY_PAGE_URL = "${BASE_URL}home.php?mod=space&do=notice&view=mypost"
     private const val LOGIN_FORM_URL = "${BASE_URL}member.php"
     private const val LOGIN_REQUEST_URL = "$LOGIN_FORM_URL?mod=logging&action=login&loginsubmit=yes&handlekey=login&loginhash=%s&inajax=1"
@@ -37,6 +38,9 @@ object UrlUtils {
 
     @JvmStatic
     fun getMessageMailPageUrl() = MESSAGE_MAIL_PAGE_URL
+
+    @JvmStatic
+    fun getMessageMailPrivatePageUrl(uid: String) = MESSAGE_MAIL_PRIVATE_PAGE_URL.format(uid)
 
     @JvmStatic
     fun getMessageReplyPageUrl() = MESSAGE_REPLY_PAGE_URL

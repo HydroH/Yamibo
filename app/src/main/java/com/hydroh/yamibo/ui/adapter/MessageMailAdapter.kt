@@ -4,9 +4,12 @@ import com.bumptech.glide.Glide
 import com.chad.library.adapter.base.BaseViewHolder
 import com.chad.library.adapter.base.entity.MultiItemEntity
 import com.hydroh.yamibo.R
+import com.hydroh.yamibo.common.Constants
 import com.hydroh.yamibo.model.MessageMail
+import com.hydroh.yamibo.ui.PrivateMessageActivity
 import com.hydroh.yamibo.ui.common.AbsMultiAdapter
 import com.hydroh.yamibo.ui.common.ItemType.TYPE_MESSAGE_MAIL
+import org.jetbrains.anko.startActivity
 
 class MessageMailAdapter(data: List<MultiItemEntity>) : AbsMultiAdapter(data) {
 
@@ -26,7 +29,12 @@ class MessageMailAdapter(data: List<MultiItemEntity>) : AbsMultiAdapter(data) {
                 }
 
                 holder.itemView.setOnClickListener {
-                    TODO("Mail Activity")
+                    (mData[holder.adapterPosition] as MessageMail).run {
+                        mContext.startActivity<PrivateMessageActivity>(
+                                Constants.ARG_INTENT_UID to authorUid,
+                                Constants.ARG_INTENT_USERNAME to author
+                        )
+                    }
                 }
             }
         }
