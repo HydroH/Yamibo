@@ -50,6 +50,8 @@ class PostActivity : AbsRefreshActivity() {
     private var mPageJumpUrl: String? = null
     private var mPageCount: Int = 1
     private var mCurrentPage: Int = 1
+    private var mAuthorOnlyUrl: String? = null
+    private var mPageOrigUrl: String? = null
     private var mReplyUrl: String? = null
     private var mFormHash: String? = null
 
@@ -86,6 +88,7 @@ class PostActivity : AbsRefreshActivity() {
                 }
             }
         }
+        mPageOrigUrl = mPageUrl
         Log.d(TAG, "onCreate: URL: $mPageUrl")
 
         try {
@@ -156,11 +159,15 @@ class PostActivity : AbsRefreshActivity() {
                     }.show()
                 }
             }
+            R.id.menu_author_only -> {
+                mPageUrl = (if (mPageUrl == mAuthorOnlyUrl) mPageOrigUrl else mAuthorOnlyUrl) ?: ""
+                loadPosts(hint_text, updateHistory = false)
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun loadPosts(view: View, updateHistory: Boolean = false) {
+    private fun loadPosts(view: View, updateHistory: Boolean = true) {
         Log.d(TAG, "refreshNetwork: URL: $mPageUrl")
 
         if (view.id == R.id.hint_text) {
@@ -186,6 +193,7 @@ class PostActivity : AbsRefreshActivity() {
                 mPageJumpUrl = postParser.pageJumpUrl
                 mPageCount = postParser.pageCount
                 mCurrentPage = postParser.currentPage
+                mAuthorOnlyUrl = postParser.authorOnlyUrl
 
                 mReplyUrl = postParser.replyUrl
                 mFormHash = postParser.formhash
@@ -296,7 +304,7 @@ class PostActivity : AbsRefreshActivity() {
             override fun onError(e: Exception) {
                 e.printStackTrace()
                 runOnUiThread {
-                    (list_common.adapter as PostAdapter).clear()
+                    (list_common.adapter as PostAdapter?)?.clear()
                     setRefreshState(RefreshState.ERROR)
                 }
             }

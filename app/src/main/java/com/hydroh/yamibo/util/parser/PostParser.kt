@@ -24,6 +24,8 @@ class PostParser {
         private set
     var currentPage: Int = 1
         private set
+    var authorOnlyUrl: String ? = null
+        private set
     var replyUrl: String? = null
         private set
     var sector: String? = null
@@ -58,6 +60,7 @@ class PostParser {
         document.select("dl.tattl.attm dd p.mbn").remove()
 
         val elements = document.select("div#postlist > div[id^='post_']")
+        authorOnlyUrl = elements.first().select("td.plc div.pti div.authi a").first().attr("href")
         elements.forEach {
             val elemAuthor = it.select("div.pls.favatar div.authi a.xw1").first()
             val author = elemAuthor.ownText()
