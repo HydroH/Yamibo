@@ -48,12 +48,13 @@ object WebRequest {
                         .header("User-Agent", ua)
                         .cookies(cookies)
                         .execute()
+                val doc = response.parse()
 
                 cookies.putAll(response.cookies())
                 cookies.values.removeAll(Collections.singleton("deleted"))
                 PrefUtils.setCookiePreference(context, cookies)
 
-                listener?.onFinish(response.parse())
+                listener?.onFinish(doc)
             } catch (e: Exception) {
                 listener?.onError(e)
             }
@@ -80,7 +81,7 @@ object WebRequest {
                 cookies.putAll(response.cookies())
                 Log.d(TAG, "run: Cookies: Before login: $cookies")
 
-                val doc = response.parse()
+                var doc = response.parse()
                 val rawHtml = doc.html()
                 var index = rawHtml.indexOf("name=\"formhash\"")
                 val formHash = rawHtml.substring(index + 23, index + 31)
@@ -104,18 +105,18 @@ object WebRequest {
                         .cookies(cookies)
                         .timeout(8000)
                         .execute()
+                doc = response.parse()
 
-                Log.d(TAG, "run: " + response.parse().outerHtml())
+                Log.d(TAG, "run: " + doc.outerHtml())
                 cookies.putAll(response.cookies())
                 cookies.values.removeAll(Collections.singleton("deleted"))
                 PrefUtils.setCookiePreference(context, cookies)
 
-                if (!response.parse().outerHtml().contains("欢迎")) {
-                    val docRes = response.parse()
-                    val message = docRes.select("p").first()?.text() ?: docRes.text().removeScripts()
+                if (!doc.outerHtml().contains("欢迎")) {
+                    val message = doc.select("p").first()?.text() ?: doc.text().removeScripts()
                     throw LoginException(message)
                 }
-                listener?.onFinish(response.parse())
+                listener?.onFinish(doc)
             } catch (e: Exception) {
                 listener?.onError(e)
             }
@@ -141,12 +142,13 @@ object WebRequest {
                         .cookies(cookies)
                         .timeout(8000)
                         .execute()
+                val doc = response.parse()
 
                 cookies.putAll(response.cookies())
                 cookies.values.removeAll(Collections.singleton("deleted"))
                 PrefUtils.setCookiePreference(context, cookies)
 
-                listener?.onFinish(response.parse())
+                listener?.onFinish(doc)
             } catch (e: Exception) {
                 listener?.onError(e)
             }
@@ -174,13 +176,14 @@ object WebRequest {
                         .cookies(cookies)
                         .timeout(8000)
                         .execute()
+                val doc = response.parse()
 
                 cookies.putAll(response.cookies())
                 cookies.values.removeAll(Collections.singleton("deleted"))
                 PrefUtils.setCookiePreference(context, cookies)
-                
-                Log.d(TAG, "postReply: ${response.parse().outerHtml()}")
-                listener?.onFinish(response.parse())
+
+                Log.d(TAG, "postReply: ${doc.outerHtml()}")
+                listener?.onFinish(doc)
             } catch (e: Exception) {
                 listener?.onError(e)
             }

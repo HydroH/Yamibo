@@ -40,7 +40,7 @@
 
 #记录生成的日志数据,gradle build时在本项目根目录输出
 #apk 包内所有 class 的内部结构
--dump class_files.txt
+#-dump class_files.txt
 
 #未混淆的类和成员
 -printseeds seeds.txt

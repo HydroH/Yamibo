@@ -1,6 +1,6 @@
 {
-    "build": 1,
-    "version": "1.0.0",
-    "description": "首次发布。",
+    "build": 3,
+    "version": "1.1.1",
+    "description": "    修复登录、发贴出错等问题。",
     "url": "https://yamibo-android.firebaseapp.com/download.html"
 }
